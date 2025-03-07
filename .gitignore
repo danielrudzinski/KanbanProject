@@ -31,3 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
+hs_err_pid14848.log
