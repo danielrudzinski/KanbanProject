@@ -508,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     wipLimitElement.textContent = `Limit: ${limit} (przekroczony!)`;
                 } else {
                     column.classList.remove('over-limit');
-                    wipLimitElement.                    wipLimitElement.classList.remove('exceeded');
+                    wipLimitElement.classList.remove('exceeded');
                     wipLimitElement.textContent = `Limit: ${limit}`;
                 }
             }
