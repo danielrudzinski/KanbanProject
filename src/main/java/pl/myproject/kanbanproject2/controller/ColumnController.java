@@ -32,5 +32,11 @@ public class ColumnController {
     public ResponseEntity<Column> patchColumn( @RequestBody Column column ,@PathVariable Integer id) {
         return columnService.patchColumn(column, id);
     }
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Integer id){
+
+        return columnService.deleteColumn(id);
+    }
+
 
 }

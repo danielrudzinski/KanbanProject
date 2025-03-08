@@ -50,4 +50,13 @@ public class ColumnService {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+    public ResponseEntity<Void>deleteColumn(@PathVariable Integer id ){
+        if(!columnRepository.existsById(id)){
+            return ResponseEntity.notFound().build();
+        }
+
+        columnRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+
+    }
 }

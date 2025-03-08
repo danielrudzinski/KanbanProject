@@ -17,7 +17,7 @@ public class Column {
     private String name;
     @jakarta.persistence.Column(name = "wip_limit")
     private Integer wipLimit;
-    @OneToMany(mappedBy = "column")
+    @OneToMany(mappedBy = "column",cascade = CascadeType.ALL)
 
     List<Task> tasks;
 

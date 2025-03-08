@@ -11,53 +11,25 @@
 
 <div class="controls">
   <div class="main-controls">
-    <input type="text" id="taskInput" placeholder="Dodaj nowe zadanie...">
+    <input type="text" id="taskInput" placeholder="Wpisz nazwę zadania...">
     <button id="addTaskBtn">Dodaj</button>
   </div>
+
   <div class="wip-control">
     <label for="wipLimit">Limit zadań "In Progress":</label>
-    <input type="number" id="wipLimit" min="1" max="10" value="3">
+    <input type="number" id="wipLimit" min="0" value="3">
     <button id="updateWipBtn">Aktualizuj limit</button>
+  </div>
+
+  <div class="column-control">
+    <input type="text" id="columnInput" placeholder="Nazwa nowej kolumny">
+    <input type="number" id="columnWipLimit" min="0" value="0" placeholder="Limit WIP">
+    <button id="addColumnBtn">Dodaj kolumnę</button>
   </div>
 </div>
 
 <div class="board">
-  <div class="column" data-column="requested">
-    <div class="column-header">
-      <div class="header-top">
-        Requested <span class="task-count">0</span>
-      </div>
-    </div>
-    <div class="task-list"></div>
-  </div>
-
-  <div class="column" data-column="in-progress">
-    <div class="column-header">
-      <div class="header-top">
-        In Progress <span class="task-count">0</span>
-      </div>
-      <span class="wip-limit">Limit: 3</span>
-    </div>
-    <div class="task-list"></div>
-  </div>
-
-  <div class="column" data-column="done">
-    <div class="column-header">
-      <div class="header-top">
-        Done <span class="task-count">0</span>
-      </div>
-    </div>
-    <div class="task-list"></div>
-  </div>
-
-  <div class="column" data-column="expedite">
-    <div class="column-header">
-      <div class="header-top">
-        Expediete <span class="task-count">0</span>
-      </div>
-    </div>
-    <div class="task-list"></div>
-  </div>
+  <!-- Kolumny będą generowane dynamicznie przez JavaScript -->
 </div>
 
 <script src="scripts.js"></script>

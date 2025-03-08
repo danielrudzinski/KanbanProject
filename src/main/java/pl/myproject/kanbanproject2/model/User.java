@@ -23,6 +23,19 @@ public class User {
         this.name = name;
         this.email = email;
     }
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    // Dodaj gettery i settery dla team
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
 
     public Integer getId() {
         return id;

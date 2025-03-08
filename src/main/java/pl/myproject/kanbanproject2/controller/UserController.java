@@ -40,4 +40,9 @@ public class UserController {
     public ResponseEntity<User> patchUser(@PathVariable Integer id, @RequestBody User user){
         return userService.patchUser(id, user);
     }
+    @PatchMapping("/{userId}/team/{teamId}")
+    public ResponseEntity<User> assignUserToTeam(@PathVariable Integer userId, @PathVariable Integer teamId) {
+        return userService.assignUserToTeam(userId, teamId);
+    }
+
 }

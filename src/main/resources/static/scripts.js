@@ -2,12 +2,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Pobierz elementy DOM
     const taskInput = document.getElementById('taskInput');
     const addTaskBtn = document.getElementById('addTaskBtn');
-    const columns = document.querySelectorAll('.column');
+    const board = document.querySelector('.board');
     const wipLimitInput = document.getElementById('wipLimit');
     const updateWipBtn = document.getElementById('updateWipBtn');
+    const columnInput = document.getElementById('columnInput');
+    const columnWipLimitInput = document.getElementById('columnWipLimit');
+    const addColumnBtn = document.getElementById('addColumnBtn');
 
     // Mapowanie identyfikatorów kolumn na ID z backendu
     let columnMap = {};
+
+    // Przechowuje dane kolumny "requested" do dodawania nowych zadań
+    let requestedColumnId = null;
 
     // Pobierz dane z backendu przy starcie
     loadDataFromBackend();
@@ -20,8 +26,179 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Aktualizacja limitu WIP
-    updateWipBtn.addEventListener('click', updateWipLimit);
+    // Aktualizacja limitu WIP dla kolumny "In Progress"
+    updateWipBtn.addEventListener('click', function() {
+        const inProgressColumnId = columnMap['in-progress'];
+        if (inProgressColumnId) {
+            updateWipLimit(inProgressColumnId, parseInt(wipLimitInput.value));
+        }
+    });
+
+    // Dodaj nową kolumnę
+    addColumnBtn.addEventListener('click', addColumn);
+    columnInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            addColumn();
+        }
+    });
+
+    // Funkcja do dynamicznego tworzenia kolumny
+    function createColumnElement(columnData) {
+        const columnId = columnData.id;
+        const columnName = columnData.name;
+        const wipLimit = columnData.wipLimit || 0;
+
+        // Utwórz identyfikator dla frontendu
+        const columnKey = columnName.toLowerCase().replace(/\s+/g, '-');
+
+        // Zapisz mapowanie
+        columnMap[columnKey] = columnId;
+
+        // Jeśli to kolumna "Requested", zapisz jej ID do globalnej zmiennej
+        if (columnName === 'Requested') {
+            requestedColumnId = columnId;
+        }
+
+        // Jeśli to kolumna "In Progress", zaktualizuj wartość w polu input
+        if (columnName === 'In Progress') {
+            wipLimitInput.value = wipLimit;
+        }
+
+        // Utwórz element kolumny
+        const column = document.createElement('div');
+        column.className = 'column';
+        column.dataset.column = columnKey;
+        column.dataset.columnId = columnId;
+
+        const columnHeader = document.createElement('div');
+        columnHeader.className = 'column-header';
+
+        const headerTop = document.createElement('div');
+        headerTop.className = 'header-top';
+
+        // Dodaj licznik zadań
+        const taskCount = document.createElement('span');
+        taskCount.className = 'task-count';
+        taskCount.textContent = '0';
+
+        headerTop.innerHTML = `${columnName} `;
+        headerTop.appendChild(taskCount);
+
+        // Dodaj przycisk usuwania kolumny
+        const deleteColumnBtn = document.createElement('button');
+        deleteColumnBtn.className = 'delete-column-btn';
+        deleteColumnBtn.innerHTML = '×';
+        deleteColumnBtn.title = 'Usuń kolumnę';
+        deleteColumnBtn.addEventListener('click', function() {
+            deleteColumn(columnId, column);
+        });
+
+        columnHeader.appendChild(headerTop);
+        columnHeader.appendChild(deleteColumnBtn);
+
+        // Dodaj element limitu WIP, jeśli kolumna ma limit
+        if (wipLimit > 0) {
+            const wipLimitElement = document.createElement('span');
+            wipLimitElement.className = 'wip-limit';
+            wipLimitElement.textContent = `Limit: ${wipLimit}`;
+            columnHeader.appendChild(wipLimitElement);
+        }
+
+        const taskList = document.createElement('div');
+        taskList.className = 'task-list';
+
+        column.appendChild(columnHeader);
+        column.appendChild(taskList);
+
+        // Dodaj obsługę przeciągania
+        column.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            const draggingTask = document.querySelector('.dragging');
+            if (!draggingTask) return;
+
+            const taskList = this.querySelector('.task-list');
+            const afterElement = getDragAfterElement(taskList, e.clientY);
+
+            if (afterElement) {
+                taskList.insertBefore(draggingTask, afterElement);
+            } else {
+                taskList.appendChild(draggingTask);
+            }
+        });
+
+        return column;
+    }
+
+    // Funkcja usuwania kolumny
+    function deleteColumn(columnId, columnElement) {
+        if (confirm('Czy na pewno chcesz usunąć tę kolumnę?')) {
+            // Pobierz wszystkie zadania z kolumny
+            const tasks = columnElement.querySelectorAll('.task');
+            const firstColumn = document.querySelector('.column:first-child');
+
+            // Jeśli to jedyna kolumna, wyświetl komunikat
+            if (document.querySelectorAll('.column').length <= 1) {
+                alert('Nie można usunąć ostatniej kolumny.');
+                return;
+            }
+
+            // Wyślij żądanie usunięcia kolumny do backendu
+            fetch(`/columns/${columnId}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok || response.status === 404) {
+                        // Przenieś zadania do pierwszej kolumny (lub innej dostępnej)
+                        if (tasks.length > 0 && firstColumn && firstColumn !== columnElement) {
+                            const targetTaskList = firstColumn.querySelector('.task-list');
+                            tasks.forEach(task => {
+                                // Zaktualizuj zadanie w backendzie
+                                const taskId = task.dataset.taskId;
+                                const targetColumnId = firstColumn.dataset.columnId;
+
+                                fetch(`/tasks/${taskId}`, {
+                                    method: 'PATCH',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        column: {
+                                            id: targetColumnId
+                                        }
+                                    })
+                                });
+
+                                targetTaskList.appendChild(task);
+                            });
+                        }
+
+                        // Usuń kolumnę z UI
+                        columnElement.remove();
+
+                        // Usuń mapowanie kolumny
+                        for (const [key, value] of Object.entries(columnMap)) {
+                            if (value === columnId) {
+                                delete columnMap[key];
+                                break;
+                            }
+                        }
+
+                        // Jeśli usunięto kolumnę "Requested", zresetuj jej ID
+                        if (columnId === requestedColumnId) {
+                            requestedColumnId = null;
+                        }
+
+                        updateTaskCounts();
+                        checkWipLimits();
+                    } else {
+                        console.error('Błąd podczas usuwania kolumny');
+                    }
+                })
+                .catch(error => {
+                    console.error('Błąd:', error);
+                });
+        }
+    }
 
     // Funkcja ładująca dane z backendu
     function loadDataFromBackend() {
@@ -29,52 +206,42 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/columns')
             .then(response => response.json())
             .then(columns => {
-                // Zapisz mapowanie kolumn
-                mapColumnsToFrontend(columns);
+                // Wyczyść planszę
+                board.innerHTML = '';
+                // Wyczyść mapowanie kolumn
+                columnMap = {};
 
-                // Wyczyść istniejące zadania
-                document.querySelectorAll('.task-list').forEach(list => {
-                    list.innerHTML = '';
+                // Sortuj kolumny (Requested, In Progress, Done, pozostałe)
+                columns.sort((a, b) => {
+                    const order = {
+                        'Requested': 0,
+                        'In Progress': 1,
+                        'Done': 2,
+                        'Expedite': 3 // Expedite na początku
+                    };
+                    const orderA = order[a.name] !== undefined ? order[a.name] : 99;
+                    const orderB = order[b.name] !== undefined ? order[b.name] : 99;
+                    return orderA - orderB;
                 });
 
-                // Dodaj zadania z backendu do odpowiednich kolumn
+                // Utwórz i dodaj kolumny do planszy
+                columns.forEach(column => {
+                    const columnElement = createColumnElement(column);
+                    board.appendChild(columnElement);
+                });
+
+                // Pobierz zadania
                 return fetch('/tasks');
             })
             .then(response => response.json())
             .then(tasks => {
                 addTasksFromBackend(tasks);
                 updateTaskCounts();
-                checkWipLimit();
+                checkWipLimits();
             })
             .catch(error => {
                 console.error('Błąd podczas ładowania danych:', error);
             });
-    }
-
-    // Funkcja mapująca kolumny z backendu do frontendu
-    function mapColumnsToFrontend(backendColumns) {
-        // Domyślne mapowanie (możesz dostosować według swoich potrzeb)
-        const defaultMapping = {
-            'requested': 'Requested',
-            'in-progress': 'In Progress',
-            'done': 'Done',
-            'expedite': 'Expedite'
-        };
-
-        backendColumns.forEach(column => {
-            for (const [frontendId, expectedName] of Object.entries(defaultMapping)) {
-                if (column.name === expectedName) {
-                    columnMap[frontendId] = column.id;
-
-                    // Aktualizuj limit WIP jeśli to kolumna "In Progress"
-                    if (frontendId === 'in-progress' && column.wipLimit) {
-                        const wipLimitElement = document.querySelector('.column[data-column="in-progress"] .wip-limit');
-                        wipLimitInput.value = column.wipLimit;
-                        wipLimitElement.textContent = `Limit: ${column.wipLimit}`;
-                    }
-                }
-            }
-        });
     }
 
     // Funkcja dodająca zadania z backendu
@@ -84,8 +251,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const columnId = getColumnKeyById(task.columnId);
             if (columnId) {
                 const columnElement = document.querySelector(`.column[data-column="${columnId}"] .task-list`);
-                const taskElement = createTaskElement(task.title, task.id);
-                columnElement.appendChild(taskElement);
+                if (columnElement) {
+                    const taskElement = createTaskElement(task.title, task.id);
+                    columnElement.appendChild(taskElement);
+                }
             }
         });
     }
@@ -100,36 +269,85 @@ document.addEventListener('DOMContentLoaded', function() {
         return null;
     }
 
-    function updateWipLimit() {
-        const newLimit = parseInt(wipLimitInput.value);
-        if (newLimit && newLimit > 0) {
-            // Aktualizuj tekst limitu w UI
-            const wipLimitElement = document.querySelector('.column[data-column="in-progress"] .wip-limit');
-            wipLimitElement.textContent = `Limit: ${newLimit}`;
-
-            // Zaktualizuj limit w backendzie
-            const inProgressColumnId = columnMap['in-progress'];
-            if (inProgressColumnId) {
-                fetch(`/columns/${inProgressColumnId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        wipLimit: newLimit
-                    })
+    // Funkcja aktualizująca limit WIP dla dowolnej kolumny
+    function updateWipLimit(columnId, newLimit) {
+        if (newLimit && newLimit >= 0) {
+            // Wyślij aktualizację do backendu
+            fetch(`/columns/${columnId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    wipLimit: newLimit
                 })
-                    .then(response => {
-                        if (!response.ok) {
-                            console.error('Błąd podczas aktualizacji limitu WIP');
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Błąd podczas aktualizacji limitu WIP');
+                    }
+
+                    // Zaktualizuj UI
+                    const columnKey = getColumnKeyById(columnId);
+                    if (columnKey) {
+                        const column = document.querySelector(`.column[data-column="${columnKey}"]`);
+                        let wipLimitElement = column.querySelector('.wip-limit');
+                        if (!wipLimitElement && newLimit > 0) {
+                            // Utwórz element limitu jeśli nie istnieje
+                            wipLimitElement = document.createElement('span');
+                            wipLimitElement.className = 'wip-limit';
+                            column.querySelector('.column-header').appendChild(wipLimitElement);
                         }
-                        checkWipLimit();
-                    })
-                    .catch(error => {
-                        console.error('Błąd:', error);
-                    });
-            }
+
+                        if (wipLimitElement) {
+                            if (newLimit > 0) {
+                                wipLimitElement.textContent = `Limit: ${newLimit}`;
+                            } else {
+                                // Usuń element limitu jeśli limit ustawiono na 0
+                                wipLimitElement.remove();
+                            }
+                        }
+
+                        checkWipLimits();
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         }
+    }
+
+    // Funkcja dodająca nową kolumnę
+    function addColumn() {
+        const columnName = columnInput.value.trim();
+        const wipLimit = parseInt(columnWipLimitInput.value) || 0;
+        if (columnName === '') return;
+
+        // Wyślij żądanie dodania kolumny do backendu
+        fetch('/columns', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: columnName,
+                wipLimit: wipLimit
+            })
+        })
+            .then(response => response.json())
+            .then(newColumn => {
+                // Utwórz element kolumny i dodaj do planszy
+                const columnElement = createColumnElement(newColumn);
+                board.appendChild(columnElement);
+                // Wyczyść pola wprowadzania
+                columnInput.value = '';
+                columnWipLimitInput.value = '0';
+                updateTaskCounts();
+                checkWipLimits();
+            })
+            .catch(error => {
+                console.error('Błąd podczas dodawania kolumny:', error);
+            });
     }
 
     // Funkcja dodająca nowe zadanie
@@ -137,9 +355,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const taskText = taskInput.value.trim();
         if (taskText === '') return;
 
-        // Dodaj zadanie do backendu
-        const requestedColumnId = columnMap['requested'];
+        // Jeśli nie ma kolumny "Requested", wyświetl komunikat
+        if (!requestedColumnId) {
+            alert('Brak kolumny "Requested". Dodaj najpierw tę kolumnę.');
+            return;
+        }
 
+        // Dodaj zadanie do backendu
         fetch('/tasks', {
             method: 'POST',
             headers: {
@@ -157,14 +379,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const taskElement = createTaskElement(savedTask.title, savedTask.id);
                 const firstColumn = document.querySelector('.column[data-column="requested"] .task-list');
                 firstColumn.appendChild(taskElement);
-
                 // Wyczyść pole wprowadzania
                 taskInput.value = '';
                 taskInput.focus();
-
                 // Zaktualizuj liczniki zadań i sprawdź limity
                 updateTaskCounts();
-                checkWipLimit();
+                checkWipLimits();
             })
             .catch(error => {
                 console.error('Błąd podczas dodawania zadania:', error);
@@ -177,15 +397,14 @@ document.addEventListener('DOMContentLoaded', function() {
         task.className = 'task';
         task.draggable = true;
         task.textContent = text;
-        task.dataset.taskId = taskId; // Zapisz ID zadania z backendu jako atrybut
+        task.dataset.taskId = taskId;
 
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-btn';
-        deleteBtn.innerHTML = '&times;';
+        deleteBtn.innerHTML = '×';
         deleteBtn.title = 'Usuń zadanie';
         deleteBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-
             // Usuń zadanie z backendu
             fetch(`/tasks/${taskId}`, {
                 method: 'DELETE'
@@ -195,11 +414,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Animacja usuwania
                         task.style.opacity = '0';
                         task.style.transform = 'translateX(10px)';
-
                         setTimeout(() => {
                             task.remove();
                             updateTaskCounts();
-                            checkWipLimit();
+                            checkWipLimits();
                         }, 200);
                     } else {
                         console.error('Błąd podczas usuwania zadania');
@@ -219,13 +437,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         task.addEventListener('dragend', function() {
             this.classList.remove('dragging');
-
             // Pobierz nową kolumnę i zaktualizuj w backendzie
             const newColumn = this.closest('.column');
             if (newColumn) {
-                const columnType = newColumn.dataset.column;
-                const backendColumnId = columnMap[columnType];
-
+                const columnId = newColumn.dataset.columnId;
                 // Aktualizuj zadanie w backendzie
                 fetch(`/tasks/${this.dataset.taskId}`, {
                     method: 'PATCH',
@@ -234,17 +449,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     body: JSON.stringify({
                         column: {
-                            id: backendColumnId
+                            id: columnId
                         }
                     })
                 })
                     .then(response => {
                         if (!response.ok) {
                             console.error('Błąd podczas aktualizacji zadania');
-                            // Możesz tutaj dodać logikę przywracania zadania do poprzedniej kolumny w przypadku błędu
                         }
                         updateTaskCounts();
-                        checkWipLimit();
+                        checkWipLimits();
                     })
                     .catch(error => {
                         console.error('Błąd:', error);
@@ -255,32 +469,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return task;
     }
 
-    // Obsługa przeciągania nad kolumnami
-    columns.forEach(column => {
-        const taskList = column.querySelector('.task-list');
-
-        column.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            const draggingTask = document.querySelector('.dragging');
-            if (!draggingTask) return;
-
-            const afterElement = getDragAfterElement(taskList, e.clientY);
-            if (afterElement) {
-                taskList.insertBefore(draggingTask, afterElement);
-            } else {
-                taskList.appendChild(draggingTask);
-            }
-        });
-    });
-
     // Funkcja określająca, gdzie wstawić przeciągane zadanie
     function getDragAfterElement(container, y) {
         const draggableElements = [...container.querySelectorAll('.task:not(.dragging)')];
-
         return draggableElements.reduce((closest, child) => {
             const box = child.getBoundingClientRect();
             const offset = y - box.top - box.height / 2;
-
             if (offset < 0 && offset > closest.offset) {
                 return { offset: offset, element: child };
             } else {
@@ -291,27 +485,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Funkcja aktualizująca liczniki zadań
     function updateTaskCounts() {
-        columns.forEach(column => {
+        document.querySelectorAll('.column').forEach(column => {
             const count = column.querySelectorAll('.task').length;
-            column.querySelector('.task-count').textContent = count;
+            const taskCountElement = column.querySelector('.header-top .task-count');
+            if (taskCountElement) {
+                taskCountElement.textContent = count;
+            }
         });
     }
 
-    // Funkcja sprawdzająca limit WIP
-    function checkWipLimit() {
-        const inProgressColumn = document.querySelector('.column[data-column="in-progress"]');
-        const inProgressCount = inProgressColumn.querySelectorAll('.task').length;
-        const wipLimitElement = inProgressColumn.querySelector('.wip-limit');
-        const WIP_LIMIT = parseInt(wipLimitInput.value);
-
-        if (inProgressCount > WIP_LIMIT) {
-            inProgressColumn.classList.add('over-limit');
-            wipLimitElement.classList.add('exceeded');
-            wipLimitElement.textContent = `Limit: ${WIP_LIMIT} (przekroczony!)`;
-        } else {
-            inProgressColumn.classList.remove('over-limit');
-            wipLimitElement.classList.remove('exceeded');
-            wipLimitElement.textContent = `Limit: ${WIP_LIMIT}`;
-        }
+    // Funkcja sprawdzająca limity WIP dla wszystkich kolumn
+    function checkWipLimits() {
+        document.querySelectorAll('.column').forEach(column => {
+            const wipLimitElement = column.querySelector('.wip-limit');
+            if (wipLimitElement) {
+                const taskCount = column.querySelectorAll('.task').length;
+                const limitText = wipLimitElement.textContent;
+                const limit = parseInt(limitText.replace('Limit: ', ''));
+                if (taskCount > limit) {
+                    column.classList.add('over-limit');
+                    wipLimitElement.classList.add('exceeded');
+                    wipLimitElement.textContent = `Limit: ${limit} (przekroczony!)`;
+                } else {
+                    column.classList.remove('over-limit');
+                    wipLimitElement.                    wipLimitElement.classList.remove('exceeded');
+                    wipLimitElement.textContent = `Limit: ${limit}`;
+                }
+            }
+        });
     }
 });
+

@@ -208,6 +208,7 @@ button:active {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 
 .header-top {
@@ -221,6 +222,40 @@ button:active {
 .task-list {
   min-height: 430px;
   flex-grow: 1;
+}
+
+.task-team {
+  font-size: 12px;
+  color: var(--orange-primary);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--gray-dark);
+}
+
+.team-indicator {
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--gray-dark);
+}
+
+.team-color-mark {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.team-name {
+  font-size: 12px;
+  color: var(--gray-light);
+}
+
+/* Dodaj efekt hover dla lepszej widoczności */
+.task:hover .team-name {
+  color: var(--white);
 }
 
 .task {
@@ -281,38 +316,6 @@ button:active {
   cursor: grabbing;
 }
 
-.column[data-column="requested"] .task {
-  border-left-color: var(--orange-muted);
-}
-
-.column[data-column="in-progress"] .task {
-  border-left-color: var(--orange-primary);
-}
-
-.column[data-column="done"] .task {
-  border-left-color: var(--orange-light);
-}
-
-.column[data-column="expedite"] .task {
-  border-left-color: var(--orange-dark);
-}
-
-.column[data-column="requested"] .column-header {
-  color: var(--orange-muted);
-}
-
-.column[data-column="in-progress"] .column-header {
-  color: var(--orange-primary);
-}
-
-.column[data-column="done"] .column-header {
-  color: var(--orange-light);
-}
-
-.column[data-column="expedite"] .column-header {
-  color: var(--orange-dark);
-}
-
 .task-count {
   display: inline-block;
   background: var(--black-dark);
@@ -342,6 +345,75 @@ button:active {
   font-weight: 600;
 }
 
+.column-control {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  padding: 15px;
+  background: var(--black-medium);
+  border-radius: 12px;
+  border: 1px solid var(--gray-dark);
+  gap: 15px;
+}
+
+.column-control input {
+  padding: 10px 15px;
+}
+
+.column-control input#columnInput {
+  flex-grow: 2;
+}
+
+.column-control input#columnWipLimit {
+  width: 80px;
+  text-align: center;
+}
+
+.delete-column-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--orange-dark);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(228, 92, 0, 0.3);
+  padding: 0;
+}
+
+.column-header:hover .delete-column-btn {
+  opacity: 1;
+}
+
+.delete-column-btn:hover {
+  background: var(--orange-primary);
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(255, 122, 0, 0.4);
+}
+
+/* Style dla sekcji zarządzania */
+.management-section,
+.management-controls,
+.add-section,
+.remove-section,
+.items-list,
+.item-card,
+.team-indicator,
+.team-color-mark,
+.team-name,
+.task-team {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .board {
     flex-direction: column;
@@ -368,6 +440,10 @@ button:active {
 
   body {
     padding: 20px 15px;
+  }
+
+  .management-controls {
+    flex-direction: column;
   }
 }
 
@@ -425,4 +501,53 @@ button::after {
 
 button:hover::after {
   opacity: 1;
+}
+
+/* Add smooth transitions for columns */
+.column {
+  transition: all 0.4s ease-out;
+}
+
+/* Animation for new columns */
+@keyframes fadeInColumn {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.column:last-child {
+  animation: fadeInColumn 0.5s ease-out;
+}
+
+/* Make each column dynamically colored based on its index */
+.column:nth-child(3n+1) .task {
+  border-left-color: var(--orange-muted);
+}
+
+.column:nth-child(3n+2) .task {
+  border-left-color: var(--orange-primary);
+}
+
+.column:nth-child(3n+3) .task {
+  border-left-color: var(--orange-light);
+}
+
+.column:nth-child(4n) .task {
+  border-left-color: var(--orange-dark);
+}
+
+/* Column header colors */
+.column:nth-child(3n+1) .column-header {
+  color: var(--orange-muted);
+}
+
+.column:nth-child(3n+2) .column-header {
+  color: var(--orange-primary);
+}
+
+.column:nth-child(3n+3) .column-header {
+  color: var(--orange-light);
+}
+
+.column:nth-child(4n) .column-header {
+  color: var(--orange-dark);
 }
