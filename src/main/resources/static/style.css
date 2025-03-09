@@ -339,4 +339,40 @@ button:active {
   body {
     padding: 20px 15px;
   }
+
+}
+.navigation {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  padding: 20px 0;
+}
+
+.navigation button,
+.navigation a {
+  padding: 15px 30px;
+  background: linear-gradient(135deg, var(--orange-primary), var(--orange-dark));
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 4px 20px rgba(255, 122, 0, 0.3);
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
+}
+
+.navigation button:hover,
+.navigation a:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 25px rgba(255, 122, 0, 0.4);
+  background: linear-gradient(135deg, var(--orange-light), var(--orange-primary));
+}
+
+.navigation button:active,
+.navigation a:active {
+  transform: translateY(0);
 }
