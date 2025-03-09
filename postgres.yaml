@@ -82,7 +82,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:13  # Using standard public image instead of ACR
+          image: postgres:13  
           ports:
             - containerPort: 5432
           env:
