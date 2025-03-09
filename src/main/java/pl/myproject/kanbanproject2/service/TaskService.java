@@ -46,11 +46,13 @@ public class TaskService {
         taskRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-    public ResponseEntity<Task> getTaskById(@PathVariable Integer id){
+    public ResponseEntity<TaskDTO> getTaskById(@PathVariable Integer id) {
         return taskRepository.findById(id)
+                .map(taskMapper)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
     public ResponseEntity<Task> patchTask(@PathVariable Integer id, @RequestBody Task task) {
         return taskRepository.findById(id)
                 .map(existingTask -> {

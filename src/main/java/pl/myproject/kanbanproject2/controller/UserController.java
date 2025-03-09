@@ -3,8 +3,11 @@ package pl.myproject.kanbanproject2.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.myproject.kanbanproject2.dto.UserDTO;
 import pl.myproject.kanbanproject2.model.User;
 import pl.myproject.kanbanproject2.service.UserService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -16,11 +19,11 @@ public class UserController {
         this.userService = userService;
     }
     @GetMapping()
-    public ResponseEntity<Iterable<User>> getAllUsers(){
+    public ResponseEntity<List<UserDTO>> getAllUsers(){
         return userService.getAllUsers();
     }
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Integer id){
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Integer id){
         return userService.getUserById(id);
     }
 
