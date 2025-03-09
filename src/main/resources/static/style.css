@@ -376,3 +376,69 @@ button:active {
 .navigation a:active {
   transform: translateY(0);
 }
+.task-details-panel {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  padding: 15px;
+  min-width: 250px;
+  z-index: 9999;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.panel-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.close-panel-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #888;
+}
+
+.close-panel-btn:hover {
+  color: #333;
+}
+
+.user-section {
+  margin-top: 10px;
+}
+
+.user-section label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.user-section select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.user-section button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.user-section button:hover {
+  background-color: #45a049;
+}
+

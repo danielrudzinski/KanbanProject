@@ -20,14 +20,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Dodaj nowe zadanie
     addTaskBtn.addEventListener('click', addTask);
-    taskInput.addEventListener('keypress', function(e) {
+    taskInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             addTask();
         }
     });
 
     // Aktualizacja limitu WIP dla kolumny "In Progress"
-    updateWipBtn.addEventListener('click', function() {
+    updateWipBtn.addEventListener('click', function () {
         const inProgressColumnId = columnMap['in-progress'];
         if (inProgressColumnId) {
             updateWipLimit(inProgressColumnId, parseInt(wipLimitInput.value));
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Dodaj nową kolumnę
     addColumnBtn.addEventListener('click', addColumn);
-    columnInput.addEventListener('keypress', function(e) {
+    columnInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             addColumn();
         }
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteColumnBtn.className = 'delete-column-btn';
         deleteColumnBtn.innerHTML = '×';
         deleteColumnBtn.title = 'Usuń kolumnę';
-        deleteColumnBtn.addEventListener('click', function() {
+        deleteColumnBtn.addEventListener('click', function () {
             deleteColumn(columnId, column);
         });
 
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
         column.appendChild(taskList);
 
         // Dodaj obsługę przeciągania
-        column.addEventListener('dragover', function(e) {
+        column.addEventListener('dragover', function (e) {
             e.preventDefault();
             const draggingTask = document.querySelector('.dragging');
             if (!draggingTask) return;
@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteBtn.className = 'delete-btn';
         deleteBtn.innerHTML = '×';
         deleteBtn.title = 'Usuń zadanie';
-        deleteBtn.addEventListener('click', function(e) {
+        deleteBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             // Usuń zadanie z backendu
             fetch(`/tasks/${taskId}`, {
@@ -431,11 +431,11 @@ document.addEventListener('DOMContentLoaded', function() {
         task.appendChild(deleteBtn);
 
         // Dodaj obsługę przeciągania
-        task.addEventListener('dragstart', function() {
+        task.addEventListener('dragstart', function () {
             this.classList.add('dragging');
         });
 
-        task.addEventListener('dragend', function() {
+        task.addEventListener('dragend', function () {
             this.classList.remove('dragging');
             // Pobierz nową kolumnę i zaktualizuj w backendzie
             const newColumn = this.closest('.column');
@@ -476,11 +476,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const box = child.getBoundingClientRect();
             const offset = y - box.top - box.height / 2;
             if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
+                return {offset: offset, element: child};
             } else {
                 return closest;
             }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }, {offset: Number.NEGATIVE_INFINITY}).element;
     }
 
     // Funkcja aktualizująca liczniki zadań
@@ -514,5 +514,230 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-});
 
+    // Funkcja tworząca element zadania
+    function createTaskElement(text, taskId) {
+        const task = document.createElement('div');
+        task.className = 'task';
+        task.draggable = true;
+        task.textContent = text;
+        task.dataset.taskId = taskId;
+
+        // Dodaj obsługę kliknięcia w zadanie
+        task.addEventListener('click', function (e) {
+            e.stopPropagation();
+            showTaskDetails(this);
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.innerHTML = '×';
+        deleteBtn.title = 'Usuń zadanie';
+        deleteBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            // Usuń zadanie z backendu
+            fetch(`/tasks/${taskId}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok || response.status === 404) {
+                        // Animacja usuwania
+                        task.style.opacity = '0';
+                        task.style.transform = 'translateX(10px)';
+                        setTimeout(() => {
+                            task.remove();
+                            updateTaskCounts();
+                            checkWipLimits();
+                        }, 200);
+                    } else {
+                        console.error('Błąd podczas usuwania zadania');
+                    }
+                })
+                .catch(error => {
+                    console.error('Błąd:', error);
+                });
+        });
+
+        task.appendChild(deleteBtn);
+
+        // Dodaj obsługę przeciągania
+        task.addEventListener('dragstart', function () {
+            this.classList.add('dragging');
+        });
+
+        task.addEventListener('dragend', function () {
+            this.classList.remove('dragging');
+            // Pobierz nową kolumnę i zaktualizuj w backendzie
+            const newColumn = this.closest('.column');
+            if (newColumn) {
+                const columnId = newColumn.dataset.columnId;
+                // Aktualizuj zadanie w backendzie
+                fetch(`/tasks/${this.dataset.taskId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        column: {
+                            id: columnId
+                        }
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            console.error('Błąd podczas aktualizacji zadania');
+                        }
+                        updateTaskCounts();
+                        checkWipLimits();
+                    })
+                    .catch(error => {
+                        console.error('Błąd:', error);
+                    });
+            }
+        });
+
+        return task;
+    }
+
+// Funkcja wyświetlająca szczegóły zadania
+    function showTaskDetails(taskElement) {
+        // Sprawdź, czy panel szczegółów już istnieje
+        const existingPanel = document.getElementById('task-details-panel');
+
+        // Jeśli panel istnieje i należy do tego samego zadania, usuń go (toggle)
+        if (existingPanel && existingPanel.dataset.taskId === taskElement.dataset.taskId) {
+            existingPanel.remove();
+            return;
+        }
+
+        // Usuń istniejący panel, jeśli istnieje
+        if (existingPanel) {
+            existingPanel.remove();
+        }
+
+        // Utwórz nowy panel szczegółów
+        const detailsPanel = document.createElement('div');
+        detailsPanel.id = 'task-details-panel';
+        detailsPanel.className = 'task-details-panel';
+        detailsPanel.dataset.taskId = taskElement.dataset.taskId;
+
+        // Dodaj nagłówek panelu z tytułem i przyciskiem zamknięcia
+        const headerContainer = document.createElement('div');
+        headerContainer.className = 'panel-header';
+
+        // Dodaj tytuł zadania
+        const title = document.createElement('h3');
+        title.textContent = taskElement.textContent.replace('×', '').trim();
+        headerContainer.appendChild(title);
+
+        // Dodaj przycisk zamknięcia
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'close-panel-btn';
+        closeBtn.innerHTML = '×';
+        closeBtn.title = 'Zamknij panel';
+        closeBtn.addEventListener('click', function () {
+            detailsPanel.remove();
+        });
+        headerContainer.appendChild(closeBtn);
+
+        detailsPanel.appendChild(headerContainer);
+
+        // Dodaj sekcję przypisywania użytkowników
+        const userSection = document.createElement('div');
+        userSection.className = 'user-section';
+
+        const userLabel = document.createElement('label');
+        userLabel.textContent = 'Przypisz użytkownika:';
+        userSection.appendChild(userLabel);
+
+        // Dodaj dropdown z użytkownikami
+        const userSelect = document.createElement('select');
+        userSelect.id = 'user-select';
+
+        // Domyślna opcja
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Wybierz użytkownika';
+        userSelect.appendChild(defaultOption);
+
+        // Pobierz użytkowników z API
+        fetch('/users')
+            .then(response => response.json())
+            .then(users => {
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.name;
+                    userSelect.appendChild(option);
+                });
+
+                // Sprawdź, czy zadanie ma już przypisanego użytkownika
+                fetch(`/tasks/${taskElement.dataset.taskId}`)
+                    .then(response => response.json())
+                    .then(task => {
+                        if (task.user && task.user.id) {
+                            userSelect.value = task.user.id;
+                        }
+                    })
+                    .catch(error => console.error('Błąd pobierania danych zadania:', error));
+            })
+            .catch(error => console.error('Błąd pobierania użytkowników:', error));
+
+        userSection.appendChild(userSelect);
+
+        // Dodaj przycisk przypisania
+        const assignBtn = document.createElement('button');
+        assignBtn.textContent = 'Przypisz';
+        assignBtn.addEventListener('click', function () {
+            assignUserToTask(userSelect.value, taskElement.dataset.taskId);
+        });
+        userSection.appendChild(assignBtn);
+
+        detailsPanel.appendChild(userSection);
+
+        // Dodaj panel do body dokumentu
+        document.body.appendChild(detailsPanel);
+
+        // Pozycjonuj panel obok zadania
+        const taskRect = taskElement.getBoundingClientRect();
+        detailsPanel.style.position = 'absolute';
+        detailsPanel.style.top = `${taskRect.top}px`;
+        detailsPanel.style.left = `${taskRect.right + 10}px`;
+        detailsPanel.style.zIndex = '9999';
+    }
+
+// Funkcja przypisująca użytkownika do zadania
+    function assignUserToTask(userId, taskId) {
+        if (!userId) {
+            alert('Wybierz użytkownika!');
+            return;
+        }
+
+        fetch(`/tasks/${taskId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user: {
+                    id: userId
+                }
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Błąd podczas przypisywania użytkownika');
+                }
+                return response.json();
+            })
+            .then(updatedTask => {
+                alert('Użytkownik został przypisany do zadania!');
+                // Zamknij panel szczegółów
+                document.getElementById('task-details-panel').remove();
+            })
+            .catch(error => {
+                console.error('Błąd:', error);
+                alert('Wystąpił błąd podczas przypisywania użytkownika');
+            });
+    }
+})
