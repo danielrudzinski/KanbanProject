@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -17,17 +20,30 @@ public class User {
     public User() {
     }
 
-    public User(Integer id, String password, String name, String email) {
+
+
+    public User(Integer id, String password, String name, String email,List<Task> tasks) {
         this.id = id;
         this.password = password;
         this.name = name;
         this.email = email;
+        this.tasks = tasks;
     }
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
 
-    // Dodaj gettery i settery dla team
+    @OneToMany(mappedBy = "user")
+    List<Task>tasks;
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
+
     public Team getTeam() {
         return team;
     }

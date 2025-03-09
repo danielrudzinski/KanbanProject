@@ -18,13 +18,29 @@ public class Task {
     @JoinColumn(name = "column_id")
     private Column column;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
     public Task() {
     }
 
-    public Task(Integer id, Column column, String title) {
+
+    public Task(Integer id, Column column, String title, User user) {
         this.id = id;
         this.column = column;
         this.title = title;
+        this.user = user;
+    }
+
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Integer getId() {
