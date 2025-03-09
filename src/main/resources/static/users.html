@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarządzanie Użytkownikami - Kanban</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="users.css">
+</head>
+<body>
+<h1>Zarządzanie Użytkownikami</h1>
+
+<div class="controls">
+    <div class="main-controls">
+        <a href="index.html" class="back-button">Powrót do tablicy</a>
+    </div>
+</div>
+
+<div class="user-container">
+    <div class="user-form-container">
+        <h2>Dodaj nowego użytkownika</h2>
+        <form id="userForm" class="user-form">
+            <div class="form-group">
+                <label for="userName">Imię i nazwisko</label>
+                <input type="text" id="userName" required placeholder="Wprowadź imię i nazwisko">
+            </div>
+            <div class="form-group">
+                <label for="userEmail">Email</label>
+                <input type="email" id="userEmail" required placeholder="Wprowadź email">
+            </div>
+            <div class="form-group">
+                <label for="userPassword">Hasło</label>
+                <input type="password" id="userPassword" required placeholder="Wprowadź hasło">
+            </div>
+            <button type="submit" id="addUserBtn">Dodaj użytkownika</button>
+        </form>
+    </div>
+
+    <div class="user-list-container">
+        <h2>Lista użytkowników</h2>
+        <div id="userList" class="user-list">
+            <!-- Użytkownicy będą dodawani dynamicznie przez JavaScript -->
+        </div>
+    </div>
+</div>
+
+<div class="task-assignment-container">
+    <h2>Przypisywanie zadań</h2>
+    <div class="assignment-form">
+        <div class="form-group">
+            <label for="taskSelect">Wybierz zadanie</label>
+            <select id="taskSelect">
+                <option value="">-- Wybierz zadanie --</option>
+                <!-- Zadania będą dodawane dynamicznie przez JavaScript -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="userSelect">Wybierz użytkownika</label>
+            <select id="userSelect">
+                <option value="">-- Wybierz użytkownika --</option>
+                <!-- Użytkownicy będą dodawani dynamicznie przez JavaScript -->
+            </select>
+        </div>
+        <button id="assignTaskBtn">Przypisz zadanie</button>
+    </div>
+
+    <div class="assignments-list-container">
+        <h3>Aktualne przypisania</h3>
+        <div id="assignmentsList" class="assignments-list">
+            <!-- Przypisania będą dodawane dynamicznie przez JavaScript -->
+        </div>
+    </div>
+</div>
+
+<script src="users.js"></script>
+</body>
+</html>

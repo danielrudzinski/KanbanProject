@@ -1,4 +1,5 @@
 package pl.myproject.kanbanproject2.model;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,7 +30,7 @@ public class User {
         this.email = email;
         this.tasks = tasks;
     }
-
+    @JsonManagedReference
     @OneToMany(mappedBy = "user")
     List<Task>tasks;
 

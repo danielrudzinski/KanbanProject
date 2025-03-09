@@ -1,0 +1,167 @@
+.user-container {
+    display: flex;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto 40px auto;
+}
+
+@media (max-width: 768px) {
+    .user-container {
+        flex-direction: column;
+    }
+}
+
+.user-form-container, .user-list-container {
+    background: var(--black-light);
+    border-radius: 16px;
+    padding: 25px;
+    border: 1px solid var(--gray-dark);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    flex: 1;
+}
+
+.user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--orange-primary);
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.user-item {
+    background: var(--black-medium);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 5px solid var(--orange-primary);
+    animation: fadeIn 0.4s ease-out;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.user-email {
+    color: var(--gray-light);
+    font-size: 14px;
+}
+
+.user-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.task-assignment-container {
+    max-width: 1200px;
+    margin: 0 auto 40px auto;
+    background: var(--black-light);
+    border-radius: 16px;
+    padding: 25px;
+    border: 1px solid var(--gray-dark);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.assignment-form {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.assignment-form .form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.assignment-form select {
+    padding: 15px;
+    background: var(--black-medium);
+    border: 1px solid var(--gray-dark);
+    border-radius: 12px;
+    color: var(--white);
+    font-size: 16px;
+}
+
+.assignment-form select:focus {
+    outline: none;
+    border-color: var(--orange-primary);
+    box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.3);
+}
+
+.assignments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.assignment-item {
+    background: var(--black-medium);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 5px solid var(--orange-light);
+    animation: fadeIn 0.4s ease-out;
+}
+
+.assignment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.task-title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.assigned-to {
+    color: var(--gray-light);
+    font-size: 14px;
+}
+
+.back-button {
+    display: inline-block;
+    padding: 15px 30px;
+    background: linear-gradient(135deg, var(--gray-medium), var(--gray-dark));
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.back-button:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, var(--gray-light), var(--gray-medium));
+}

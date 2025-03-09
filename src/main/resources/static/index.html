@@ -11,25 +11,26 @@
 
 <div class="controls">
   <div class="main-controls">
-    <input type="text" id="taskInput" placeholder="Wpisz nazwę zadania...">
-    <button id="addTaskBtn">Dodaj</button>
+    <input type="text" id="taskInput" placeholder="Dodaj nowe zadanie...">
+    <button id="addTaskBtn">Dodaj zadanie</button>
   </div>
-
+  <div class="secondary-controls">
+    <a href="users.html" class="users-button">Zarządzanie użytkownikami</a>
+  </div>
   <div class="wip-control">
     <label for="wipLimit">Limit zadań "In Progress":</label>
-    <input type="number" id="wipLimit" min="0" value="3">
+    <input type="number" id="wipLimit" min="0" value="5">
     <button id="updateWipBtn">Aktualizuj limit</button>
   </div>
-
   <div class="column-control">
-    <input type="text" id="columnInput" placeholder="Nazwa nowej kolumny">
+    <input type="text" id="columnInput" placeholder="Nazwa kolumny">
     <input type="number" id="columnWipLimit" min="0" value="0" placeholder="Limit WIP">
     <button id="addColumnBtn">Dodaj kolumnę</button>
   </div>
 </div>
 
 <div class="board">
-  <!-- Kolumny będą generowane dynamicznie przez JavaScript -->
+  <!-- Kolumny będą dodawane dynamicznie przez JavaScript -->
 </div>
 
 <script src="scripts.js"></script>
