@@ -36,9 +36,10 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Task> patchTask(@PathVariable Integer id, @RequestBody Task task) {
+    public ResponseEntity<TaskDTO> patchTask(@PathVariable Integer id, @RequestBody Task task) {
         return taskService.patchTask(id, task);
     }
+
     @PostMapping()
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
         return taskService.addTask(task);

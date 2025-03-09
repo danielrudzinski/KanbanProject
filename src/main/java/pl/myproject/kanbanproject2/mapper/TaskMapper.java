@@ -5,6 +5,7 @@ import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.model.Task;
 
 import java.util.function.Function;
+
 @Component
 public class TaskMapper implements Function<Task, TaskDTO> {
     @Override
@@ -18,9 +19,15 @@ public class TaskMapper implements Function<Task, TaskDTO> {
             columnId = task.getColumn().getId();
         }
 
+        Integer userId = null;
+        if (task.getUser() != null) {
+            userId = task.getUser().getId();
+        }
+
         return new TaskDTO(
                 task.getId(),
                 task.getTitle(),
-                columnId);
+                columnId,
+                userId);
     }
 }

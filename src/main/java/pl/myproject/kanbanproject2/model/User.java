@@ -1,10 +1,8 @@
 package pl.myproject.kanbanproject2.model;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
@@ -20,9 +18,7 @@ public class User {
     public User() {
     }
 
-
-
-    public User(Integer id, String password, String name, String email,List<Task> tasks) {
+    public User(Integer id, String password, String name, String email, List<Task> tasks) {
         this.id = id;
         this.password = password;
         this.name = name;
@@ -31,7 +27,8 @@ public class User {
     }
 
     @OneToMany(mappedBy = "user")
-    List<Task>tasks;
+    @JsonIgnore
+    List<Task> tasks;
 
     public List<Task> getTasks() {
         return tasks;
@@ -40,7 +37,6 @@ public class User {
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
     }
-
 
     public Integer getId() {
         return id;
