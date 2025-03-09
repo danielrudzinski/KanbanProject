@@ -10,8 +10,9 @@ import org.springframework.web.util.UriComponents;
 import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.mapper.TaskMapper;
 import pl.myproject.kanbanproject2.model.Task;
+import pl.myproject.kanbanproject2.model.User;
 import pl.myproject.kanbanproject2.repository.TaskRepository;
-
+import pl.myproject.kanbanproject2.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -20,37 +21,43 @@ import java.util.stream.StreamSupport;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final UserRepository userRepository;
+
     @Autowired
-    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, UserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
+        this.userRepository = userRepository;
     }
 
-    public ResponseEntity<Task>addTask(@RequestBody Task task){
+    public ResponseEntity<Task> addTask(@RequestBody Task task) {
         Task savedTask = taskRepository.save(task);
-
         UriComponents uriComponents = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedTask.getId());
         return ResponseEntity.created(uriComponents.toUri()).body(savedTask);
     }
-    public ResponseEntity<List<TaskDTO>> getAllTasks(){
+
+    public ResponseEntity<List<TaskDTO>> getAllTasks() {
         List<TaskDTO> taskDTOS = StreamSupport.stream(taskRepository.findAll().spliterator(), false)
                 .map(taskMapper)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(taskDTOS);
     }
-    public ResponseEntity<Void> deleteTask(@PathVariable Integer id){
-        if(!taskRepository.existsById(id)){
+
+    public ResponseEntity<Void> deleteTask(@PathVariable Integer id) {
+        if (!taskRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
         taskRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-    public ResponseEntity<Task> getTaskById(@PathVariable Integer id){
+
+    public ResponseEntity<Task> getTaskById(@PathVariable Integer id) {
         return taskRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
     public ResponseEntity<Task> patchTask(@PathVariable Integer id, @RequestBody Task task) {
         return taskRepository.findById(id)
                 .map(existingTask -> {
@@ -60,7 +67,13 @@ public class TaskService {
                     if (task.getColumn() != null) {
                         existingTask.setColumn(task.getColumn());
                     }
-
+                    // Obsługa aktualizacji użytkownika
+                    if (task.getUser() != null && task.getUser().getId() != null) {
+                        userRepository.findById(task.getUser().getId())
+                                .ifPresent(existingTask::setUser);
+                    } else if (task.getUser() == null) {
+                        existingTask.setUser(null);
+                    }
                     return taskRepository.save(existingTask);
                 })
                 .map(ResponseEntity::ok)

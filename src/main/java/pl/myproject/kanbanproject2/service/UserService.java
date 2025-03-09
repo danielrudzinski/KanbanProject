@@ -6,23 +6,30 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
+import pl.myproject.kanbanproject2.dto.UserDTO;
+import pl.myproject.kanbanproject2.mapper.UserMapper;
 import pl.myproject.kanbanproject2.model.User;
-import pl.myproject.kanbanproject2.repository.TeamRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import java.util.List;
 
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final TeamRepository teamRepository;
-    public UserService(UserRepository userRepository, TeamRepository teamRepository ) {
+    private final UserMapper userMapper;
+
+    public UserService(UserRepository userRepository,  UserMapper userMapper) {
         this.userRepository = userRepository;
-        this.teamRepository = teamRepository;
+        this.userMapper = userMapper;
     }
 
-    public ResponseEntity<Iterable<User>> getAllUsers(){
-        Iterable<User> users = userRepository.findAll();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UserDTO>> getAllUsers(){
+        List<UserDTO> userDTOs = StreamSupport.stream(userRepository.findAll().spliterator(), false)
+                .map(userMapper)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDTOs);
     }
 
     public ResponseEntity<User> getUserById(@PathVariable Integer id ){
@@ -78,19 +85,7 @@ public class UserService {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-    public ResponseEntity<User> assignUserToTeam(@PathVariable Integer userId, @PathVariable Integer teamId) {
-        return userRepository.findById(userId)
-                .map(user -> {
-                    return teamRepository.findById(teamId)
-                            .map(team -> {
-                                user.setTeam(team);
-                                return userRepository.save(user);
-                            })
-                            .map(ResponseEntity::ok)
-                            .orElseGet(() -> ResponseEntity.notFound().build());
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+
 
 
 

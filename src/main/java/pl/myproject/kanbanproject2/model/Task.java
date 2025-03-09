@@ -1,5 +1,6 @@
 package pl.myproject.kanbanproject2.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +21,8 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    @JsonBackReference
+   User user;
 
 
     public Task() {

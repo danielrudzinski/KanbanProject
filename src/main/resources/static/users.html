@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarządzanie Użytkownikami - Tablica Kanban</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="users.css">
+</head>
+<body>
+<header>
+    <h1>Zarządzanie Użytkownikami</h1>
+    <nav class="main-nav">
+        <a href="index.html" class="nav-link">Powrót do Tablicy</a>
+    </nav>
+</header>
+
+<div class="controls">
+    <div class="main-controls">
+        <input type="text" id="nameInput" placeholder="Imię i nazwisko...">
+        <input type="email" id="emailInput" placeholder="Email...">
+        <input type="password" id="passwordInput" placeholder="Hasło...">
+        <button id="addUserBtn">Dodaj Użytkownika</button>
+    </div>
+</div>
+
+<div class="users-container">
+    <div class="user-filter">
+        <input type="text" id="userSearch" placeholder="Szukaj użytkownika...">
+    </div>
+    <div class="users-list">
+        <!-- Użytkownicy będą generowani dynamicznie przez JavaScript -->
+    </div>
+</div>
+
+<!-- Modal do edycji użytkownika -->
+<div id="editUserModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Edytuj Użytkownika</h2>
+        <form id="editUserForm">
+            <input type="hidden" id="editUserId">
+            <div class="form-group">
+                <label for="editName">Imię i nazwisko</label>
+                <input type="text" id="editName" required>
+            </div>
+            <div class="form-group">
+                <label for="editEmail">Email</label>
+                <input type="email" id="editEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="editPassword">Nowe hasło (pozostaw puste, aby nie zmieniać)</label>
+                <input type="password" id="editPassword">
+            </div>
+            <button type="submit" class="save-btn">Zapisz zmiany</button>
+        </form>
+    </div>
+</div>
+
+<div id="assignTasksModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Przypisz zadania do użytkownika</h2>
+        <h3 id="assignToUser"></h3>
+        <div class="tasks-list" id="availableTasks">
+            <!-- Zadania będą generowane dynamicznie -->
+        </div>
+        <button id="saveAssignments" class="save-btn">Zapisz przypisania</button>
+    </div>
+</div>
+
+<script src="users.js"></script>
+</body>
+</html>

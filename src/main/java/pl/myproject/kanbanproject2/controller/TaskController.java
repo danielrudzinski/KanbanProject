@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.myproject.kanbanproject2.dto.TaskDTO;
+import pl.myproject.kanbanproject2.dto.TaskUpdateDTO;
 import pl.myproject.kanbanproject2.model.Task;
 import pl.myproject.kanbanproject2.service.TaskService;
 
@@ -12,7 +13,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
-
     private final TaskService taskService;
 
     @Autowired
@@ -39,6 +39,7 @@ public class TaskController {
     public ResponseEntity<Task> patchTask(@PathVariable Integer id, @RequestBody Task task) {
         return taskService.patchTask(id, task);
     }
+
     @PostMapping()
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
         return taskService.addTask(task);

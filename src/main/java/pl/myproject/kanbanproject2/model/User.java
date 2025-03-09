@@ -1,4 +1,5 @@
 package pl.myproject.kanbanproject2.model;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,12 +30,12 @@ public class User {
         this.email = email;
         this.tasks = tasks;
     }
-    @ManyToOne
-    @JoinColumn(name = "team_id")
-    private Team team;
+
 
     @OneToMany(mappedBy = "user")
-    List<Task>tasks;
+    @JsonManagedReference
+    List<Task> tasks;
+
 
     public List<Task> getTasks() {
         return tasks;
@@ -43,15 +44,6 @@ public class User {
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
     }
-
-    public Team getTeam() {
-        return team;
-    }
-
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-
 
     public Integer getId() {
         return id;
