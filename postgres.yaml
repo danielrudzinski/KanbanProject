@@ -1,0 +1,115 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-db
+data:
+  db.sql: |
+    CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        name VARCHAR(255) NOT NULL
+    );
+
+    CREATE TABLE columns (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        wip_limit INTEGER NOT NULL DEFAULT 0
+    );
+
+    CREATE TABLE tasks (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        column_id INTEGER NOT NULL,
+        FOREIGN KEY (column_id) REFERENCES columns(id) ON DELETE CASCADE
+    );
+
+    BEGIN;
+
+    DO $$ 
+    BEGIN
+        INSERT INTO columns (name) VALUES ('Requested');
+        INSERT INTO columns (name, wip_limit) VALUES ('In Progress', 5);
+        INSERT INTO columns (name) VALUES ('Done');
+        INSERT INTO columns (name) VALUES ('Expedite');
+
+        INSERT INTO users (email, password, name) VALUES ('user1@example.com', 'password1', 'User One');
+        INSERT INTO users (email, password, name) VALUES ('user2@example.com', 'password2', 'User Two');
+    END $$;
+
+    COMMIT;
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13  # Using standard public image instead of ACR
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: kanban
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: asdasd123
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-storage
+            - mountPath: /docker-entrypoint-initdb.d
+              name: postgres-init-db
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+        - name: postgres-init-db
+          configMap:
+            name: postgres-init-db
