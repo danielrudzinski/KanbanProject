@@ -34,6 +34,7 @@ public class UserService {
         return ResponseEntity.ok(userDTOS);
     }
 
+
     public ResponseEntity<UserDTO> getUserById (@PathVariable Integer id) {
         return userRepository.findById(id)
                 .map(userMapper)
