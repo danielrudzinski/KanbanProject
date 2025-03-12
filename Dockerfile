@@ -1,13 +1,31 @@
-FROM openjdk:23-jdk-slim
+# Stage 1: Build frontend
+FROM node:18 AS frontend-build
+WORKDIR /frontend
+COPY frontend/package*.json ./
+RUN npm install
+COPY frontend/ ./
+RUN npm run build
 
-# Set the working directory in the container
+# Stage 2: Build and run the application
+FROM openjdk:23-jdk-slim
 WORKDIR /app
 
-# Copy the application JAR file to the container
-COPY target/KanbanProject2-0.0.1-SNAPSHOT.jar app.jar
+# Copy the frontend build output
+COPY --from=frontend-build /frontend/dist/ /app/src/main/resources/static/
 
-# Expose the port the application runs on
+# Copy the backend source code and build files
+COPY pom.xml ./
+COPY src ./src/
+
+# Install curl
+RUN apt-get update && \
+    apt-get install -y curl && \
+    rm -rf /var/lib/apt/lists/*
+    
+# Build and run the application
+COPY mvnw ./
+COPY .mvn ./.mvn/
+RUN chmod +x mvnw
+RUN ./mvnw package -DskipTests
 EXPOSE 8080
-
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "target/KanbanProject2-0.0.1-SNAPSHOT.jar"]

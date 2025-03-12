@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     // Set the output directory to Spring Boot static resources folder
-    outDir: '../src/main/resources/static',
+    outDir: 'dist',
     emptyOutDir: true,
   },
   server: {
