@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import pl.myproject.kanbanproject2.dto.ColumnDTO;
+import pl.myproject.kanbanproject2.dto.UserDTO;
 import pl.myproject.kanbanproject2.mapper.ColumnMapper;
 import pl.myproject.kanbanproject2.model.Column;
 import pl.myproject.kanbanproject2.model.Task;
@@ -105,5 +106,19 @@ public class ColumnServiceTest {
         Assertions.assertEquals(testColumn, response.getBody());
         Mockito.verify(columnRepository).save(testColumn);
     }
+    @Test
+    void updateColumnShouldUpdateUser() {
+        // given
+        Mockito.when(columnRepository.findById(testColumn.getId())).thenReturn(Optional.of(testColumn));
+        Mockito.when(columnRepository.save(testColumn)).thenReturn(testColumn);
+        // when
+        ResponseEntity<Column> response = columnService.patchColumn(testColumn, testColumn.getId());
+        //then
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(testColumn, response.getBody());
+        Mockito.verify(columnRepository).findById(testColumn.getId());
+        Mockito.verify(columnRepository).save(testColumn);
+    }
+
 
 }
