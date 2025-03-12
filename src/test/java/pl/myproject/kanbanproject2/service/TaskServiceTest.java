@@ -62,9 +62,9 @@ public class TaskServiceTest {
         testTask.setId(1);
         testTask.setTitle("Test");
         testTask.setColumn(testColumn);
-        testTask.setUser(testUser);
+        testTask.setUsers(testUsers);
 
-        testTaskDTO = new TaskDTO(1,"test",testColumn.getId(),testUser.getId());
+        testTaskDTO = new TaskDTO(1,"test",testColumn.getId(),testUsers.getId());
     }
     @AfterEach
     void tearDown() {

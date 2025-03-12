@@ -2,13 +2,11 @@ package pl.myproject.kanbanproject2.mapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.dto.UserDTO;
+import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.model.User;
-
-import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @Component
 public class UserMapper implements Function<User, UserDTO> {
@@ -22,22 +20,15 @@ public class UserMapper implements Function<User, UserDTO> {
 
     @Override
     public UserDTO apply(User user) {
-        if (user == null) {
-            return null;
-        }
-
-        List<TaskDTO> taskDTOs = null;
-        if (user.getTasks() != null) {
-            taskDTOs = user.getTasks().stream()
-                    .map(taskMapper)
-                    .collect(Collectors.toList());
-        }
+        if (user == null) return null;
 
         return new UserDTO(
                 user.getId(),
                 user.getEmail(),
                 user.getName(),
-                taskDTOs
+                user.getTasks().stream()
+                        .map(taskMapper)
+                        .collect(Collectors.toSet())
         );
     }
 }

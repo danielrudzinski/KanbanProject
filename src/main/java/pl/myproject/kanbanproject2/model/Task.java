@@ -1,54 +1,56 @@
 package pl.myproject.kanbanproject2.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Task {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String title;
 
     @ManyToOne
     @JoinColumn(name = "column_id")
     private Column column;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToMany
+    @JoinTable(
+            name = "user_task",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @JsonManagedReference
+    private Set<User> users = new HashSet<>();
 
+    public Task() {}
 
-    public Task() {
-    }
-
-
-    public Task(Integer id, Column column, String title, User user) {
+    public Task(Integer id, String title, Column column, Set<User> users) {
         this.id = id;
-        this.column = column;
         this.title = title;
-        this.user = user;
+        this.column = column;
+        this.users = users;
     }
 
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
+    // Gettery i settery
     public Integer getId() {
         return id;
     }
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Column getColumn() {
@@ -59,11 +61,11 @@ public class Task {
         this.column = column;
     }
 
-    public String getTitle() {
-        return title;
+    public Set<User> getUsers() {
+        return users;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 }

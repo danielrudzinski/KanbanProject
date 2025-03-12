@@ -1,4 +1,6 @@
 package pl.myproject.kanbanproject2.dto;
 
-public record TaskDTO(Integer id, String title, Integer columnId, Integer userId) {
+import java.util.Set;
+
+public record TaskDTO(Integer id, String title, Integer columnId, Set<Integer> userIds) {
 }

@@ -44,4 +44,10 @@ public class TaskController {
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
         return taskService.addTask(task);
     }
+
+    @PutMapping("/{taskId}/user/{userId}")
+    public ResponseEntity<TaskDTO> assignUserToTask(@PathVariable Integer taskId, @PathVariable Integer userId) {
+        return taskService.assignUserToTask(taskId, userId);
+    }
+
 }

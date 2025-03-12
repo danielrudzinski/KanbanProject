@@ -1,51 +1,38 @@
 package pl.myproject.kanbanproject2.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private String email;
     private String password;
     private String name;
 
-    public User() {
-    }
+    @ManyToMany(mappedBy = "users")
+    @JsonBackReference
+    private Set<Task> tasks = new HashSet<>();
 
-    public User(Integer id, String password, String name, String email, List<Task> tasks) {
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "avatar_id")
+    private FileEntity avatar;
+
+    public User() {}
+
+    public User(Integer id, String password, String name, String email, Set<Task> tasks) {
         this.id = id;
         this.password = password;
         this.name = name;
         this.email = email;
-        this.tasks = tasks;
-    }
-
-    @OneToMany(mappedBy = "user")
-    @JsonIgnore
-    List<Task> tasks;
-    @OneToOne(cascade = CascadeType.ALL) // Relacja 1-1 z plikiem
-    @JoinColumn(name = "avatar_id") // Klucz obcy w tabeli users
-    private FileEntity avatar;
-
-    public FileEntity getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(FileEntity avatar) {
-        this.avatar = avatar;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
     }
 
@@ -55,6 +42,22 @@ public class User {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public FileEntity getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(FileEntity avatar) {
+        this.avatar = avatar;
+    }
+
+    public Set<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(Set<Task> tasks) {
+        this.tasks = tasks;
     }
 
     public String getName() {
