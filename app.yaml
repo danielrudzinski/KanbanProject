@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: kanban-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: kanban-app
@@ -40,22 +40,27 @@ spec:
               value: asdasd123
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "100m"
-            limits:
               memory: "512Mi"
-              cpu: "200m"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "500m"
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
+            initialDelaySeconds: 200
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 6
+
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8080
-            initialDelaySeconds: 60
-            periodSeconds: 15
+            initialDelaySeconds: 200
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6 
       imagePullSecrets:
         - name: regcred

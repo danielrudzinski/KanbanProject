@@ -1,0 +1,26 @@
+.board {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    overflow-x: auto;
+  }
+  
+  .board-loading,
+  .board-error {
+    text-align: center;
+    padding: 50px;
+    color: #666;
+    font-size: 18px;
+  }
+  
+  .board-error {
+    color: #e60000;
+  }
+  
+  /* Media query for smaller screens */
+  @media (max-width: 768px) {
+    .board {
+      padding: 10px 0;
+      gap: 10px;
+    }
+  }
