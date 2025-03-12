@@ -29,6 +29,17 @@ public class User {
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     List<Task> tasks;
+    @OneToOne(cascade = CascadeType.ALL) // Relacja 1-1 z plikiem
+    @JoinColumn(name = "avatar_id") // Klucz obcy w tabeli users
+    private FileEntity avatar;
+
+    public FileEntity getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(FileEntity avatar) {
+        this.avatar = avatar;
+    }
 
     public List<Task> getTasks() {
         return tasks;

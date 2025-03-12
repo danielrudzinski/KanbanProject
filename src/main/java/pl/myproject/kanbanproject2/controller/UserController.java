@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.myproject.kanbanproject2.dto.UserDTO;
 import pl.myproject.kanbanproject2.model.User;
 import pl.myproject.kanbanproject2.service.UserService;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -42,6 +43,23 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<User> patchUser(@PathVariable Integer id, @RequestBody User user){
         return userService.patchUser(id, user);
+    }
+    // Upload awatara
+    @PostMapping("/{id}/avatar")
+    public ResponseEntity<String> uploadAvatar(@PathVariable Integer id, @RequestParam("file") MultipartFile file) {
+        return userService.uploadAvatar(id, file);
+    }
+
+    //  Pobieranie awatara
+    @GetMapping("/{id}/avatar")
+    public ResponseEntity<byte[]> getAvatar(@PathVariable Integer id) {
+        return userService.getAvatar(id);
+    }
+
+    //  Usuwanie awatara
+    @DeleteMapping("/{id}/avatar")
+    public ResponseEntity<String> deleteAvatar(@PathVariable Integer id) {
+        return userService.deleteAvatar(id);
     }
   
 
