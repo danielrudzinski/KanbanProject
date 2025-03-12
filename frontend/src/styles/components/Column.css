@@ -9,9 +9,26 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
   border-top: 5px solid var(--primary);
   overflow: hidden;
+  cursor: grab;
+}
+
+.column:active {
+  cursor: grabbing;
+}
+
+.column.column-dragging {
+  opacity: 0.6;
+  transform: scale(1.02);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.column .task-list {
+  cursor: default;
 }
 
 .column:hover {
@@ -24,12 +41,23 @@
   background-color: rgba(239, 68, 68, 0.05);
 }
 
+.column-dragging {
+  opacity: 0.6;
+  transform: scale(0.98);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.column .task-list {
+  pointer-events: auto;
+}
+
 .column-header {
-  padding: 0.5rem 0 1rem 0;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--gray-200);
-  color: var(--gray-900);
+  cursor: move;
+  cursor: grab;
+}
+
+.column-header:active {
+  cursor: grabbing;
 }
 
 .header-top {
@@ -76,7 +104,7 @@
 }
 
 .delete-column-btn:hover {
-  color: var(--error);
+  color: var(--surface-light);
   background-color: var(--gray-100);
 }
 

@@ -33,3 +33,4 @@ build/
 .vscode/
 hs_err_pid14848.log
 *.log
+/frontend/.vite

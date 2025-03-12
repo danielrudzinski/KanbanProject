@@ -3,19 +3,6 @@
   margin: 10px;
 }
 
-.toggle-form-btn {
-  width: 250px;
-  background-color: #ebecf0;
-  border: none;
-  border-radius: 3px;
-  padding: 10px;
-  font-size: 14px;
-  color: #5e6c84;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-}
 
 .toggle-form-btn:hover {
   background-color: #dfe1e6;
@@ -23,6 +10,8 @@
 
 .form-container {
   width: 350px;
+  margin: auto;
+  position: relative;
   background-color: #ebecf0;
   border: none;
   border-radius: 3px;

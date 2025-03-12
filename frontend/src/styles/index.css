@@ -155,7 +155,12 @@ button:focus-visible {
   }
   
   .toggle-form-btn {
-    background-color: var(--gray-700);
-    color: var(--gray-300);
-  }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: var(--text-light);
+    padding: 0.5rem 1rem;
+    width: fit-content;
+}
 }
