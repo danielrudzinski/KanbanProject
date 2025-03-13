@@ -5,49 +5,82 @@ import '../styles/components/TaskDetails.css';
 
 function TaskDetails({ task, onClose }) {
   const [users, setUsers] = useState([]);
+  const [assignedUsers, setAssignedUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState('');
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
   const panelRef = useRef(null);
-  
-  // Load users and current assigned user when component mounts
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch all users
-        const usersData = await fetchUsers();
-        setUsers(usersData);
-        
-        // Fetch complete task to get current assigned user
-        const taskData = await fetchTask(task.id);
-        if (taskData.user && taskData.user.id) {
-          setSelectedUserId(taskData.user.id);
-        }
-        
-        setLoading(false);
-      } catch (error) {
-        console.error('Error loading data:', error);
-        setLoading(false);
-      }
-    };
-    
-    loadData();
-    
-    // Position the panel
-    if (panelRef.current) {
-      positionPanel();
+
+  const handleRemoveUser = async (userId) => {
+    try {
+      await removeUserFromTask(task.id, userId);
+      await loadTaskData(); // Refresh task data after removal
+      
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error removing user:', error);
+      alert('Wystąpił błąd podczas usuwania użytkownika');
     }
-    
-    // Add window resize listener
-    window.addEventListener('resize', positionPanel);
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('resize', positionPanel);
-    };
+  };
+
+  const loadTaskData = async () => {
+    try {
+      const taskData = await fetchTask(task.id);
+      const allUsers = await fetchUsers();
+      
+      setUsers(allUsers);
+      
+      if (taskData.userIds && taskData.userIds.length > 0) {
+        const assigned = allUsers.filter(user => 
+          taskData.userIds.includes(user.id)
+        );
+        setAssignedUsers(assigned);
+      } else {
+        setAssignedUsers([]);
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading task data:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleAssignUser = async () => {
+    try {
+      await assignUserToTask(task.id, parseInt(selectedUserId));
+      await loadTaskData(); // Refresh task data after assignment
+      
+      setSuccess(true);
+      setSelectedUserId('');
+      
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error assigning user:', error);
+      alert('Wystąpił błąd podczas przypisywania użytkownika');
+    }
+  };
+
+  // Load data when component mounts
+  useEffect(() => {
+    loadTaskData();
   }, [task.id]);
+
+  if (loading) {
+    return createPortal(
+      <div className="task-details-overlay">
+        <div className="task-details-panel loading">
+          <p>Ładowanie...</p>
+        </div>
+      </div>,
+      document.body
+    );
+  }
   
   // Position panel relative to viewport
   const positionPanel = () => {
@@ -66,63 +99,42 @@ function TaskDetails({ task, onClose }) {
     }
   };
   
-  // Handle user assignment
-  const handleAssignUser = async () => {
-    if (!selectedUserId) {
-      alert('Wybierz użytkownika!');
-      return;
-    }
-    
-    try {
-      await assignUserToTask(task.id, selectedUserId);
-      setSuccess(true);
-      
-      // Hide success message after a delay
-      setTimeout(() => {
-        setSuccess(false);
-      }, 2000);
-    } catch (error) {
-      console.error('Error assigning user:', error);
-      alert('Wystąpił błąd podczas przypisywania użytkownika');
-    }
-  };
   
   return createPortal(
     <>
-    <div className="task-details-overlay" onClick={onClose} />
-    <div 
-      id="task-details-panel" 
-      className="task-details-panel" 
-      ref={panelRef}
-      data-task-id={task.id}
-    >
-      <div className="panel-header">
-        <h3>{task.title}</h3>
-        <button 
-          className="close-panel-btn" 
-          title="Zamknij panel"
-          onClick={onClose}
-        >
-          ×
-        </button>
-      </div>
-      
-      <div className="user-section">
-          {task.user && (
-            <div className="current-user">
-              <label>Przypisany użytkownik:</label>
-              <div className="user-info">
-                <UserAvatar user={task.user} size="large" />
-                <span>{task.user.name}</span>
+      <div className="task-details-overlay" onClick={onClose} />
+      <div className="task-details-panel" ref={panelRef}>
+        <div className="panel-header">
+          <h3>{task.title}</h3>
+          <button className="close-panel-btn" onClick={onClose}>×</button>
+        </div>
+        
+        <div className="user-section">
+          {assignedUsers.length > 0 && (
+            <div className="assigned-users">
+              <h4>Przypisani użytkownicy:</h4>
+              <div className="users-list">
+                {assignedUsers.map(user => (
+                  <div key={user.id} className="user-item">
+                    <div className="user-avatar">
+                      {user.name.charAt(0)}
+                    </div>
+                    <span>{user.name}</span>
+                    <button 
+                      className="remove-user-btn"
+                      onClick={() => handleRemoveUser(user.id)}
+                      title="Usuń użytkownika"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           )}
-        <label htmlFor="user-select">Przypisz użytkownika:</label>
-        
-        {loading ? (
-          <p>Ładowanie użytkowników...</p>
-        ) : (
-          <>
+
+          <div className="assign-user-form">
+            <label htmlFor="user-select">Przypisz nowego użytkownika:</label>
             <select 
               id="user-select"
               value={selectedUserId}
@@ -136,19 +148,18 @@ function TaskDetails({ task, onClose }) {
               ))}
             </select>
             
-            <button onClick={handleAssignUser}>
+            <button onClick={handleAssignUser} disabled={!selectedUserId}>
               Przypisz
             </button>
-            
-            {success && (
-              <div className="success-message">
-                Użytkownik został przypisany!
-              </div>
-            )}
-          </>
-        )}
+          </div>
+
+          {success && (
+            <div className="success-message">
+              Użytkownik został przypisany!
+            </div>
+          )}
+        </div>
       </div>
-    </div>
     </>,
     document.body
   );

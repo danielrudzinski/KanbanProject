@@ -119,16 +119,11 @@ const API_ENDPOINTS = {
   // Assign user to task
   export const assignUserToTask = async (taskId, userId) => {
     try {
-      const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}`, {
-        method: 'PATCH',
+      const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}/user/${userId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          user: {
-            id: userId
-          }
-        })
+        }
       });
       
       if (!response.ok) {
@@ -233,6 +228,26 @@ const API_ENDPOINTS = {
       return true;
     } catch (error) {
       console.error(`Error deleting column ${columnId}:`, error);
+      throw error;
+    }
+  };
+  
+  export const removeUserFromTask = async (taskId, userId) => {
+    try {
+      const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}/user/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error removing user: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error(`Error removing user from task ${taskId}:`, error);
       throw error;
     }
   };
