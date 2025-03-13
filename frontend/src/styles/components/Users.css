@@ -132,8 +132,8 @@ button:active {
 
 .users-header {
     display: grid;
-    grid-template-columns: 80px 1fr 1fr 120px;
-    padding: 20px;
+    grid-template-columns: 100px 50px 370px 380px 85px;
+    padding: 18px;
     background: var(--black-medium);
     font-weight: bold;
     border-bottom: 2px solid var(--gray-dark);

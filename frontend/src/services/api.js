@@ -6,18 +6,21 @@ const API_ENDPOINTS = {
   };
   
   // Fetch all columns
-  export const fetchColumns = async () => {
-    try {
-      const response = await fetch(API_ENDPOINTS.COLUMNS);
-      if (!response.ok) {
-        throw new Error(`Error fetching columns: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching columns:', error);
-      throw error;
+  export const fetchColumns = async (retries = 3) => {
+    while (retries > 0) {
+        try {
+            const response = await fetch(API_ENDPOINTS.COLUMNS);
+            if (!response.ok) {
+                throw new Error(`Error fetching columns: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            if (retries === 1) throw error;
+            retries--;
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+        }
     }
-  };
+};
   
   // Fetch all tasks
   export const fetchTasks = async () => {

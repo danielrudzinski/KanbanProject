@@ -193,3 +193,85 @@
     color: #f87171;
   }
 }
+
+.task-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.task-title {
+  flex-grow: 1;
+  margin-right: 8px;
+}
+
+.task-avatar {
+  position: relative;
+  min-width: 32px;
+  height: 32px;
+  margin-left: 8px;
+}
+
+.task-avatar img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #e0e0e0;
+}
+
+.avatar-count {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 10px;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* For TaskDetails.css - improve avatar styling */
+.user-avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #e0e0e0;
+  background-color: #f5f5f5;
+}
+
+.user-item span {
+  margin-left: 8px;
+  flex-grow: 1;
+}
+
+.assign-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.assign-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.success-message {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 16px;
+  text-align: center;
+}
