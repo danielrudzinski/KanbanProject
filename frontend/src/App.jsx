@@ -23,6 +23,11 @@ function KanbanBoard() {
   const [showAddTask, setShowAddTask] = useState(false);
   const [showAddColumn, setShowAddColumn] = useState(false);
   const [showWipLimit, setShowWipLimit] = useState(false);
+  const [activeForm, setActiveForm] = useState(null); // 'task', 'column', or 'wip'
+
+  const handleFormToggle = (formType) => {
+    setActiveForm(activeForm === formType ? null : formType);
+  };
 
   return (
     <div className="app">
@@ -31,7 +36,7 @@ function KanbanBoard() {
       <div className="menu-controls">
         <button 
           className="menu-item"
-          onClick={() => setShowAddTask(!showAddTask)}
+          onClick={() => handleFormToggle('task')}
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -41,20 +46,20 @@ function KanbanBoard() {
 
         <button 
           className="menu-item"
-          onClick={() => setShowWipLimit(!showWipLimit)}
+          onClick={() => handleFormToggle('wip')}
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
           </svg>
           <span>Limit WIP</span>
         </button>
 
         <button 
           className="menu-item"
-          onClick={() => setShowAddColumn(!showAddColumn)}
+          onClick={() => handleFormToggle('column')}
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
           <span>Dodaj kolumnę</span>
         </button>
@@ -67,10 +72,10 @@ function KanbanBoard() {
         </Link>
       </div>
 
-      {showAddTask && <AddTaskForm />}
-      {showWipLimit && <WipLimitControl />}
-      {showAddColumn && <AddColumnForm />}
-      
+      {activeForm === 'task' && <AddTaskForm onClose={() => setActiveForm(null)} />}
+      {activeForm === 'wip' && <WipLimitControl onClose={() => setActiveForm(null)} />}
+      {activeForm === 'column' && <AddColumnForm onClose={() => setActiveForm(null)} />}
+
       <Board />
     </div>
   );
