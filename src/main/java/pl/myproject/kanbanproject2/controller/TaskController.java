@@ -41,7 +41,7 @@ public class TaskController {
         return taskService.patchTask(id, task);
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, "application/json;charset=UTF-8"})
+    @PostMapping()
     public ResponseEntity<TaskDTO> createTask(@RequestBody Task task) {
         return taskService.addTask(task);
     }
