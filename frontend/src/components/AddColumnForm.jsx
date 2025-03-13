@@ -13,6 +13,10 @@ function AddColumnForm() {
   const toggleForm = () => {
     setIsFormVisible(!isFormVisible);
     setError(null);
+    
+    if (isFormVisible) {
+      onClose();
+    }
   };
 
   const handleSubmit = async (e) => {
