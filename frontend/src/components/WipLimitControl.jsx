@@ -20,10 +20,10 @@ function WipLimitControl() {
     setIsFormVisible(!isFormVisible);
     setError(null);
     
-    // Reset form if closing
     if (isFormVisible) {
       setSelectedColumn('');
       setWipLimit('');
+      onClose();
     }
   };
   

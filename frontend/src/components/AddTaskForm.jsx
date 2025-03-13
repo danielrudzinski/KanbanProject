@@ -8,6 +8,10 @@ function AddTaskForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   
+  const toggleForm = () => {
+    onClose();
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     
