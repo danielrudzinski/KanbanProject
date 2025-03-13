@@ -33,11 +33,16 @@ public class TaskService {
         this.taskMapper = taskMapper;
     }
 
-    public ResponseEntity<Task> addTask(Task task) {
+    public ResponseEntity<TaskDTO> addTask(Task task) {
         Task savedTask = taskRepository.save(task);
+
+        // Konwersja do DTO
+        TaskDTO taskDTO = taskMapper.apply(savedTask);
+
         UriComponents uriComponents = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedTask.getId());
-        return ResponseEntity.created(uriComponents.toUri()).body(savedTask);
+
+        return ResponseEntity.created(uriComponents.toUri()).body(taskDTO);
     }
 
     public ResponseEntity<List<TaskDTO>> getAllTasks() {

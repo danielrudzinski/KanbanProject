@@ -1,6 +1,6 @@
 package pl.myproject.kanbanproject2.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,13 +18,14 @@ public class Task {
     @JoinColumn(name = "column_id")
     private Column column;
 
+    // Remove @JsonManagedReference and add @JsonIgnoreProperties
     @ManyToMany
     @JoinTable(
             name = "user_task",
             joinColumns = @JoinColumn(name = "task_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    @JsonManagedReference
+    @JsonIgnoreProperties("tasks")
     private Set<User> users = new HashSet<>();
 
     public Task() {}
@@ -36,7 +37,7 @@ public class Task {
         this.users = users;
     }
 
-    // Gettery i settery
+    // Getters and setters remain the same
     public Integer getId() {
         return id;
     }

@@ -1,6 +1,7 @@
 package pl.myproject.kanbanproject2.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.myproject.kanbanproject2.dto.TaskDTO;
@@ -40,8 +41,8 @@ public class TaskController {
         return taskService.patchTask(id, task);
     }
 
-    @PostMapping()
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, "application/json;charset=UTF-8"})
+    public ResponseEntity<TaskDTO> createTask(@RequestBody Task task) {
         return taskService.addTask(task);
     }
 

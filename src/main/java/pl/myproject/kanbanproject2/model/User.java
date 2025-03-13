@@ -18,8 +18,9 @@ public class User {
     private String password;
     private String name;
 
+    // Change from @JsonBackReference to @JsonIgnore
     @ManyToMany(mappedBy = "users")
-    @JsonBackReference
+    @JsonIgnore
     private Set<Task> tasks = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -36,6 +37,7 @@ public class User {
         this.tasks = tasks;
     }
 
+    // Getters and setters remain the same
     public Integer getId() {
         return id;
     }
