@@ -223,3 +223,57 @@
     font-size: 16px;
     color: var(--gray-700);
   }
+
+  .task-details-panel .assigned-users {
+    margin-bottom: 24px;
+    padding: 16px;
+    background-color: var(--black-medium);
+    border-radius: 6px;
+    border: 1px solid var(--gray-dark);
+  }
+  
+  .task-details-panel .assigned-users h4 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    color: var(--white);
+  }
+  
+  .task-details-panel .users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .task-details-panel .user-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: var(--black-light);
+    border: 1px solid var(--gray-dark);
+    border-radius: 4px;
+  }
+  
+  .task-details-panel .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--blue-primary);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    margin-right: 12px;
+  }
+  
+  .task-details-panel .user-item span {
+    color: var(--white);
+    font-size: 14px;
+  }
+  
+  .task-details-panel .assign-user-form {
+    padding: 16px;
+    background-color: var(--black-medium);
+    border-radius: 6px;
+    border: 1px solid var(--gray-dark);
+  }
