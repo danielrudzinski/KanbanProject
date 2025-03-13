@@ -121,9 +121,20 @@ export function KanbanProvider({ children }) {
   const handleUpdateWipLimit = async (columnId, newLimit) => {
     try {
       await updateColumnWipLimit(columnId, newLimit);
-      // Refresh columns to get the latest state
+      
+      // Fetch fresh column data while preserving order
       const updatedColumns = await fetchColumns();
-      setColumns(updatedColumns);
+      const columnOrderMap = {};
+      columns.forEach((col, index) => {
+        columnOrderMap[col.id] = index;
+      });
+      
+      // Sort updated columns based on original order
+      const sortedUpdatedColumns = updatedColumns.sort((a, b) => {
+        return columnOrderMap[a.id] - columnOrderMap[b.id];
+      });
+      
+      setColumns(sortedUpdatedColumns);
     } catch (err) {
       console.error('Failed to update WIP limit:', err);
       setError('Failed to update WIP limit. Please try again.');
