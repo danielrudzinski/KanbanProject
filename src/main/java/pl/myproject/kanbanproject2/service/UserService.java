@@ -1,5 +1,6 @@
 package pl.myproject.kanbanproject2.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-
+@Transactional
 @Service
 public class UserService {
     private final UserRepository userRepository;

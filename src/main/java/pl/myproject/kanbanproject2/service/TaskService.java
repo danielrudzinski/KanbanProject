@@ -1,5 +1,6 @@
 package pl.myproject.kanbanproject2.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
+@Transactional
 @Service
 public class TaskService {
 
@@ -113,5 +114,33 @@ public class TaskService {
 
         return ResponseEntity.ok(taskDTO);
     }
+    public ResponseEntity<TaskDTO> removeUserFromTask(Integer taskId, Integer userId) {
+        Optional<Task> optionalTask = taskRepository.findById(taskId);
+        if (optionalTask.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Task task = optionalTask.get();
+        User user = optionalUser.get();
+
+        // Usuń użytkownika z zadania i zadanie z użytkownika
+        task.getUsers().remove(user);
+        user.getTasks().remove(task);
+
+        // Zapisz zmiany w obu encjach
+        userRepository.save(user);
+        Task updatedTask = taskRepository.save(task);
+
+        // Konwertuj do DTO i zwróć odpowiedź
+        TaskDTO taskDTO = taskMapper.apply(updatedTask);
+
+        return ResponseEntity.ok(taskDTO);
+    }
+
 
 }
