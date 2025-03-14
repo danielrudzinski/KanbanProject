@@ -1,5 +1,6 @@
 package pl.myproject.kanbanproject2.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import pl.myproject.kanbanproject2.repository.ColumnRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Transactional
 @Service
 public class ColumnService {
     private final ColumnRepository columnRepository;
