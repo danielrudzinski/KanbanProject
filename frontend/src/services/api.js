@@ -15,6 +15,7 @@ const API_ENDPOINTS = {
             }
             return await response.json();
         } catch (error) {
+            console.error('Error fetching columns:', error);
             if (retries === 1) throw error;
             retries--;
             await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry

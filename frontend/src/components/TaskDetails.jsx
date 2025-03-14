@@ -33,31 +33,26 @@ function TaskDetails({ task, onClose }) {
   };
 
   const fetchUserAvatar = async (userId) => {
-    let retries = 3;
-    while (retries > 0) {
-      try {
+    try {
         const response = await fetch(`/users/${userId}/avatar`, {
-          headers: {
-            'Accept': 'image/*, application/json',
-            'Cache-Control': 'no-cache'
-          }
+            headers: {
+                'Accept': 'image/*, application/json',
+                'Cache-Control': 'no-cache'
+            }
         });
         
         if (!response.ok) {
-          throw new Error('Failed to fetch avatar');
+            console.warn(`Could not fetch avatar for user ${userId}: ${response.status}`);
+            return null;
         }
         
         const blob = await response.blob();
         return URL.createObjectURL(blob);
-      } catch (error) {
-        console.warn(`Retry ${4 - retries} failed for user ${userId}:`, error);
-        retries--;
-        if (retries === 0) return null;
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
+    } catch (error) {
+        console.warn(`Error fetching avatar for user ${userId}:`, error);
+        return null;
     }
-    return null;
-  };
+};
   
   // Update loadTaskData to include avatar loading
   const loadTaskData = async () => {
