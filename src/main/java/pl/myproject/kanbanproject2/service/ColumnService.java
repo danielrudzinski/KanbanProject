@@ -1,5 +1,6 @@
 package pl.myproject.kanbanproject2.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import pl.myproject.kanbanproject2.dto.ColumnDTO;
+import pl.myproject.kanbanproject2.dto.RowDTO;
 import pl.myproject.kanbanproject2.mapper.ColumnMapper;
 import pl.myproject.kanbanproject2.model.Column;
 import pl.myproject.kanbanproject2.repository.ColumnRepository;
@@ -59,5 +61,10 @@ public class ColumnService {
         columnRepository.deleteById(id);
         return ResponseEntity.noContent().build();
 
+    }
+    public ColumnDTO getColumnById(Integer id) {
+        return columnRepository.findById(id).
+                map(columnMapper::apply).
+                orElseThrow(() -> new EntityNotFoundException("Nie ma wiersza"));
     }
 }

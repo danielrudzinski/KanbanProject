@@ -17,6 +17,9 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "column_id")
     private Column column;
+    @ManyToOne
+    @JoinColumn(name = "row_id")
+    private Row row;
 
     // Remove @JsonManagedReference and add @JsonIgnoreProperties
     @ManyToMany
@@ -30,11 +33,20 @@ public class Task {
 
     public Task() {}
 
-    public Task(Integer id, String title, Column column, Set<User> users) {
+    public Task(Integer id, String title, Column column, Set<User> users, Row row) {
         this.id = id;
         this.title = title;
         this.column = column;
         this.users = users;
+        this.row = row;
+    }
+
+    public Row getRow() {
+        return row;
+    }
+
+    public void setRow(Row row) {
+        this.row = row;
     }
 
     // Getters and setters remain the same

@@ -1,8 +1,11 @@
 package pl.myproject.kanbanproject2.controller;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.myproject.kanbanproject2.dto.ColumnDTO;
+import pl.myproject.kanbanproject2.dto.RowDTO;
 import pl.myproject.kanbanproject2.model.Column;
 import pl.myproject.kanbanproject2.service.ColumnService;
 import java.net.URI;
@@ -37,6 +40,11 @@ public class ColumnController {
 
         return columnService.deleteColumn(id);
     }
-
-
+    @GetMapping("/{id}")
+    public ResponseEntity<ColumnDTO> getRowById(@PathVariable Integer id) {
+        return new ResponseEntity<>(columnService.getColumnById(id), HttpStatus.OK);
+    }
 }
+
+
+
