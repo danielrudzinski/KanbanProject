@@ -1,10 +1,5 @@
 package pl.myproject.kanbanproject2.model;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 
 @Entity
 @Table(name = "files")
@@ -12,17 +7,19 @@ public class FileEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String type;
-    @Lob
+
+    @Lob // Pole przechowujące plik jako bajty
     private byte[] data;
+
+    public FileEntity() {}
+
     public FileEntity(String name, String type, byte[] data) {
         this.name = name;
         this.type = type;
         this.data = data;
-    }
-
-    public FileEntity() {
     }
 
     public Long getId() {
@@ -33,20 +30,20 @@ public class FileEntity {
         this.id = id;
     }
 
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
-    }
-
     public String getType() {
         return type;
     }
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 
     public String getName() {
@@ -56,4 +53,6 @@ public class FileEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    // Gettery i settery
 }
