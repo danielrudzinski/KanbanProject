@@ -77,7 +77,7 @@ public class SubTaskController {
         }
     }
 
-    @PatchMapping("/{id}/toggle")
+    @PatchMapping("/{id}/change")
     public ResponseEntity<SubTaskDTO> toggleSubTaskCompletion(@PathVariable Integer id) {
         try {
             return ResponseEntity.ok(subTaskService.toggleSubTaskCompletion(id));
