@@ -1,6 +1,7 @@
 package pl.myproject.kanbanproject2.service;
 
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final FileRepository fileRepository;
-
+    @Autowired
     public UserService(UserRepository userRepository, UserMapper userMapper,FileRepository fileRepository ) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
