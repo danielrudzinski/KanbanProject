@@ -1,4 +1,4 @@
-package pl.myproject.kanbanproject2.exception;
+package pl.myproject.kanbanproject2.Exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
