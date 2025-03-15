@@ -42,9 +42,9 @@ public class RowController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteRow(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteRow(@PathVariable Integer id) {
         rowService.deleteRow(id);
-        ResponseEntity.noContent().build();
+        return   ResponseEntity.noContent().build();
 
     }
 }

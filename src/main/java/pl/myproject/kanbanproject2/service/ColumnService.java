@@ -3,12 +3,8 @@ package pl.myproject.kanbanproject2.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import pl.myproject.kanbanproject2.dto.ColumnDTO;
-import pl.myproject.kanbanproject2.dto.RowDTO;
 import pl.myproject.kanbanproject2.mapper.ColumnMapper;
 import pl.myproject.kanbanproject2.model.Column;
 import pl.myproject.kanbanproject2.repository.ColumnRepository;
@@ -19,52 +15,50 @@ import java.util.stream.Collectors;
 @Service
 public class ColumnService {
     private final ColumnRepository columnRepository;
-    private final ColumnMapper columnMapper; // Dodajemy ColumnMapper
+    private final ColumnMapper columnMapper;
 
     @Autowired
-    public ColumnService(ColumnRepository columnRepository, ColumnMapper columnMapper) { // Dodajemy ColumnMapper do konstruktora
+    public ColumnService(ColumnRepository columnRepository, ColumnMapper columnMapper) {
         this.columnRepository = columnRepository;
         this.columnMapper = columnMapper;
     }
 
-    public ResponseEntity<List<ColumnDTO>> getAllColumns() { // Zmieniamy typ zwracany na List<ColumnDTO>
-        List<ColumnDTO> columnDTOs = columnRepository.findAll().stream()
-                .map(columnMapper::apply) // Używamy ColumnMapper do przekształcenia Column na ColumnDTO
+     public List<ColumnDTO> getAllColumns() {
+        List<ColumnDTO> columnDTOS = columnRepository.findAll().stream()
+                .map(columnMapper::apply)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(columnDTOs);
+        return columnDTOS;
     }
 
-    public ResponseEntity<Column> addNewColumn(@RequestBody Column column) {
-        Column newColumn = columnRepository.save(column);
-        return ResponseEntity.created(null).body(newColumn);
+    public Column addNewColumn(Column column) {
+        return columnRepository.save(column);
+
     }
 
-    public ResponseEntity<Column> patchColumn(@RequestBody Column column, @PathVariable Integer id) {
-        return columnRepository.findById(id)
-                .map(existingColumn -> {
-                    if (column.getName() != null) {
-                        existingColumn.setName(column.getName());
-                    }
-                    if (column.getWipLimit() != null) {
-                        existingColumn.setWipLimit(column.getWipLimit());
-                    }
-                    return columnRepository.save(existingColumn);
-                })
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-    public ResponseEntity<Void>deleteColumn(@PathVariable Integer id ){
-        if(!columnRepository.existsById(id)){
-            return ResponseEntity.notFound().build();
+
+    public ColumnDTO patchColumn(ColumnDTO columnDTO, Integer id) {
+        Column existingColumn = columnRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nie ma takiego wiersza"));
+
+        if (columnDTO.name() != null) {
+            existingColumn.setName(columnDTO.name());
         }
-
-        columnRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
-
+        if(columnDTO.wipLimit() != null) {
+            existingColumn.setWipLimit(columnDTO.wipLimit());
+        }
+        Column updatedColumn = columnRepository.save(existingColumn);
+        return columnMapper.apply(updatedColumn);
     }
+
+    public void deleteColumn(Integer id){
+        if(!columnRepository.existsById(id)){
+           throw new EntityNotFoundException("Nie ma kolumny o takim id");
+        }
+        columnRepository.deleteById(id);
+    }
+
     public ColumnDTO getColumnById(Integer id) {
         return columnRepository.findById(id).
                 map(columnMapper::apply).
-                orElseThrow(() -> new EntityNotFoundException("Nie ma wiersza"));
+                orElseThrow(() -> new EntityNotFoundException("Nie ma kolumny o takim id"));
     }
 }

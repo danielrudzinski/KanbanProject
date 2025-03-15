@@ -23,26 +23,27 @@ public class ColumnController {
 
     @GetMapping
     public ResponseEntity<List<ColumnDTO>> getAllColumns() {
-        return columnService.getAllColumns();
+        return ResponseEntity.ok(columnService.getAllColumns());
     }
 
     @PostMapping
     public ResponseEntity<Column> addNewColumn(@RequestBody Column column) {
-        return columnService.addNewColumn(column);
+       return ResponseEntity.ok(columnService.addNewColumn(column));
+
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Column> patchColumn( @RequestBody Column column ,@PathVariable Integer id) {
-        return columnService.patchColumn(column, id);
+    public ResponseEntity<ColumnDTO> patchColumn( @RequestBody ColumnDTO column ,@PathVariable Integer id) {
+        return ResponseEntity.ok(columnService.patchColumn(column, id));
     }
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id){
-
-        return columnService.deleteColumn(id);
+        columnService.deleteColumn(id);
+        return ResponseEntity.noContent().build();
     }
     @GetMapping("/{id}")
     public ResponseEntity<ColumnDTO> getRowById(@PathVariable Integer id) {
-        return new ResponseEntity<>(columnService.getColumnById(id), HttpStatus.OK);
+        return ResponseEntity.ok(columnService.getColumnById(id));
     }
 }
 

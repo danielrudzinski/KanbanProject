@@ -36,8 +36,8 @@ public class RowService {
     }
 
     public Row createRow(Row row) {
-        rowRepository.save(row);
-        return row;
+       return rowRepository.save(row);
+
     }
 
     public RowDTO patchRow(RowDTO rowDTO, Integer id) {
