@@ -35,24 +35,9 @@ public class RowService {
         return rowDTOS;
     }
 
-    // In your RowService.java
     public Row createRow(Row row) {
-        // Check for existing tasks and handle them
-        if (row.getTasks() != null) {
-            for (Task task : row.getTasks()) {
-                if (task.getId() != null) {
-                    // This is an existing task
-                    Task existingTask = taskRepository.findById(task.getId()).orElse(null);
-                    if (existingTask != null) {
-                        task.setRow(row);
-                    }
-                } else {
-                    // New task
-                    task.setRow(row);
-                }
-            }
-        }
-        return rowRepository.save(row);
+        rowRepository.save(row);
+        return row;
     }
 
     public RowDTO patchRow(RowDTO rowDTO, Integer id) {
