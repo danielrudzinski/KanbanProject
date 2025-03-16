@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Board from './components/Board';
 import AddTaskForm from './components/AddTaskForm';
 import AddColumnForm from './components/AddColumnForm';
+import AddRowForm from './components/AddRowForm';
 import WipLimitControl from './components/WipLimitControl';
 import UsersManagement from './components/UsersManagement';
 import './styles/App.css';
@@ -20,10 +21,7 @@ function App() {
 
 // KanbanBoard component extracted from current App component
 function KanbanBoard() {
-  const [showAddTask, setShowAddTask] = useState(false);
-  const [showAddColumn, setShowAddColumn] = useState(false);
-  const [showWipLimit, setShowWipLimit] = useState(false);
-  const [activeForm, setActiveForm] = useState(null); // 'task', 'column', or 'wip'
+  const [activeForm, setActiveForm] = useState(null); // 'task', 'column', 'row', or 'wip'
 
   const handleFormToggle = (formType) => {
     setActiveForm(activeForm === formType ? null : formType);
@@ -64,6 +62,16 @@ function KanbanBoard() {
           <span>Dodaj kolumnę</span>
         </button>
 
+        <button 
+          className="menu-item"
+          onClick={() => handleFormToggle('row')}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
+          <span>Dodaj wiersz</span>
+        </button>
+
         <Link to="/users" className="menu-item">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -75,6 +83,7 @@ function KanbanBoard() {
       {activeForm === 'task' && <AddTaskForm onClose={() => setActiveForm(null)} />}
       {activeForm === 'wip' && <WipLimitControl onClose={() => setActiveForm(null)} />}
       {activeForm === 'column' && <AddColumnForm onClose={() => setActiveForm(null)} />}
+      {activeForm === 'row' && <AddRowForm onClose={() => setActiveForm(null)} />}
 
       <Board />
     </div>

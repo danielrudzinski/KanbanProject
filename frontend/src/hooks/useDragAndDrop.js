@@ -19,20 +19,31 @@ const useDragAndDrop = (onMoveTask) => {
         e.stopPropagation();
     };
 
-    const handleDrop = async (e, targetColumnId) => {
-        e.preventDefault();
-        const data = e.dataTransfer.getData('application/json');
-        
-        try {
-            const { taskId, sourceColumnId } = JSON.parse(data);
-            
-            if (sourceColumnId !== targetColumnId) {
-                await onMoveTask(taskId, targetColumnId);
-            }
-        } catch (error) {
-            console.error('Error during drop:', error);
+const handleDrop = async (e, targetColumnId, targetRowId = null) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData('application/json');
+    
+    if (!data) {
+        console.error('Drop event received empty data.');
+        return;
+    }
+
+    try {
+        const parsedData = JSON.parse(data);
+        if (!parsedData.taskId) return;
+
+        const { taskId, sourceColumnId, sourceRowId = null } = parsedData;
+
+        if (sourceRowId === null || targetRowId === null) {
+            await onMoveTask(taskId, targetColumnId);
+        } else if (sourceColumnId !== targetColumnId || sourceRowId !== targetRowId) {
+            await onMoveTask(taskId, targetColumnId, targetRowId);
         }
-    };
+    } catch (error) {
+        console.error('Error during drop:', error);
+    }
+};
+
 
     return {
         isDragging,

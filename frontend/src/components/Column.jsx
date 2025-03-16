@@ -1,15 +1,13 @@
 import { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import Task from './Task';
-import useDragAndDrop from '../hooks/useDragAndDrop';
 import '../styles/components/Column.css';
 
-function Column({ column, tasks }) {
-  const { deleteColumn, moveTask } = useKanban();
+function Column({ column, tasks}) {
+  const { deleteColumn, dragAndDrop } = useKanban();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-
-  // Use drag and drop hook
-  const { handleDragOver, handleDrop } = useDragAndDrop(moveTask);
+  
+  const { handleDragOver, handleDrop } = dragAndDrop;
 
   const isOverLimit = column.wipLimit > 0 && tasks.length > column.wipLimit;
 
@@ -25,12 +23,20 @@ function Column({ column, tasks }) {
     setIsConfirmingDelete(false);
   };
 
+  const onDragOver = (e) => {
+    handleDragOver(e);
+  };
+  
+  const onDrop = (e) => {
+    handleDrop(e, column.id);
+  };
+
   return (
     <div 
-    className={`column ${isOverLimit ? 'over-limit' : ''}`} 
-    data-column-id={column.id}
-    onDragOver={handleDragOver}
-    onDrop={(e) => handleDrop(e, column.id)}
+      className={`column ${isOverLimit ? 'over-limit' : ''}`} 
+      data-column-id={column.id}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
     >
       <div className="column-header">
         <div className="header-top">
@@ -66,14 +72,15 @@ function Column({ column, tasks }) {
       <div 
         className="task-list" 
         data-column-id={column.id}
-        onDragOver={handleDragOver}
-        onDrop={(e) => handleDrop(e, column.id)}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
       >
         {tasks.map(task => (
           <Task 
             key={task.id} 
             task={task}
-            columnId={column.id} 
+            columnId={column.id}
+            rowId={null}
           />
         ))}
       </div>

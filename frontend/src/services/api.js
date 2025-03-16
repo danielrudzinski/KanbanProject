@@ -2,7 +2,9 @@
 const API_ENDPOINTS = {
     COLUMNS: '/columns',
     TASKS: '/tasks',
-    USERS: '/users'
+    USERS: '/users',
+    ROWS: '/rows',
+    SUBTASKS: '/subtasks'
   };
   
   // Fetch all columns
@@ -255,3 +257,139 @@ const API_ENDPOINTS = {
       throw error;
     }
   };
+
+  // Row-related functions
+// Fetch all rows
+export const fetchRows = async (retries = 3) => {
+  while (retries > 0) {
+    try {
+      const response = await fetch(API_ENDPOINTS.ROWS);
+      if (!response.ok) {
+        throw new Error(`Error fetching rows: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching rows:', error);
+      if (retries === 1) throw error;
+      retries--;
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+    }
+  }
+};
+
+// Fetch a single row
+export const fetchRow = async (rowId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.ROWS}/${rowId}`);
+    if (!response.ok) {
+      throw new Error(`Error fetching row: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching row ${rowId}:`, error);
+    throw error;
+  }
+};
+
+// Add a new row
+export const addRow = async (name, wipLimit) => {
+  try {
+    const response = await fetch(API_ENDPOINTS.ROWS, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name,
+        wipLimit: parseInt(wipLimit) || 0
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error adding row: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error adding row:', error);
+    throw error;
+  }
+};
+
+// Update row WIP limit
+export const updateRowWipLimit = async (rowId, wipLimit) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.ROWS}/${rowId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        wipLimit: parseInt(wipLimit)
+      })
+    });
+
+    if (response.status >= 200 && response.status < 300) {
+      try {
+        return await response.json();
+      } catch (parseError) {
+        console.warn('JSON parse error but update likely succeeded:', parseError);
+        return {
+          id: rowId,
+          wipLimit: parseInt(wipLimit)
+        };
+      }
+    }
+
+    throw new Error(`Error updating row WIP limit: ${response.status}`);
+  } catch (error) {
+    console.error(`Error updating WIP limit for row ${rowId}:`, error);
+    throw error;
+  }
+};
+
+// Delete a row
+export const deleteRow = async (rowId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.ROWS}/${rowId}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok && response.status !== 404) {
+      throw new Error(`Error deleting row: ${response.status}`);
+    }
+    
+    return true;
+  } catch (error) {
+    console.error(`Error deleting row ${rowId}:`, error);
+    throw error;
+  }
+};
+
+// Update task's row
+export const updateTaskRow = async (taskId, rowId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        row: {
+          id: rowId
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error details:", errorData);
+      throw new Error(`Error updating task row: ${response.status} - ${errorData.message || 'Unknown error'}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Error updating task ${taskId} row:`, error);
+    throw error;
+  }
+};
