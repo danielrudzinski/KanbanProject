@@ -6,6 +6,7 @@ import '../styles/components/Column.css';
 function Column({ column, tasks}) {
   const { deleteColumn, dragAndDrop } = useKanban();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
   
   const { handleDragStart, handleDragOver, handleDrop } = dragAndDrop;
 
@@ -24,22 +25,47 @@ function Column({ column, tasks}) {
   };
 
   const onDragOver = (e) => {
+    e.preventDefault(); // This is critical to allow drops
+    
+    // Set visual feedback
+    setIsDragOver(true);
+    
+    // Call the context's drag over handler
     handleDragOver(e);
   };
   
+  const onDragLeave = () => {
+    setIsDragOver(false);
+  };
+  
   const onDrop = (e) => {
-    handleDrop(e, column.id);
+    console.log('Column drop event on column:', column.id);
+    
+    // Reset visual feedback
+    setIsDragOver(false);
+    
+    // Call the context's drop handler
+    handleDrop(e, column.id, null);
   };
   
   const onDragStart = (e) => {
-    handleDragStart(e, column.id, 'column');
+    console.log('Column drag start:', column.id);
+    
+    // Set the data directly
+    const data = { id: column.id, type: 'column' };
+    const dataString = JSON.stringify(data);
+    
+    e.dataTransfer.setData('application/column', dataString);
+    e.dataTransfer.setData('text/plain', dataString);
+    e.dataTransfer.effectAllowed = 'move';
   };
 
   return (
     <div 
-      className={`column ${isOverLimit ? 'over-limit' : ''}`} 
+      className={`column ${isOverLimit ? 'over-limit' : ''} ${isDragOver ? 'drag-over' : ''}`} 
       data-column-id={column.id}
       onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
       onDrop={onDrop}
       draggable="true"
       onDragStart={onDragStart}
@@ -77,9 +103,10 @@ function Column({ column, tasks}) {
       )}
 
       <div 
-        className="task-list" 
+        className={`task-list ${isDragOver ? 'drag-over' : ''}`} 
         data-column-id={column.id}
         onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
         onDrop={onDrop}
       >
         {tasks.map(task => (

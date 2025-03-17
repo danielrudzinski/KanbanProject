@@ -146,6 +146,25 @@ export function KanbanProvider({ children }) {
     try {
       const newRow = await addRow(name, wipLimit);
       setRows([...rows, newRow]);
+      
+      // If this is the first row being added, assign all tasks with null rowId to this row
+      if (rows.length === 0) {
+        const tasksToUpdate = tasks.filter(task => task.rowId === null || task.rowId === undefined);
+        
+        const updatedTasks = tasks.map(task => 
+          (task.rowId === null || task.rowId === undefined)
+            ? { ...task, rowId: newRow.id } 
+            : task
+        );
+        
+        setTasks(updatedTasks);
+        
+        // Update tasks in backend
+        tasksToUpdate.forEach(async (task) => {
+          await updateTaskRow(task.id, newRow.id);
+        });
+      }
+      
       return newRow;
     } catch (err) {
       setError(err.message);
@@ -357,28 +376,129 @@ export function KanbanProvider({ children }) {
     }
   };
 
-  // Drag and drop handlers
-  const handleDragStart = (e, id, type = 'task', sourceColumnId = null, sourceRowId = null) => {
-    // Set the data transfer
-    let data;
-    
-    if (type === 'task') {
-      data = {
-        id,
-        type,
-        sourceColumnId,
-        sourceRowId
-      };
-    } else {
-      data = { id, type };
+// Replace the handleDragStart method in KanbanContext.jsx
+const handleDragStart = (e, id, type = 'task', sourceColumnId = null, sourceRowId = null) => {
+  // Create a clear data structure
+  let data;
+  
+  if (type === 'task') {
+    data = {
+      id,
+      type,
+      sourceColumnId,
+      sourceRowId
+    };
+  } else {
+    data = { id, type };
+  }
+  
+  // Set the data in standard format
+  const dataString = JSON.stringify(data);
+  e.dataTransfer.setData(`application/${type}`, dataString);
+  
+  // For debugging, also set as plain text
+  e.dataTransfer.setData('text/plain', dataString);
+  
+  e.dataTransfer.effectAllowed = 'move';
+  
+  // Store the dragged item info in state
+  setDraggedItem({ id, type, sourceColumnId, sourceRowId });
+  
+  // For backwards compatibility, add the data with the old format too
+  if (type === 'task') {
+    e.dataTransfer.setData('taskId', id);
+    e.dataTransfer.setData('columnId', sourceColumnId);
+  }
+};
+
+// Replace the handleDrop method in KanbanContext.jsx
+const handleDrop = (e, targetColumnId, targetRowId) => {
+  e.preventDefault();
+  
+  console.log('Drop event:', { targetColumnId, targetRowId });
+  
+  // First, check if we're dropping a task
+  if (e.dataTransfer.types.includes('application/task')) {
+    try {
+      const dataString = e.dataTransfer.getData('application/task');
+      console.log('Task data string:', dataString);
+      
+      const taskData = JSON.parse(dataString);
+      console.log('Parsed task data:', taskData);
+      
+      // Extract the task ID
+      const taskId = taskData.id;
+      
+      // Extract source information
+      const sourceColumnId = taskData.sourceColumnId;
+      const sourceRowId = taskData.sourceRowId;
+      
+      console.log('Moving task:', { taskId, sourceColumnId, targetColumnId, sourceRowId, targetRowId });
+      
+      // Skip if source and target are identical
+      if (sourceColumnId === targetColumnId && sourceRowId === targetRowId) {
+        return;
+      }
+      
+      // Move the task
+      handleMoveTask(taskId, targetColumnId, targetRowId);
+    } catch (err) {
+      console.error('Error processing task drop:', err);
+      
+      // Fallback: try to get the task ID directly
+      try {
+        const taskId = e.dataTransfer.getData('taskId');
+        const sourceColumnId = e.dataTransfer.getData('columnId');
+        
+        if (taskId && sourceColumnId !== targetColumnId) {
+          console.log('Fallback: Moving task with direct IDs', { taskId, targetColumnId });
+          handleMoveTask(taskId, targetColumnId, targetRowId);
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback error:', fallbackErr);
+      }
     }
-    
-    e.dataTransfer.setData(`application/${type}`, JSON.stringify(data));
-    e.dataTransfer.effectAllowed = 'move';
-    
-    // Store the dragged item info in state
-    setDraggedItem({ id, type, sourceColumnId, sourceRowId });
-  };
+  }
+  
+  // Check for column data
+  else if (e.dataTransfer.types.includes('application/column')) {
+    try {
+      const dataString = e.dataTransfer.getData('application/column');
+      console.log('Column data string:', dataString);
+      
+      const columnData = JSON.parse(dataString);
+      const columnId = columnData.id;
+      
+      // Don't drop on itself
+      if (columnId !== targetColumnId) {
+        handleMoveColumn(columnId, targetColumnId);
+      }
+    } catch (err) {
+      console.error('Error processing column drop:', err);
+    }
+  }
+  
+  // Check for row data
+  else if (e.dataTransfer.types.includes('application/row')) {
+    try {
+      const dataString = e.dataTransfer.getData('application/row');
+      console.log('Row data string:', dataString);
+      
+      const rowData = JSON.parse(dataString);
+      const rowId = rowData.id;
+      
+      // Don't drop on itself
+      if (rowId !== targetRowId) {
+        handleMoveRow(rowId, targetRowId);
+      }
+    } catch (err) {
+      console.error('Error processing row drop:', err);
+    }
+  }
+  
+  // Clear the dragged item state
+  setDraggedItem(null);
+};
   
   const handleDragOver = (e) => {
     if (e.preventDefault) {
@@ -387,60 +507,6 @@ export function KanbanProvider({ children }) {
     
     e.dataTransfer.dropEffect = 'move';
     return false;
-  };
-  
-  const handleDrop = (e, targetColumnId, targetRowId) => {
-    e.preventDefault();
-    
-    // Check if we're dropping a task
-    if (e.dataTransfer.types.includes('application/task')) {
-      try {
-        const data = JSON.parse(e.dataTransfer.getData('application/task'));
-        const taskId = data.id;
-        
-        // If source and target are the same, do nothing
-        if (data.sourceColumnId === targetColumnId && data.sourceRowId === targetRowId) {
-          return;
-        }
-        
-        // Move the task
-        handleMoveTask(taskId, targetColumnId, targetRowId);
-      } catch (err) {
-        console.error('Error dropping task:', err);
-      }
-    }
-    
-    // Check if we're dropping a column
-    else if (e.dataTransfer.types.includes('application/column')) {
-      try {
-        const data = JSON.parse(e.dataTransfer.getData('application/column'));
-        const columnId = data.id;
-        
-        // Don't drop on itself
-        if (columnId !== targetColumnId) {
-          handleMoveColumn(columnId, targetColumnId);
-        }
-      } catch (err) {
-        console.error('Error dropping column:', err);
-      }
-    }
-    
-    // Check if we're dropping a row
-    else if (e.dataTransfer.types.includes('application/row')) {
-      try {
-        const data = JSON.parse(e.dataTransfer.getData('application/row'));
-        const rowId = data.id;
-        
-        // Don't drop on itself
-        if (rowId !== targetRowId) {
-          handleMoveRow(rowId, targetRowId);
-        }
-      } catch (err) {
-        console.error('Error dropping row:', err);
-      }
-    }
-    
-    setDraggedItem(null);
   };
   
   const handleDragEnd = () => {

@@ -1,16 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import TaskDetails from './TaskDetails';
-import useDragAndDrop from '../hooks/useDragAndDrop';
 import '../styles/components/Task.css';
 
 function Task({ task, columnId }) {
-  const { deleteTask } = useKanban();
+  const { deleteTask, dragAndDrop } = useKanban();
   const [showDetails, setShowDetails] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const taskRef = useRef(null);
 
-  const { handleDragStart, handleDragEnd } = useDragAndDrop();
+  const { handleDragStart, handleDragEnd } = dragAndDrop;
 
   const fetchUserAvatar = async (userId) => {
     try {
@@ -32,7 +31,7 @@ function Task({ task, columnId }) {
         console.warn(`Error fetching avatar for user ${userId}:`, error);
         return null;
     }
-};
+  };
 
   useEffect(() => {
     // If task has a user assigned, fetch their avatar
@@ -92,16 +91,58 @@ function Task({ task, columnId }) {
     );
   };
 
+  // Handle drag start event
+  const onDragStartHandler = (e) => {
+    console.log('Task drag start:', { taskId: task.id, columnId });
+    
+    // Set the data directly in the format expected by handleDrop
+    const data = {
+      id: task.id,
+      type: 'task',
+      sourceColumnId: columnId,
+      sourceRowId: task.rowId
+    };
+    
+    // Set the data in standard format
+    const dataString = JSON.stringify(data);
+    e.dataTransfer.setData('application/task', dataString);
+    
+    // For debugging, also set as plain text
+    e.dataTransfer.setData('text/plain', dataString);
+    
+    // For backwards compatibility
+    e.dataTransfer.setData('taskId', task.id);
+    e.dataTransfer.setData('columnId', columnId);
+    
+    e.dataTransfer.effectAllowed = 'move';
+    
+    // Add a class to indicate dragging
+    if (taskRef.current) {
+      taskRef.current.classList.add('dragging');
+    }
+  };
+  
+  const onDragEndHandler = (e) => {
+    console.log('Task drag end');
+    
+    // Remove the dragging class
+    if (taskRef.current) {
+      taskRef.current.classList.remove('dragging');
+    }
+  };
+
   return (
     <>
       <div
         ref={taskRef}
         className="task"
-        draggable={true}
+        draggable="true"
         onClick={handleTaskClick}
-        onDragStart={(e) => handleDragStart(e, { taskId: task.id, sourceColumnId: columnId })}
-        onDragEnd={handleDragEnd}
+        onDragStart={onDragStartHandler}
+        onDragEnd={onDragEndHandler}
         data-task-id={task.id}
+        data-column-id={columnId}
+        data-row-id={task.rowId || "null"}
       >
         <div className="task-content">
           <div className="task-title">{task.title}</div>

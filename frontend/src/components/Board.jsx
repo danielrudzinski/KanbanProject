@@ -30,16 +30,22 @@ function Board() {
 
   // Filter tasks by column and optionally by row
   const getTasksByColumnAndRow = (columnId, rowId = null) => {
-    if (rowId === null) {
+    // When rows exist but looking for tasks with no row (rowId is null)
+    // Return empty array because all tasks should be associated with rows
+    if (rows.length > 0 && rowId === null) {
+      return [];
+    }
+    
+    // When rows exist and looking for tasks in a specific row
+    if (rows.length > 0 && rowId !== null) {
       return tasks.filter(task => 
-        task.columnId === columnId && 
-        (task.rowId === null || task.rowId === undefined)
+        task.columnId === columnId && task.rowId === rowId
       );
     }
     
-    return tasks.filter(task => 
-      task.columnId === columnId && task.rowId === rowId
-    );
+    // When no rows exist, return all tasks for the column
+    // This handles tasks with null rowId (or any rowId) when there are no rows
+    return tasks.filter(task => task.columnId === columnId);
   };
 
   // Calculate task counts for each row
