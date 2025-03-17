@@ -7,7 +7,7 @@ function Column({ column, tasks}) {
   const { deleteColumn, dragAndDrop } = useKanban();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   
-  const { handleDragOver, handleDrop } = dragAndDrop;
+  const { handleDragStart, handleDragOver, handleDrop } = dragAndDrop;
 
   const isOverLimit = column.wipLimit > 0 && tasks.length > column.wipLimit;
 
@@ -30,6 +30,10 @@ function Column({ column, tasks}) {
   const onDrop = (e) => {
     handleDrop(e, column.id);
   };
+  
+  const onDragStart = (e) => {
+    handleDragStart(e, column.id, 'column');
+  };
 
   return (
     <div 
@@ -37,9 +41,12 @@ function Column({ column, tasks}) {
       data-column-id={column.id}
       onDragOver={onDragOver}
       onDrop={onDrop}
+      draggable="true"
+      onDragStart={onDragStart}
     >
       <div className="column-header">
         <div className="header-top">
+          <span className="column-drag-handle">☰</span>
           {column.name}
           <span className="task-count">{tasks.length}</span>
           <button 

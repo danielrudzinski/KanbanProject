@@ -14,7 +14,6 @@ import {
   deleteRow,
   updateTaskRow
 } from '../services/api';
-import useDragAndDrop from '../hooks/useDragAndDrop';
 
 const KanbanContext = createContext();
 
@@ -25,6 +24,7 @@ export function KanbanProvider({ children }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [draggedItem, setDraggedItem] = useState(null);
   
   // Map of column ids to their frontend keys
   const [columnMap, setColumnMap] = useState({});
@@ -279,19 +279,30 @@ export function KanbanProvider({ children }) {
   // Move task between columns and/or rows
   const handleMoveTask = async (taskId, newColumnId, newRowId) => {
     try {
-      await updateTaskColumn(taskId, newColumnId);
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
       
-      let updatedTask = { ...tasks.find(task => task.id === taskId), columnId: newColumnId };
+      // Only update if something actually changed
+      const columnChanged = newColumnId !== undefined && newColumnId !== task.columnId;
+      const rowChanged = newRowId !== undefined && newRowId !== task.rowId;
       
-      // If rowId is provided, update the task's row
-      if (newRowId !== undefined) {
+      if (!columnChanged && !rowChanged) return;
+      
+      let updatedTask = { ...task };
+      
+      // Update column if needed
+      if (columnChanged) {
+        await updateTaskColumn(taskId, newColumnId);
+        updatedTask.columnId = newColumnId;
+      }
+      
+      // Update row if needed
+      if (rowChanged) {
         await updateTaskRow(taskId, newRowId);
         updatedTask.rowId = newRowId;
       }
       
-      setTasks(tasks.map(task => 
-        task.id === taskId ? updatedTask : task
-      ));
+      setTasks(tasks.map(t => t.id === taskId ? updatedTask : t));
     } catch (err) {
       setError(err.message);
       throw err;
@@ -346,8 +357,104 @@ export function KanbanProvider({ children }) {
     }
   };
 
-  // Set up drag and drop functionality
-  const dragAndDrop = useDragAndDrop(handleMoveTask);
+  // Drag and drop handlers
+  const handleDragStart = (e, id, type = 'task', sourceColumnId = null, sourceRowId = null) => {
+    // Set the data transfer
+    let data;
+    
+    if (type === 'task') {
+      data = {
+        id,
+        type,
+        sourceColumnId,
+        sourceRowId
+      };
+    } else {
+      data = { id, type };
+    }
+    
+    e.dataTransfer.setData(`application/${type}`, JSON.stringify(data));
+    e.dataTransfer.effectAllowed = 'move';
+    
+    // Store the dragged item info in state
+    setDraggedItem({ id, type, sourceColumnId, sourceRowId });
+  };
+  
+  const handleDragOver = (e) => {
+    if (e.preventDefault) {
+      e.preventDefault(); // Necessary to allow dropping
+    }
+    
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+  };
+  
+  const handleDrop = (e, targetColumnId, targetRowId) => {
+    e.preventDefault();
+    
+    // Check if we're dropping a task
+    if (e.dataTransfer.types.includes('application/task')) {
+      try {
+        const data = JSON.parse(e.dataTransfer.getData('application/task'));
+        const taskId = data.id;
+        
+        // If source and target are the same, do nothing
+        if (data.sourceColumnId === targetColumnId && data.sourceRowId === targetRowId) {
+          return;
+        }
+        
+        // Move the task
+        handleMoveTask(taskId, targetColumnId, targetRowId);
+      } catch (err) {
+        console.error('Error dropping task:', err);
+      }
+    }
+    
+    // Check if we're dropping a column
+    else if (e.dataTransfer.types.includes('application/column')) {
+      try {
+        const data = JSON.parse(e.dataTransfer.getData('application/column'));
+        const columnId = data.id;
+        
+        // Don't drop on itself
+        if (columnId !== targetColumnId) {
+          handleMoveColumn(columnId, targetColumnId);
+        }
+      } catch (err) {
+        console.error('Error dropping column:', err);
+      }
+    }
+    
+    // Check if we're dropping a row
+    else if (e.dataTransfer.types.includes('application/row')) {
+      try {
+        const data = JSON.parse(e.dataTransfer.getData('application/row'));
+        const rowId = data.id;
+        
+        // Don't drop on itself
+        if (rowId !== targetRowId) {
+          handleMoveRow(rowId, targetRowId);
+        }
+      } catch (err) {
+        console.error('Error dropping row:', err);
+      }
+    }
+    
+    setDraggedItem(null);
+  };
+  
+  const handleDragEnd = () => {
+    setDraggedItem(null);
+  };
+  
+  // Combine all drag and drop handlers
+  const dragAndDrop = {
+    draggedItem,
+    handleDragStart,
+    handleDragOver,
+    handleDrop,
+    handleDragEnd
+  };
   
   const value = {
     columns,

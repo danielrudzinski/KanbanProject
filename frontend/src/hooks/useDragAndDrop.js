@@ -1,57 +1,99 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
-const useDragAndDrop = (onMoveTask) => {
-    const [isDragging, setIsDragging] = useState(false);
-
-    const handleDragStart = (e, taskData) => {
-        setIsDragging(true);
-        e.dataTransfer.setData('application/json', JSON.stringify(taskData));
-        e.target.classList.add('dragging');
+const useDragAndDrop = (moveTask, moveColumn, moveRow) => {
+  const [draggedItem, setDraggedItem] = useState(null);
+  
+  // Handle drag start
+  const handleDragStart = useCallback((e, id, type, sourceColumnId, sourceRowId) => {
+    // Set the data transfer
+    const data = {
+      id,
+      type,
+      sourceColumnId,
+      sourceRowId
     };
-
-    const handleDragEnd = (e) => {
-        setIsDragging(false);
-        e.target.classList.remove('dragging');
-    };
-
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-    };
-
-const handleDrop = async (e, targetColumnId, targetRowId = null) => {
-    e.preventDefault();
-    const data = e.dataTransfer.getData('application/json');
     
-    if (!data) {
-        console.error('Drop event received empty data.');
-        return;
+    e.dataTransfer.setData(`application/${type}`, JSON.stringify(data));
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggedItem({ id, type });
+    
+    // For columns and rows, set specific data type
+    if (type === 'column') {
+      e.dataTransfer.setData('application/column', id);
+    } else if (type === 'row') {
+      e.dataTransfer.setData('application/row', id);
     }
-
-    try {
-        const parsedData = JSON.parse(data);
-        if (!parsedData.taskId) return;
-
-        const { taskId, sourceColumnId, sourceRowId = null } = parsedData;
-
-        if (sourceRowId === null || targetRowId === null) {
-            await onMoveTask(taskId, targetColumnId);
-        } else if (sourceColumnId !== targetColumnId || sourceRowId !== targetRowId) {
-            await onMoveTask(taskId, targetColumnId, targetRowId);
+  }, []);
+  
+  // Handle drag over
+  const handleDragOver = useCallback((e) => {
+    if (e.preventDefault) {
+      e.preventDefault(); // Necessary to allow dropping
+    }
+    
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+  }, []);
+  
+  // Handle drop
+  const handleDrop = useCallback((e, targetColumnId, targetRowId) => {
+    e.preventDefault();
+    
+    // Check if we're dropping a task
+    if (e.dataTransfer.types.includes('application/task')) {
+      try {
+        const data = JSON.parse(e.dataTransfer.getData('application/task'));
+        const taskId = data.id;
+        
+        // If source and target are the same, do nothing
+        if (data.sourceColumnId === targetColumnId && data.sourceRowId === targetRowId) {
+          return;
         }
-    } catch (error) {
-        console.error('Error during drop:', error);
+        
+        // Move the task
+        moveTask(taskId, targetColumnId, targetRowId);
+      } catch (err) {
+        console.error('Error dropping task:', err);
+      }
     }
-};
-
-
-    return {
-        isDragging,
-        handleDragStart,
-        handleDragEnd,
-        handleDragOver,
-        handleDrop
-    };
+    
+    // Check if we're dropping a column
+    else if (e.dataTransfer.types.includes('application/column')) {
+      try {
+        const columnId = e.dataTransfer.getData('application/column');
+        
+        // Don't drop on itself
+        if (columnId !== targetColumnId) {
+          moveColumn(columnId, targetColumnId);
+        }
+      } catch (err) {
+        console.error('Error dropping column:', err);
+      }
+    }
+    
+    // Check if we're dropping a row
+    else if (e.dataTransfer.types.includes('application/row')) {
+      try {
+        const rowId = e.dataTransfer.getData('application/row');
+        
+        // Don't drop on itself
+        if (rowId !== targetRowId) {
+          moveRow(rowId, targetRowId);
+        }
+      } catch (err) {
+        console.error('Error dropping row:', err);
+      }
+    }
+    
+    setDraggedItem(null);
+  }, [moveTask, moveColumn, moveRow]);
+  
+  return {
+    draggedItem,
+    handleDragStart,
+    handleDragOver,
+    handleDrop
+  };
 };
 
 export default useDragAndDrop;

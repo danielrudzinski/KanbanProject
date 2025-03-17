@@ -3,8 +3,9 @@ import { useKanban } from '../context/KanbanContext';
 import '../styles/components/Row.css';
 
 function Row({ row, children }) {
-  const { deleteRow } = useKanban();
+  const { deleteRow, dragAndDrop } = useKanban();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const { handleDragStart, handleDragOver, handleDrop } = dragAndDrop;
 
   const handleDeleteClick = () => {
     setIsConfirmingDelete(true);
@@ -17,14 +18,31 @@ function Row({ row, children }) {
   const handleCancelDelete = () => {
     setIsConfirmingDelete(false);
   };
+  
+  const onDragStart = (e) => {
+    handleDragStart(e, row.id, 'row');
+  };
+  
+  const onDragOver = (e) => {
+    handleDragOver(e);
+  };
+  
+  const onDrop = (e) => {
+    handleDrop(e, null, row.id);
+  };
 
   return (
     <div 
       className="row" 
       data-row-id={row.id}
+      draggable="true"
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
     >
       <div className="row-header">
         <div className="header-left">
+          <span className="row-drag-handle">☰</span>
           {row.name}
           <span className="task-count">{row.taskCount || 0}</span>
           <button 

@@ -6,7 +6,7 @@ import '../styles/components/Board.css';
 
 function Board() {
   const { columns, rows, tasks, loading, error, deleteRow, dragAndDrop } = useKanban();
-  const { handleDragOver } = dragAndDrop;
+  const { handleDragOver, handleDrop } = dragAndDrop;
 
   if (loading) {
     return <div className="board-loading">Loading kanban board...</div>;
@@ -84,6 +84,93 @@ function Board() {
     }
   };
 
+  // Render the row header with drag and drop handlers
+  const renderRowHeader = (row) => {
+    const onDragStart = (e) => {
+      dragAndDrop.handleDragStart(e, row.id, 'row');
+    };
+    
+    const onDragOver = (e) => {
+      dragAndDrop.handleDragOver(e);
+    };
+    
+    const onDrop = (e) => {
+      dragAndDrop.handleDrop(e, null, row.id);
+    };
+    
+    return (
+      <td 
+        className="grid-row-header"
+        draggable="true"
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+        data-row-id={row.id}
+      >
+        <div className="row-title">
+          <span className="row-drag-handle">☰</span>
+          {row.name}
+        </div>
+        <div className="row-actions">
+          <span className="task-count">{row.taskCount || 0}</span>
+          {row.wipLimit > 0 && (
+            <span className={`wip-limit ${row.isOverLimit ? 'exceeded' : ''}`}>
+              ({row.taskCount || 0}/{row.wipLimit})
+            </span>
+          )}
+          <button 
+            className="delete-row-btn" 
+            title="Usuń wiersz"
+            onClick={() => {
+              if (window.confirm('Czy na pewno chcesz usunąć ten wiersz?')) {
+                deleteRow(row.id);
+              }
+            }}
+          >
+            ×
+          </button>
+        </div>
+      </td>
+    );
+  };
+
+  // Render column header with drag and drop handlers
+  const renderColumnHeader = (column) => {
+    const onDragStart = (e) => {
+      dragAndDrop.handleDragStart(e, column.id, 'column');
+    };
+    
+    const onDragOver = (e) => {
+      dragAndDrop.handleDragOver(e);
+    };
+    
+    const onDrop = (e) => {
+      dragAndDrop.handleDrop(e, column.id);
+    };
+    
+    return (
+      <th 
+        key={column.id} 
+        className="grid-column-header"
+        draggable="true"
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+        data-column-id={column.id}
+      >
+        <div className="column-title">
+          <span className="column-drag-handle">☰</span>
+          {column.name}
+        </div>
+        {column.wipLimit > 0 && (
+          <span className={`wip-limit ${tasks.filter(t => t.columnId === column.id).length > column.wipLimit ? 'exceeded' : ''}`}>
+            ({tasks.filter(t => t.columnId === column.id).length}/{column.wipLimit})
+          </span>
+        )}
+      </th>
+    );
+  };
+
   // If no rows, render the board with just columns
   if (rows.length === 0) {
     return (
@@ -112,16 +199,7 @@ function Board() {
             <th className="grid-corner"></th>
             
             {/* Column headers */}
-            {columns.map(column => (
-              <th key={column.id} className="grid-column-header">
-                <div className="column-title">{column.name}</div>
-                {column.wipLimit > 0 && (
-                  <span className={`wip-limit ${tasks.filter(t => t.columnId === column.id).length > column.wipLimit ? 'exceeded' : ''}`}>
-                    ({tasks.filter(t => t.columnId === column.id).length}/{column.wipLimit})
-                  </span>
-                )}
-              </th>
-            ))}
+            {columns.map(column => renderColumnHeader(column))}
           </tr>
         </thead>
         <tbody>
@@ -151,30 +229,7 @@ function Board() {
           {enhancedRows.map(row => (
             <tr key={row.id}>
               {/* Row header */}
-              <td 
-                className="grid-row-header"
-              >
-                <div className="row-title">{row.name}</div>
-                <div className="row-actions">
-                  <span className="task-count">{row.taskCount || 0}</span>
-                  {row.wipLimit > 0 && (
-                    <span className={`wip-limit ${row.isOverLimit ? 'exceeded' : ''}`}>
-                      ({row.taskCount || 0}/{row.wipLimit})
-                    </span>
-                  )}
-                  <button 
-                    className="delete-row-btn" 
-                    title="Usuń wiersz"
-                    onClick={() => {
-                      if (window.confirm('Czy na pewno chcesz usunąć ten wiersz?')) {
-                        deleteRow(row.id);
-                      }
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-              </td>
+              {renderRowHeader(row)}
               
               {/* Row cells */}
               {columns.map(column => (
