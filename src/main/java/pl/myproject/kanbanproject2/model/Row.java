@@ -18,6 +18,8 @@ public class Row {
     private Integer id;
     @Column(name = "name")
     private String name;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer position;
     @Column(name = "wip_limit")
     private Integer wipLimit;
     @OneToMany(mappedBy = "row", cascade = CascadeType.MERGE)

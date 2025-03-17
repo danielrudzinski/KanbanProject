@@ -19,6 +19,8 @@ public class SubTask {
     private String title;
     private String description;
     private boolean completed;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer position;
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;

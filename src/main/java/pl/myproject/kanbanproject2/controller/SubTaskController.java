@@ -85,4 +85,12 @@ public class SubTaskController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PatchMapping("/{id}/position/{position}")
+    public ResponseEntity<SubTaskDTO> updateSubTaskPosition(@PathVariable Integer id, @PathVariable Integer position) {
+        try {
+            return ResponseEntity.ok(subTaskService.updateSubTaskPosition(id, position));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

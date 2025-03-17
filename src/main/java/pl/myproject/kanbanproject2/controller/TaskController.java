@@ -16,7 +16,6 @@ public class TaskController {
 
     private final TaskService taskService;
 
-
     @Autowired
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
@@ -73,6 +72,17 @@ public class TaskController {
     public ResponseEntity<TaskDTO> removeUserFromTask(@PathVariable Integer taskId, @PathVariable Integer userId) {
         try {
             return ResponseEntity.ok(taskService.removeUserFromTask(taskId, userId));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}/position/{position}")
+    public ResponseEntity<TaskDTO> updateTaskPosition(
+            @PathVariable Integer id,
+            @PathVariable Integer position) {
+        try {
+            return ResponseEntity.ok(taskService.updateTaskPosition(id, position));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }

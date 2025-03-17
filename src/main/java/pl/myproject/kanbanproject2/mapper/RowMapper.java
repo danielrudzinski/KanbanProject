@@ -1,12 +1,9 @@
 package pl.myproject.kanbanproject2.mapper;
 
 import org.springframework.stereotype.Component;
-import pl.myproject.kanbanproject2.dto.ColumnDTO;
 import pl.myproject.kanbanproject2.dto.RowDTO;
 import pl.myproject.kanbanproject2.dto.TaskDTO;
-import pl.myproject.kanbanproject2.model.Column;
 import pl.myproject.kanbanproject2.model.Row;
-import pl.myproject.kanbanproject2.model.Task;
 
 import java.util.List;
 import java.util.function.Function;
@@ -28,12 +25,13 @@ public class RowMapper implements Function<Row, RowDTO> {
         }
 
         List<TaskDTO> taskDTOs = row.getTasks().stream()
-                .map(taskMapper::apply) // Używamy TaskMapper do mapowania każdego Task na TaskDTO
+                .map(taskMapper::apply)
                 .collect(Collectors.toList());
 
         return new RowDTO(
                 row.getId(),
                 row.getName(),
+                row.getPosition(),
                 row.getWipLimit(),
                 taskDTOs
         );

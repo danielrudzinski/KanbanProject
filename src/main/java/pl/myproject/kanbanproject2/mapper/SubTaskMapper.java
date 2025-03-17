@@ -30,6 +30,7 @@ public class SubTaskMapper {
                 entity.getTitle(),
                 entity.getDescription(),
                 entity.isCompleted(),
+                entity.getPosition(),
                 entity.getTask() != null ? entity.getTask().getId() : null
         );
     }
@@ -54,6 +55,7 @@ public class SubTaskMapper {
         entity.setTitle(dto.title());
         entity.setDescription(dto.description());
         entity.setCompleted(dto.completed());
+        entity.setPosition(dto.position());
 
         // Ustawienie relacji z Task, jeśli taskId jest dostępne
         if (dto.taskId() != null) {
@@ -84,6 +86,10 @@ public class SubTaskMapper {
         entity.setTitle(dto.title());
         entity.setDescription(dto.description());
         entity.setCompleted(dto.completed());
+
+        if (dto.position() != null) {
+            entity.setPosition(dto.position());
+        }
 
         // Aktualizacja relacji, jeśli taskId się zmienił
         if (dto.taskId() != null &&

@@ -32,6 +32,11 @@ public class SubTaskService {
     }
 
     public SubTask addSubTask(SubTask subTask) {
+        // If position is not set, set it to the last position + 1
+        if (subTask.getPosition() == null) {
+            long count = subTaskRepository.count();
+            subTask.setPosition((int) count + 1);
+        }
         return subTaskRepository.save(subTask);
     }
 
@@ -74,6 +79,10 @@ public class SubTaskService {
             existingSubTask.setTask(subTask.getTask());
         }
 
+        if (subTask.getPosition() != null) {
+            existingSubTask.setPosition(subTask.getPosition());
+        }
+
         SubTask savedSubTask = subTaskRepository.save(existingSubTask);
         return subTaskMapper.toDto(savedSubTask);
     }
@@ -109,6 +118,14 @@ public class SubTaskService {
 
         subTask.setCompleted(!subTask.isCompleted());
 
+        SubTask updatedSubTask = subTaskRepository.save(subTask);
+        return subTaskMapper.toDto(updatedSubTask);
+    }
+
+    public SubTaskDTO updateSubTaskPosition(Integer id, Integer position) {
+        SubTask subTask = subTaskRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Nie ma podzadania o takim id"));
+        subTask.setPosition(position);
         SubTask updatedSubTask = subTaskRepository.save(subTask);
         return subTaskMapper.toDto(updatedSubTask);
     }

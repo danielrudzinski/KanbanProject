@@ -1,7 +1,6 @@
 package pl.myproject.kanbanproject2.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.myproject.kanbanproject2.dto.RowDTO;
@@ -28,7 +27,7 @@ public class RowController {
 
     @GetMapping("/{id}")
     public ResponseEntity<RowDTO> getRowById(@PathVariable Integer id) {
-        return  ResponseEntity.ok(rowService.getRowById(id));
+        return ResponseEntity.ok(rowService.getRowById(id));
     }
 
     @PostMapping
@@ -44,7 +43,13 @@ public class RowController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRow(@PathVariable Integer id) {
         rowService.deleteRow(id);
-        return   ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
+    }
 
+    @PatchMapping("/{id}/position/{position}")
+    public ResponseEntity<RowDTO> updateRowPosition(
+            @PathVariable Integer id,
+            @PathVariable Integer position) {
+        return ResponseEntity.ok(rowService.updateRowPosition(id, position));
     }
 }

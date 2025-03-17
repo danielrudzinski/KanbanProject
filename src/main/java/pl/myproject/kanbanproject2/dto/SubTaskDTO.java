@@ -4,5 +4,6 @@ public record SubTaskDTO(
         String title,
         String description,
         boolean completed,
+        Integer position,
         Integer taskId
 ) {}

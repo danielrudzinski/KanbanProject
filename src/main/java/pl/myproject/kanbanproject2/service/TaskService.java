@@ -30,6 +30,11 @@ public class TaskService {
     }
 
     public Task addTask(Task task) {
+        // If position is not set, set it to the last position + 1
+        if (task.getPosition() == null) {
+            long count = taskRepository.count();
+            task.setPosition((int) count + 1);
+        }
         return taskRepository.save(task);
     }
 
@@ -66,6 +71,12 @@ public class TaskService {
         if (task.getUsers() != null) {
             existingTask.setUsers(task.getUsers());
         }
+        if (task.getPosition() != null) {
+            existingTask.setPosition(task.getPosition());
+        }
+        if (task.getRow() != null) {
+            existingTask.setRow(task.getRow());
+        }
 
         Task savedTask = taskRepository.save(existingTask);
         return taskMapper.apply(savedTask);
@@ -78,10 +89,8 @@ public class TaskService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-
         task.getUsers().add(user);
         user.getTasks().add(task);
-
 
         userRepository.save(user);
         Task updatedTask = taskRepository.save(task);
@@ -96,14 +105,20 @@ public class TaskService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-
         task.getUsers().remove(user);
         user.getTasks().remove(task);
-
 
         userRepository.save(user);
         Task updatedTask = taskRepository.save(task);
 
+        return taskMapper.apply(updatedTask);
+    }
+
+    public TaskDTO updateTaskPosition(Integer id, Integer position) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+        task.setPosition(position);
+        Task updatedTask = taskRepository.save(task);
         return taskMapper.apply(updatedTask);
     }
 }
