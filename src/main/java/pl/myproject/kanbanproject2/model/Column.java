@@ -18,7 +18,6 @@ public class Column {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer position;
     @jakarta.persistence.Column(name = "wip_limit")
     private Integer wipLimit;
