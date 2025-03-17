@@ -38,7 +38,7 @@ export function KanbanProvider({ children }) {
         // Fetch columns
         const columnsData = await fetchColumns();
         
-        // Sort columns (Requested, In Progress, Done, others)
+        // Sort columns
         const sortedColumns = columnsData.sort((a, b) => {
           const order = {
             'Requested': 0,
@@ -61,18 +61,30 @@ export function KanbanProvider({ children }) {
         setColumns(sortedColumns);
         setColumnMap(newColumnMap);
         
-        // Fetch tasks
-        const tasksData = await fetchTasks();
-        setTasks(tasksData);
-        
-        // Fetch rows
+        // Fetch rows FIRST
+        let rowsData = [];
         try {
-          const rowsData = await fetchRows();
+          rowsData = await fetchRows();
           setRows(rowsData);
         } catch (rowErr) {
           console.error('Error fetching rows:', rowErr);
-          // If rows can't be fetched, we'll just use the board without rows
+          rowsData = [];
           setRows([]);
+        }
+        
+        // THEN fetch tasks
+        const tasksData = await fetchTasks();
+        
+        // If rows exist, ensure all tasks have valid rowIds
+        if (rowsData.length > 0) {
+          const defaultRowId = rowsData[0].id;
+          const updatedTasks = tasksData.map(task => 
+            (!task.rowId || task.rowId === null) ? { ...task, rowId: defaultRowId } : task
+          );
+          setTasks(updatedTasks);
+        } else {
+          // No rows, just set tasks as-is
+          setTasks(tasksData);
         }
         
         setLoading(false);

@@ -30,21 +30,21 @@ function Board() {
 
   // Filter tasks by column and optionally by row
   const getTasksByColumnAndRow = (columnId, rowId = null) => {
-    // When rows exist but looking for tasks with no row (rowId is null)
-    // Return empty array because all tasks should be associated with rows
-    if (rows.length > 0 && rowId === null) {
-      return [];
+    if (rows.length > 0) {
+      if (rowId === null) {
+        // Return tasks without row assignment (shouldn't be any if properly initialized)
+        return tasks.filter(task => 
+          task.columnId === columnId && (task.rowId === null || task.rowId === undefined)
+        );
+      } else {
+        // Return tasks for specific column and row
+        return tasks.filter(task => 
+          task.columnId === columnId && task.rowId === rowId
+        );
+      }
     }
     
-    // When rows exist and looking for tasks in a specific row
-    if (rows.length > 0 && rowId !== null) {
-      return tasks.filter(task => 
-        task.columnId === columnId && task.rowId === rowId
-      );
-    }
-    
-    // When no rows exist, return all tasks for the column
-    // This handles tasks with null rowId (or any rowId) when there are no rows
+    // When no rows exist
     return tasks.filter(task => task.columnId === columnId);
   };
 
@@ -195,6 +195,40 @@ function Board() {
     );
   }
 
+  // Render table cells with proper drag and drop handlers
+  const renderCell = (column, row) => {
+    const cellTasks = getTasksByColumnAndRow(column.id, row.id);
+    
+    const onDragOver = (e) => {
+      e.preventDefault();
+      dragAndDrop.handleDragOver(e);
+    };
+    
+    const onDrop = (e) => {
+      e.preventDefault();
+      dragAndDrop.handleDrop(e, column.id, row.id);
+    };
+    
+    return (
+      <td 
+        key={`${row.id}-${column.id}`} 
+        className="grid-cell"
+        data-column-id={column.id}
+        data-row-id={row.id}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+      >
+        {cellTasks.map(task => (
+          <Task 
+            key={task.id} 
+            task={task}
+            columnId={column.id} 
+          />
+        ))}
+      </td>
+    );
+  };
+
   // Otherwise, render the grid-based board with rows and columns
   return (
     <div className="board-grid">
@@ -217,22 +251,7 @@ function Board() {
               {renderRowHeader(row)}
               
               {/* Row cells */}
-              {columns.map(column => (
-                <td 
-                  key={`${row.id}-${column.id}`} 
-                  className="grid-cell"
-                  data-column-id={column.id}
-                  data-row-id={row.id}
-                >
-                  {getTasksByColumnAndRow(column.id, row.id).map(task => (
-                    <Task 
-                      key={task.id} 
-                      task={task}
-                      columnId={column.id} 
-                    />
-                  ))}
-                </td>
-              ))}
+              {columns.map(column => renderCell(column, row))}
             </tr>
           ))}
         </tbody>
