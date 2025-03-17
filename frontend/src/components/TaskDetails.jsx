@@ -10,6 +10,9 @@ function TaskDetails({ task, onClose }) {
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
   const [avatarPreviews, setAvatarPreviews] = useState({});
+  const [subtasks, setSubtasks] = useState([]);
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+  const [showAssignForm, setShowAssignForm] = useState(false);
   const panelRef = useRef(null);
 
   const removeUserFromTask = async (taskId, userId) => {
@@ -34,33 +37,112 @@ function TaskDetails({ task, onClose }) {
 
   const fetchUserAvatar = async (userId) => {
     try {
-        const response = await fetch(`/users/${userId}/avatar`, {
-            headers: {
-                'Accept': 'image/*, application/json',
-                'Cache-Control': 'no-cache'
-            }
-        });
-        
-        if (!response.ok) {
-            console.warn(`Could not fetch avatar for user ${userId}: ${response.status}`);
-            return null;
+      const response = await fetch(`/users/${userId}/avatar`, {
+        headers: {
+          'Accept': 'image/*, application/json',
+          'Cache-Control': 'no-cache'
         }
-        
-        const blob = await response.blob();
-        return URL.createObjectURL(blob);
-    } catch (error) {
-        console.warn(`Error fetching avatar for user ${userId}:`, error);
+      });
+      
+      if (!response.ok) {
+        console.warn(`Could not fetch avatar for user ${userId}: ${response.status}`);
         return null;
+      }
+      
+      const blob = await response.blob();
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.warn(`Error fetching avatar for user ${userId}:`, error);
+      return null;
     }
-};
+  };
+
+  const fetchSubtasks = async (taskId) => {
+    try {
+      const response = await fetch(`/subtasks/task/${taskId}`);
+      if (!response.ok) {
+        throw new Error(`Error fetching subtasks: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error(`Error fetching subtasks for task ${taskId}:`, error);
+      return [];
+    }
+  };
+
+  const addSubtask = async (taskId, title) => {
+    try {
+      const response = await fetch('/subtasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title,
+          completed: false,
+          task: {
+            id: taskId
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error adding subtask: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error adding subtask:', error);
+      throw error;
+    }
+  };
+
+  const toggleSubtaskCompletion = async (subtaskId) => {
+    try {
+      const response = await fetch(`/subtasks/${subtaskId}/change`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error toggling subtask completion: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error(`Error toggling subtask ${subtaskId} completion:`, error);
+      throw error;
+    }
+  };
+
+  const deleteSubtask = async (subtaskId) => {
+    try {
+      const response = await fetch(`/subtasks/${subtaskId}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok && response.status !== 404) {
+        throw new Error(`Error deleting subtask: ${response.status}`);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error(`Error deleting subtask ${subtaskId}:`, error);
+      throw error;
+    }
+  };
   
-  // Update loadTaskData to include avatar loading
+  // Update loadTaskData to include subtasks loading
   const loadTaskData = async () => {
     try {
       const taskData = await fetchTask(task.id);
       const allUsers = await fetchUsers();
+      const taskSubtasks = await fetchSubtasks(task.id);
       
       setUsers(allUsers);
+      setSubtasks(taskSubtasks);
       
       if (taskData.userIds && taskData.userIds.length > 0) {
         const assigned = allUsers.filter(user => 
@@ -88,6 +170,61 @@ function TaskDetails({ task, onClose }) {
     } catch (error) {
       console.error('Error loading task data:', error);
       setLoading(false);
+    }
+  };
+
+  const handleAddSubtask = async () => {
+    if (!newSubtaskTitle.trim()) return;
+    
+    try {
+      await addSubtask(task.id, newSubtaskTitle.trim());
+      setNewSubtaskTitle('');
+      await loadTaskData(); // Refresh task data including subtasks
+      
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error adding subtask:', error);
+      alert('Wystąpił błąd podczas dodawania podzadania');
+    }
+  };
+
+  const handleToggleSubtask = async (subtaskId) => {
+    try {
+      await toggleSubtaskCompletion(subtaskId);
+      
+      // Update the UI by toggling the completion status locally
+      setSubtasks(prev => prev.map(subtask => {
+        if (subtask.id === subtaskId) {
+          return {
+            ...subtask,
+            completed: !subtask.completed
+          };
+        }
+        return subtask;
+      }));
+    } catch (error) {
+      console.error('Error toggling subtask completion:', error);
+      alert('Wystąpił błąd podczas zmiany statusu podzadania');
+    }
+  };
+
+  const handleDeleteSubtask = async (subtaskId) => {
+    try {
+      await deleteSubtask(subtaskId);
+      
+      // Update the UI by removing the deleted subtask
+      setSubtasks(prev => prev.filter(subtask => subtask.id !== subtaskId));
+      
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error deleting subtask:', error);
+      alert('Wystąpił błąd podczas usuwania podzadania');
     }
   };
 
@@ -153,6 +290,7 @@ function TaskDetails({ task, onClose }) {
       
       setSuccess(true);
       setSelectedUserId('');
+      setShowAssignForm(false);
       
       setTimeout(() => {
         setSuccess(false);
@@ -210,42 +348,39 @@ function TaskDetails({ task, onClose }) {
     }
   };
   
-  
   return createPortal(
     <>
       <div className="task-details-overlay" onClick={onClose} />
       <div className="task-details-panel" ref={panelRef}>
         <div className="panel-header">
           <h3>{task.title}</h3>
-          <button className="close-panel-btn" onClick={onClose}>×</button>
-        </div>
-        
-        <div className="user-section">
-        {assignedUsers.length > 0 && (
-          <div className="assigned-users">
-            <h4>Przypisani użytkownicy:</h4>
-            <div className="users-list">
-              {assignedUsers.map(user => (
-                <div key={user.id} className="user-item">
-                  {renderUserAvatar(user)}
-                  <span>{user.name}</span>
-                  <button 
-                    className="remove-user-btn"
-                    onClick={() => handleRemoveUser(user.id)}
-                    title="Usuń użytkownika"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
+          <div className="panel-actions">
+            <button 
+              className="assign-user-icon" 
+              onClick={() => setShowAssignForm(!showAssignForm)}
+              title="Przypisz użytkownika"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </button>
+            <button className="close-panel-btn" onClick={onClose}>×</button>
           </div>
-          )}
-
-          <div className="assign-user-form">
-            <label htmlFor="user-select">Przypisz nowego użytkownika:</label>
+        </div>
+  
+        {/* User assignment dropdown */}
+        {showAssignForm && (
+          <div className="assign-user-dropdown">
+            <div className="dropdown-header">
+              <h4>Przypisz użytkownika</h4>
+              <button 
+                className="close-dropdown" 
+                onClick={() => setShowAssignForm(false)}
+              >
+                ×
+              </button>
+            </div>
             <select 
-              id="user-select"
               value={selectedUserId}
               onChange={(e) => setSelectedUserId(e.target.value)}
             >
@@ -259,7 +394,6 @@ function TaskDetails({ task, onClose }) {
                 ))
               }
             </select>
-            
             <button 
               onClick={handleAssignUser} 
               disabled={!selectedUserId}
@@ -268,17 +402,91 @@ function TaskDetails({ task, onClose }) {
               Przypisz
             </button>
           </div>
-
-          {success && (
-            <div className="success-message">
-              Operacja zakończona pomyślnie!
+        )}
+  
+        {/* Assigned users section */}
+        {assignedUsers.length > 0 && (
+          <div className="assigned-users-bar">
+            <span>Przypisani:</span>
+            <div className="avatar-list">
+              {assignedUsers.map(user => (
+                <div key={user.id} className="avatar-item" title={user.name}>
+                  {renderUserAvatar(user)}
+                  <button 
+                    className="remove-user-btn"
+                    onClick={() => handleRemoveUser(user.id)}
+                    title="Usuń użytkownika"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
             </div>
+          </div>
+        )}
+  
+        {/* Subtasks Section - Now the main focus */}
+        <div className="subtasks-section">
+          <h4>Podzadania</h4>
+          
+          <div className="add-subtask-form">
+            <input
+              type="text"
+              value={newSubtaskTitle}
+              onChange={(e) => setNewSubtaskTitle(e.target.value)}
+              placeholder="Nazwa podzadania"
+              className="subtask-input"
+            />
+            <button 
+              onClick={handleAddSubtask}
+              disabled={!newSubtaskTitle.trim()}
+              className="add-subtask-btn"
+            >
+              Dodaj
+            </button>
+            </div>
+          
+          {subtasks.length > 0 ? (
+            <div className="subtasks-list">
+              {subtasks.map(subtask => (
+                <div key={subtask.id} className="subtask-item">
+                  <input
+                    type="checkbox"
+                    checked={subtask.completed}
+                    onChange={() => handleToggleSubtask(subtask.id)}
+                    id={`subtask-${subtask.id}`}
+                    className="subtask-checkbox"
+                  />
+                  <label 
+                    htmlFor={`subtask-${subtask.id}`}
+                    className={subtask.completed ? 'completed' : ''}
+                  >
+                    {subtask.title}
+                  </label>
+                  <button
+                    className="delete-subtask-btn"
+                    onClick={() => handleDeleteSubtask(subtask.id)}
+                    title="Usuń podzadanie"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="no-subtasks">Brak podzadań</p>
           )}
         </div>
+  
+        {success && (
+          <div className="success-message">
+            Operacja zakończona pomyślnie!
+          </div>
+        )}
       </div>
     </>,
     document.body
   );
-}
+}  
 
 export default TaskDetails;

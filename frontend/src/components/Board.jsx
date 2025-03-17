@@ -203,27 +203,6 @@ function Board() {
           </tr>
         </thead>
         <tbody>
-          {/* Uncategorized row */}
-          <tr>
-            <td className="grid-row-header">Bez kategorii</td>
-            
-            {/* Uncategorized row cells */}
-            {columns.map(column => (
-              <td 
-                key={`uncategorized-${column.id}`} 
-                className="grid-cell"
-                data-column-id={column.id}
-              >
-                {getTasksByColumnAndRow(column.id, null).map(task => (
-                  <Task 
-                    key={task.id} 
-                    task={task}
-                    columnId={column.id} 
-                  />
-                ))}
-              </td>
-            ))}
-          </tr>
           
           {/* Rows with headers and cells */}
           {enhancedRows.map(row => (
