@@ -26,12 +26,13 @@ public class ColumnMapper implements Function<Column, ColumnDTO> {
         }
 
         List<TaskDTO> taskDTOs = column.getTasks().stream()
-                .map(taskMapper::apply) // Używamy TaskMapper do mapowania każdego Task na TaskDTO
+                .map(taskMapper::apply)
                 .collect(Collectors.toList());
 
         return new ColumnDTO(
                 column.getId(),
                 column.getName(),
+                column.getPosition(),
                 column.getWipLimit(),
                 taskDTOs
         );

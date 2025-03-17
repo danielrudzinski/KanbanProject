@@ -7,7 +7,6 @@ import pl.myproject.kanbanproject2.model.User;
 
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Component
 public class TaskMapper implements Function<Task, TaskDTO> {
@@ -23,6 +22,11 @@ public class TaskMapper implements Function<Task, TaskDTO> {
             columnId = task.getColumn().getId();
         }
 
+        Integer rowId = null;
+        if (task.getRow() != null) {
+            rowId = task.getRow().getId();
+        }
+
         Set<Integer> userIds = null;
         if (task.getUsers() != null) {
             userIds = task.getUsers().stream()
@@ -33,7 +37,9 @@ public class TaskMapper implements Function<Task, TaskDTO> {
         return new TaskDTO(
                 task.getId(),
                 task.getTitle(),
+                task.getPosition(),
                 columnId,
+                rowId,
                 userIds
         );
     }

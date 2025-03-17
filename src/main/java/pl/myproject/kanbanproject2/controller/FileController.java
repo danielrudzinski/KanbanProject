@@ -23,9 +23,9 @@ public class FileController {
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             FileEntity savedFile = fileService.saveFile(file);
-            return ResponseEntity.ok("File uploaded successfully! ID: " + savedFile.getId());
+            return ResponseEntity.ok("Plik załadowany z sukcesem! ID: " + savedFile.getId());
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Failed to upload file.");
+            return ResponseEntity.status(500).body("Nie udało się wysłać pliku.");
         }
     }
 
@@ -41,9 +41,9 @@ public class FileController {
     public ResponseEntity<String> deleteFile(@PathVariable Long id) {
         try {
             fileService.deleteFile(id);
-            return ResponseEntity.ok("File deleted successfully");
+            return ResponseEntity.ok("Plik usunięty pomyślnie!");
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body("File not found");
+            return ResponseEntity.status(404).body("Plik nie znaleziony");
         }
     }
 

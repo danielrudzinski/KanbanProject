@@ -2,23 +2,33 @@ package pl.myproject.kanbanproject2.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
 @Entity
 public class Task {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String title;
-
+    private Integer position;
     @ManyToOne
     @JoinColumn(name = "column_id")
     private Column column;
-
-    // Remove @JsonManagedReference and add @JsonIgnoreProperties
+    @ManyToOne
+    @JoinColumn(name = "row_id")
+    private Row row;
     @ManyToMany
     @JoinTable(
             name = "user_task",
@@ -27,46 +37,6 @@ public class Task {
     )
     @JsonIgnoreProperties("tasks")
     private Set<User> users = new HashSet<>();
-
-    public Task() {}
-
-    public Task(Integer id, String title, Column column, Set<User> users) {
-        this.id = id;
-        this.title = title;
-        this.column = column;
-        this.users = users;
-    }
-
-    // Getters and setters remain the same
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Column getColumn() {
-        return column;
-    }
-
-    public void setColumn(Column column) {
-        this.column = column;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SubTask> subTasks = new ArrayList<>();
 }

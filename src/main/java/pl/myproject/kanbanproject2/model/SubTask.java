@@ -6,21 +6,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-@NoArgsConstructor
-@AllArgsConstructor
-@Setter
 @Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@Table(name = "columns")
-public class Column {
+@Table(name = "subtasks")
+public class SubTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String name;
+    private String title;
+    private String description;
+    private boolean completed;
     private Integer position;
-    @jakarta.persistence.Column(name = "wip_limit")
-    private Integer wipLimit;
-    @OneToMany(mappedBy = "column",cascade = CascadeType.ALL)
-    List<Task> tasks;
+    @ManyToOne
+    @JoinColumn(name = "task_id")
+    private Task task;
+
 }
+

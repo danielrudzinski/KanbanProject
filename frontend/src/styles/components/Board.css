@@ -1,26 +1,175 @@
+/* Standard board (no rows) */
 .board {
-    display: flex;
-    gap: 20px;
-    padding: 20px 0;
-    overflow-x: auto;
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  min-height: 70vh;
+  padding: 1rem;
+}
+
+/* Grid-based board for when rows are present */
+.board-grid {
+  padding: 1rem;
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Table-based styling */
+.kanban-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0.5rem;
+  table-layout: fixed;
+}
+
+/* Set dynamic column count with JavaScript */
+:root {
+  --column-count: 3; /* Default, will be updated with JS */
+}
+
+/* Corner cell (top-left empty cell) */
+.grid-corner {
+  background-color: var(--gray-200);
+  border-radius: 4px;
+  min-width: 120px;
+  padding: 0.75rem;
+}
+
+/* Column headers */
+.grid-column-header {
+  background-color: var(--primary-transparent);
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-weight: bold;
+  text-align: center;
+  min-width: 200px;
+}
+
+.grid-column-header .column-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Row headers */
+.grid-row-header {
+  background-color: var(--accent-transparent);
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-weight: bold;
+  min-width: 120px;
+}
+
+.grid-row-header .row-title {
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+.grid-row-header .row-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+/* Grid cells */
+.grid-cell {
+  background-color: var(--gray-100);
+  padding: 0.5rem;
+  border-radius: 4px;
+  min-height: 100px;
+  min-width: 200px;
+  vertical-align: top;
+}
+
+/* WIP limit indicator */
+.wip-limit {
+  font-size: 0.8rem;
+  color: var(--gray-600);
+}
+
+.wip-limit.exceeded {
+  color: var(--error);
+  font-weight: bold;
+}
+
+.task-count {
+  font-size: 0.8rem;
+  background-color: var(--gray-200);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  color: var(--gray-700);
+}
+
+.delete-row-btn {
+  background: none;
+  border: none;
+  color: var(--gray-500);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0.25rem;
+  min-width: auto;
+}
+
+.delete-row-btn:hover {
+  color: var(--error);
+}
+
+/* Loading and error states */
+.board-loading,
+.board-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  font-size: 1.2rem;
+  color: var(--gray-600);
+}
+
+.board-error {
+  color: var(--error);
+}
+  
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .board {
+    padding: 10px 0;
+    gap: 10px;
   }
   
-  .board-loading,
-  .board-error {
-    text-align: center;
-    padding: 50px;
-    color: #666;
-    font-size: 18px;
+  .kanban-table {
+    border-spacing: 0.25rem;
+  }
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  .grid-corner {
+    background-color: var(--gray-800);
   }
   
-  .board-error {
-    color: #e60000;
+  .grid-column-header {
+    background-color: var(--primary-dark);
+    color: var(--text-light);
   }
   
-  /* Media query for smaller screens */
-  @media (max-width: 768px) {
-    .board {
-      padding: 10px 0;
-      gap: 10px;
-    }
+  .grid-row-header {
+    background-color: var(--gray-800);
+    color: var(--text-light);
   }
+  
+  .grid-cell {
+    background-color: var(--gray-800);
+  }
+  
+  .task-count {
+    background-color: var(--gray-700);
+    color: var(--gray-300);
+  }
+  
+  .wip-limit {
+    color: var(--gray-400);
+  }
+}
