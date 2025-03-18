@@ -348,10 +348,10 @@ export const updateRowWipLimit = async (rowId, wipLimit) => {
   }
 };
 
-// Delete a row
-export const deleteRow = async (rowId) => {
+// Delete a row with cascade option
+export const deleteRow = async (rowId, cascade = false) => {
   try {
-    const response = await fetch(`${API_ENDPOINTS.ROWS}/${rowId}`, {
+    const response = await fetch(`${API_ENDPOINTS.ROWS}/${rowId}${cascade ? '?cascade=true' : ''}`, {
       method: 'DELETE'
     });
     
@@ -375,7 +375,7 @@ export const updateTaskRow = async (taskId, rowId) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        row: {
+        row: rowId === null ? null : {
           id: rowId
         }
       })

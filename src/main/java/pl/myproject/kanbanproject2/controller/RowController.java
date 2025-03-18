@@ -41,9 +41,15 @@ public class RowController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRow(@PathVariable Integer id) {
-        rowService.deleteRow(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteRow(
+            @PathVariable Integer id,
+            @RequestParam(required = false, defaultValue = "false") boolean cascade) {
+        try {
+            rowService.deleteRow(id, cascade);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PatchMapping("/{id}/position/{position}")

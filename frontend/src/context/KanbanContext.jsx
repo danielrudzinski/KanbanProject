@@ -106,16 +106,23 @@ export function KanbanProvider({ children }) {
       }
       
       const firstColumn = columns[0];
+      
+      // Create object with all required properties upfront
+      const taskData = {
+        title,
+        columnId: firstColumn.id,
+        rowId: rowId || null
+      };
+      
+      // Add task with all properties in one go
       const newTask = await addTask(title, firstColumn.id);
       
       // If rowId is provided, update the task's row
       if (rowId) {
         await updateTaskRow(newTask.id, rowId);
-        newTask.rowId = rowId;
       }
       
-      setTasks([...tasks, newTask]);
-
+      // Force a complete refresh of the board data
       await refreshTasks();
       return newTask;
     } catch (err) {
@@ -126,10 +133,24 @@ export function KanbanProvider({ children }) {
 
   const refreshTasks = async () => {
     try {
-      const updatedTasks = await fetchTasks();
-      setTasks(updatedTasks);
+      setLoading(true);
+      
+      // Refresh all data to ensure consistency
+      const [columnsData, tasksData, rowsData] = await Promise.all([
+        fetchColumns(),
+        fetchTasks(),
+        fetchRows()
+      ]);
+      
+      setColumns(columnsData);
+      setRows(rowsData);
+      setTasks(tasksData);
+      
+      setLoading(false);
     } catch (err) {
+      console.error('Error refreshing data:', err);
       setError(err.message);
+      setLoading(false);
     }
   };  
   
@@ -267,34 +288,73 @@ export function KanbanProvider({ children }) {
     }
   };
   
-  // Delete row
-  const handleDeleteRow = async (rowId) => {
-    try {
+// Delete row
+const handleDeleteRow = async (rowId) => {
+  try {
+    // Check if this is the last row
+    const isLastRow = rows.length === 1;
+    
+    // Get all tasks that belong to this row
+    const tasksToUpdate = tasks.filter(task => task.rowId === rowId);
+    
+    if (!isLastRow) {
+      // Find an alternative row
+      const remainingRows = rows.filter(row => row.id !== rowId);
+      const targetRowId = remainingRows[0].id;
+      
+      // Update each task in the backend BEFORE deleting the row
+      for (const task of tasksToUpdate) {
+        await updateTaskRow(task.id, targetRowId);
+      }
+      
+      // Now delete the row
       await deleteRow(rowId);
       
-      // Remove row from state
+      // Update local state
       setRows(rows.filter(row => row.id !== rowId));
       
-      // Reset rowId for tasks in this row
-      const tasksToUpdate = tasks.filter(task => task.rowId === rowId);
-      
+      // Update tasks in local state
       const updatedTasks = tasks.map(task => 
-        task.rowId === rowId 
-          ? { ...task, rowId: null } 
-          : task
+        task.rowId === rowId ? { ...task, rowId: targetRowId } : task
       );
-      
       setTasks(updatedTasks);
+    } 
+    // Special handling for the last row
+    else {
+      // First, update all tasks to have null rowId in the database
+      for (const task of tasksToUpdate) {
+        // Use the existing updateTaskRow function with a special null handling
+        try {
+          // Call our modified updateTaskRow that handles null values
+          await updateTaskRow(task.id, null);
+        } catch (updateErr) {
+          console.error('Error updating task row to null:', updateErr);
+          // Continue with other tasks even if one fails
+        }
+      }
       
-      // Update tasks in backend
-      tasksToUpdate.forEach(async (task) => {
-        await updateTaskRow(task.id, null);
-      });
-    } catch (err) {
-      setError(err.message);
-      throw err;
+      // Now delete the row
+      await deleteRow(rowId, true);
+      
+      // Clear rows in local state
+      setRows([]);
+      
+      // Update tasks in local state
+      const updatedTasks = tasks.map(task => 
+        task.rowId === rowId ? { ...task, rowId: null } : task
+      );
+      setTasks(updatedTasks);
     }
-  };
+    
+    // Force refresh the board data
+    await refreshTasks();
+    
+  } catch (err) {
+    console.error('Error deleting row:', err);
+    setError(err.message);
+    throw err;
+  }
+};
   
   // Delete task
   const handleDeleteTask = async (taskId) => {
