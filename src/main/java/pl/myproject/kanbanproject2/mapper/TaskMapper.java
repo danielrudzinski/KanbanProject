@@ -5,6 +5,7 @@ import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.model.Task;
 import pl.myproject.kanbanproject2.model.User;
 
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -34,13 +35,16 @@ public class TaskMapper implements Function<Task, TaskDTO> {
                     .collect(java.util.stream.Collectors.toSet());
         }
 
+        List<String> labels = task.getLabels();
+
         return new TaskDTO(
                 task.getId(),
                 task.getTitle(),
                 task.getPosition(),
                 columnId,
                 rowId,
-                userIds
+                userIds,
+                labels
         );
     }
 }
