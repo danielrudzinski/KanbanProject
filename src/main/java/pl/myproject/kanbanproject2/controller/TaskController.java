@@ -87,4 +87,32 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PutMapping("/{taskId}/label/{label}")
+    public ResponseEntity<TaskDTO> addLabelToTask(@PathVariable Integer taskId, @PathVariable String label) {
+        try {
+            return ResponseEntity.ok(taskService.addLabelToTask(taskId, label));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{taskId}/label/{label}")
+    public ResponseEntity<TaskDTO> removeLabelFromTask(@PathVariable Integer taskId, @PathVariable String label) {
+        try {
+            return ResponseEntity.ok(taskService.removeLabelFromTask(taskId, label));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @PatchMapping("/{taskId}/labels")
+    public ResponseEntity<TaskDTO> updateTaskLabels(
+            @PathVariable Integer taskId,
+            @RequestBody List<String> labels) {
+        try {
+            return ResponseEntity.ok(taskService.updateTaskLabels(taskId, labels));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

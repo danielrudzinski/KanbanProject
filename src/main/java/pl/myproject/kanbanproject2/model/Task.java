@@ -23,6 +23,10 @@ public class Task {
     private Integer id;
     private String title;
     private Integer position;
+    @ElementCollection
+    @CollectionTable(name = "task_labels", joinColumns = @JoinColumn(name = "task_id"))
+    @jakarta.persistence.Column(name = "label")
+    private List<String> labels;
     @ManyToOne
     @JoinColumn(name = "column_id")
     private Column column;

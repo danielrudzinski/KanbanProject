@@ -11,6 +11,7 @@ import pl.myproject.kanbanproject2.model.User;
 import pl.myproject.kanbanproject2.repository.TaskRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,12 @@ public class TaskService {
             long count = taskRepository.count();
             task.setPosition((int) count + 1);
         }
+
+        // Initialize labels if null
+        if (task.getLabels() == null) {
+            task.setLabels(new ArrayList<>());
+        }
+
         return taskRepository.save(task);
     }
 
@@ -77,6 +84,9 @@ public class TaskService {
         if (task.getRow() != null) {
             existingTask.setRow(task.getRow());
         }
+        if (task.getLabels() != null) {
+            existingTask.setLabels(task.getLabels());
+        }
 
         Task savedTask = taskRepository.save(existingTask);
         return taskMapper.apply(savedTask);
@@ -118,6 +128,40 @@ public class TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
         task.setPosition(position);
+        Task updatedTask = taskRepository.save(task);
+        return taskMapper.apply(updatedTask);
+    }
+
+    public TaskDTO addLabelToTask(Integer taskId, String label) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+        if (task.getLabels() == null) {
+            task.setLabels(new ArrayList<>());
+        }
+
+        task.getLabels().add(label);
+        Task updatedTask = taskRepository.save(task);
+        return taskMapper.apply(updatedTask);
+    }
+
+    public TaskDTO removeLabelFromTask(Integer taskId, String label) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+        if (task.getLabels() != null) {
+            task.getLabels().remove(label);
+            Task updatedTask = taskRepository.save(task);
+            return taskMapper.apply(updatedTask);
+        }
+
+        return taskMapper.apply(task);
+    }
+    public TaskDTO updateTaskLabels(Integer taskId, List<String> labels) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+        task.setLabels(labels);
         Task updatedTask = taskRepository.save(task);
         return taskMapper.apply(updatedTask);
     }
