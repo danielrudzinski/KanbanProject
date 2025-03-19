@@ -28,10 +28,14 @@ BEGIN;
 -- Insert columns first since tasks depend on them
 DO $$ 
 BEGIN
-    INSERT INTO columns (name) VALUES ('Requested');
+    INSERT INTO columns (name) VALUES ('New Issues');
+    INSERT INTO columns (name) VALUES ('Icebox');
+    INSERT INTO columns (name) VALUES ('Product Backlog');
+    INSERT INTO columns (name, wip_limit) VALUES ('Sprint Backlog', 10);
     INSERT INTO columns (name, wip_limit) VALUES ('In Progress', 5);
+    INSERT INTO columns (name) VALUES ('QA/Review');
     INSERT INTO columns (name) VALUES ('Done');
-    INSERT INTO columns (name) VALUES ('Expedite');
+    INSERT INTO columns (name) VALUES ('Closed');
 
     INSERT INTO users (email, password, name) VALUES ('user1@example.com', 'password1', 'User One');
     INSERT INTO users (email, password, name) VALUES ('user2@example.com', 'password2', 'User Two');
