@@ -100,29 +100,30 @@ export function KanbanProvider({ children }) {
   // Add a new task
   const handleAddTask = async (title, rowId) => {
     try {
-      // Find first column in the sorted list
       if (columns.length === 0) {
         throw new Error('Nie ma żadnej kolumny. Dodaj najpierw kolumnę.');
       }
       
       const firstColumn = columns[0];
       
-      // Create object with all required properties upfront
-      const taskData = {
-        title,
-        columnId: firstColumn.id,
-        rowId: rowId || null
-      };
-      
-      // Add task with all properties in one go
+      // First, create the task with columnId
       const newTask = await addTask(title, firstColumn.id);
       
-      // If rowId is provided, update the task's row
-      if (rowId) {
-        await updateTaskRow(newTask.id, rowId);
+      // Ensure rowId is set when in row+column view
+      if (rows.length > 0) {
+        // If rowId is provided, use it; otherwise, use the first row
+        const targetRowId = rowId || rows[0].id;
+        await updateTaskRow(newTask.id, targetRowId);
+        
+        // Update the local task state to reflect the change immediately
+        const updatedTask = { ...newTask, rowId: targetRowId };
+        setTasks(prevTasks => [...prevTasks, updatedTask]);
+      } else {
+        // No rows, just add the task to the state
+        setTasks(prevTasks => [...prevTasks, newTask]);
       }
       
-      // Force a complete refresh of the board data
+      // Refresh all tasks to ensure everything is in sync
       await refreshTasks();
       return newTask;
     } catch (err) {
