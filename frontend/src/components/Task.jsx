@@ -7,6 +7,7 @@ function Task({ task, columnId }) {
   const { deleteTask, dragAndDrop } = useKanban();
   const [showDetails, setShowDetails] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(null);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const taskRef = useRef(null);
 
   const { handleDragStart, handleDragEnd } = dragAndDrop;
@@ -53,18 +54,31 @@ function Task({ task, columnId }) {
   }, [task.userIds]);
 
   const handleTaskClick = (e) => {
-    if (e.target.className === 'delete-btn') return;
+    if (e.target.className === 'delete-btn' || 
+        e.target.className === 'confirm-delete-btn' || 
+        e.target.className === 'cancel-delete-btn') return;
     setShowDetails(!showDetails);
   };
 
   const handleDeleteClick = (e) => {
     e.stopPropagation();
+    setIsConfirmingDelete(true);
+  };
+
+  const handleConfirmDelete = (e) => {
+    e.stopPropagation();
+    setIsConfirmingDelete(false);
     const taskElement = taskRef.current;
     taskElement.style.opacity = '0';
     taskElement.style.transform = 'translateX(10px)';
     setTimeout(() => {
       deleteTask(task.id);
     }, 200);
+  };
+
+  const handleCancelDelete = (e) => {
+    e.stopPropagation();
+    setIsConfirmingDelete(false);
   };
 
   const renderUserAvatar = () => {
@@ -156,6 +170,18 @@ function Task({ task, columnId }) {
           ×
         </button>
       </div>
+
+      {isConfirmingDelete && (
+        <div className="delete-modal-overlay" onClick={handleCancelDelete}>
+          <div className="delete-modal" onClick={e => e.stopPropagation()}>
+            <p>Czy na pewno chcesz usunąć to zadanie?</p>
+            <div className="confirmation-buttons">
+              <button className="confirm-delete-btn" onClick={handleConfirmDelete}>Tak</button>
+              <button className="cancel-delete-btn" onClick={handleCancelDelete}>Nie</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showDetails && (
         <TaskDetails 
