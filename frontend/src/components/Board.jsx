@@ -30,25 +30,18 @@ function Board() {
 
 // Filter tasks by column and optionally by row
 const getTasksByColumnAndRow = (columnId, rowId = null) => {
-  // For debugging
-  console.log('Filtering tasks for column:', columnId, 'row:', rowId);
-  console.log('Available tasks:', tasks);
-  
   if (rows.length > 0) {
     if (rowId === null) {
-      // Return tasks without row assignment (shouldn't be any if properly initialized)
       return tasks.filter(task => 
         task.columnId === columnId && (task.rowId === null || task.rowId === undefined)
       );
     } else {
-      // Return tasks for specific column and row
       return tasks.filter(task => 
         task.columnId === columnId && task.rowId === rowId
       );
     }
   }
   
-  // When no rows exist, return all tasks for the column regardless of rowId
   return tasks.filter(task => task.columnId === columnId);
 };
 
@@ -226,7 +219,8 @@ const getTasksByColumnAndRow = (columnId, rowId = null) => {
           <Task 
             key={task.id} 
             task={task}
-            columnId={column.id} 
+            columnId={column.id}
+            rowId={row.id}  // Make sure rowId is passed here
           />
         ))}
       </td>
