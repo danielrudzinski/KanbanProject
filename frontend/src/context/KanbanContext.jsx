@@ -12,7 +12,9 @@ import {
   addRow,
   updateRowWipLimit,
   deleteRow,
-  updateTaskRow
+  updateTaskRow,
+  updateColumnPosition,
+  updateRowPosition
 } from '../services/api';
 
 const KanbanContext = createContext();
@@ -38,18 +40,8 @@ export function KanbanProvider({ children }) {
         // Fetch columns
         const columnsData = await fetchColumns();
         
-        // Sort columns
-        const sortedColumns = columnsData.sort((a, b) => {
-          const order = {
-            'Requested': 0,
-            'In Progress': 1,
-            'Done': 2,
-            'Expedite': 3
-          };
-          const orderA = order[a.name] !== undefined ? order[a.name] : 99;
-          const orderB = order[b.name] !== undefined ? order[b.name] : 99;
-          return orderA - orderB;
-        });
+        // Sort columns by position field
+        const sortedColumns = columnsData.sort((a, b) => a.position - b.position);
         
         // Create column mapping
         const newColumnMap = {};
@@ -65,7 +57,9 @@ export function KanbanProvider({ children }) {
         let rowsData = [];
         try {
           rowsData = await fetchRows();
-          setRows(rowsData);
+          // Sort rows by position field
+          const sortedRows = rowsData.sort((a, b) => a.position - b.position);
+          setRows(sortedRows);
         } catch (rowErr) {
           console.error('Error fetching rows:', rowErr);
           rowsData = [];
@@ -100,29 +94,30 @@ export function KanbanProvider({ children }) {
   // Add a new task
   const handleAddTask = async (title, rowId) => {
     try {
-      // Find first column in the sorted list
       if (columns.length === 0) {
         throw new Error('Nie ma żadnej kolumny. Dodaj najpierw kolumnę.');
       }
       
       const firstColumn = columns[0];
       
-      // Create object with all required properties upfront
-      const taskData = {
-        title,
-        columnId: firstColumn.id,
-        rowId: rowId || null
-      };
-      
-      // Add task with all properties in one go
+      // First, create the task with columnId
       const newTask = await addTask(title, firstColumn.id);
       
-      // If rowId is provided, update the task's row
-      if (rowId) {
-        await updateTaskRow(newTask.id, rowId);
+      // Ensure rowId is set when in row+column view
+      if (rows.length > 0) {
+        // If rowId is provided, use it; otherwise, use the first row
+        const targetRowId = rowId || rows[0].id;
+        await updateTaskRow(newTask.id, targetRowId);
+        
+        // Update the local task state to reflect the change immediately
+        const updatedTask = { ...newTask, rowId: targetRowId };
+        setTasks(prevTasks => [...prevTasks, updatedTask]);
+      } else {
+        // No rows, just add the task to the state
+        setTasks(prevTasks => [...prevTasks, newTask]);
       }
       
-      // Force a complete refresh of the board data
+      // Refresh all tasks to ensure everything is in sync
       await refreshTasks();
       return newTask;
     } catch (err) {
@@ -142,8 +137,14 @@ export function KanbanProvider({ children }) {
         fetchRows()
       ]);
       
-      setColumns(columnsData);
-      setRows(rowsData);
+      // Sort columns by position
+      const sortedColumns = columnsData.sort((a, b) => a.position - b.position);
+      setColumns(sortedColumns);
+      
+      // Sort rows by position
+      const sortedRows = rowsData.sort((a, b) => a.position - b.position);
+      setRows(sortedRows);
+      
       setTasks(tasksData);
       
       setLoading(false);
@@ -217,10 +218,8 @@ export function KanbanProvider({ children }) {
         columnOrderMap[col.id] = index;
       });
       
-      // Sort updated columns based on original order
-      const sortedUpdatedColumns = updatedColumns.sort((a, b) => {
-        return columnOrderMap[a.id] - columnOrderMap[b.id];
-      });
+      // Sort updated columns based on position
+      const sortedUpdatedColumns = updatedColumns.sort((a, b) => a.position - b.position);
       
       setColumns(sortedUpdatedColumns);
     } catch (err) {
@@ -236,7 +235,9 @@ export function KanbanProvider({ children }) {
       
       // Fetch fresh row data
       const updatedRows = await fetchRows();
-      setRows(updatedRows);
+      // Sort by position
+      const sortedRows = updatedRows.sort((a, b) => a.position - b.position);
+      setRows(sortedRows);
     } catch (err) {
       console.error('Failed to update row WIP limit:', err);
       setError('Failed to update row WIP limit. Please try again.');
@@ -400,7 +401,7 @@ const handleDeleteRow = async (rowId) => {
     }
   };
 
-  // Move column
+  // Move column - updated to persist position changes
   const handleMoveColumn = async (columnId, targetColumnId) => {
     try {
       // Find the index of both columns
@@ -414,17 +415,28 @@ const handleDeleteRow = async (rowId) => {
       const [movedColumn] = newColumns.splice(columnIndex, 1);
       newColumns.splice(targetIndex, 0, movedColumn);
       
+      // Update the local state first for immediate feedback
       setColumns(newColumns);
       
-      // We could potentially update backend here if needed
-      // For now just update the state
+      // Update positions in the backend
+      const updatePromises = newColumns.map(async (column, index) => {
+        try {
+          await updateColumnPosition(column.id, index);
+        } catch (error) {
+          console.error(`Error updating column position for ${column.id}:`, error);
+        }
+      });
+      
+      await Promise.all(updatePromises);
+      
     } catch (err) {
+      console.error('Error moving column:', err);
       setError(err.message);
       throw err;
     }
   };
 
-  // Move row
+  // Move row - updated to persist position changes
   const handleMoveRow = async (rowId, targetRowId) => {
     try {
       // Find the index of both rows
@@ -438,11 +450,22 @@ const handleDeleteRow = async (rowId) => {
       const [movedRow] = newRows.splice(rowIndex, 1);
       newRows.splice(targetIndex, 0, movedRow);
       
+      // Update the local state first for immediate feedback
       setRows(newRows);
       
-      // We could potentially update backend here if needed
-      // For now just update the state
+      // Update positions in the backend
+      const updatePromises = newRows.map(async (row, index) => {
+        try {
+          await updateRowPosition(row.id, index);
+        } catch (error) {
+          console.error(`Error updating row position for ${row.id}:`, error);
+        }
+      });
+      
+      await Promise.all(updatePromises);
+      
     } catch (err) {
+      console.error('Error moving row:', err);
       setError(err.message);
       throw err;
     }
