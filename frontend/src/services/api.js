@@ -729,14 +729,20 @@ export const fetchSubTasksByTaskId = async (taskId) => {
   }
 };
 
-export const addSubTask = async (subTaskData) => {
+export const addSubTask = async (taskId, title) => {
   try {
-    const response = await fetch(API_ENDPOINTS.SUBTASKS, {
+    const response = await fetch('/subtasks', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(subTaskData)
+      body: JSON.stringify({
+        title,
+        completed: false,
+        task: {
+          id: taskId
+        }
+      })
     });
     
     if (!response.ok) {
