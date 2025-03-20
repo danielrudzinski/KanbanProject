@@ -14,7 +14,8 @@ import {
   deleteRow,
   updateTaskRow,
   updateColumnPosition,
-  updateRowPosition
+  updateRowPosition,
+  updateTaskPosition
 } from '../services/api';
 
 const KanbanContext = createContext();
@@ -121,6 +122,72 @@ export function KanbanProvider({ children }) {
       await refreshTasks();
       return newTask;
     } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  const handleTaskReorder = async (draggedTaskId, targetTaskId) => {
+    try {
+      // Find both tasks
+      const draggedTask = tasks.find(t => t.id === draggedTaskId);
+      const targetTask = tasks.find(t => t.id === targetTaskId);
+      
+      if (!draggedTask || !targetTask) return;
+      
+      // Check if they're in the same column and row
+      if (draggedTask.columnId !== targetTask.columnId || 
+          draggedTask.rowId !== targetTask.rowId) {
+        // If not in the same container, let the normal move task handle it
+        return handleMoveTask(draggedTaskId, targetTask.columnId, targetTask.rowId);
+      }
+      
+      // Get all tasks in this column and row
+      const containerTasks = tasks.filter(
+        t => t.columnId === targetTask.columnId && t.rowId === targetTask.rowId
+      );
+      
+      // Sort tasks by position if available, otherwise use current order
+      const sortedTasks = [...containerTasks].sort((a, b) => 
+        (a.position !== undefined && b.position !== undefined) 
+          ? a.position - b.position 
+          : 0
+      );
+      
+      // Find indices
+      const draggedIndex = sortedTasks.findIndex(t => t.id === draggedTaskId);
+      const targetIndex = sortedTasks.findIndex(t => t.id === targetTaskId);
+      
+      // Reorder
+      const newOrder = [...sortedTasks];
+      newOrder.splice(draggedIndex, 1);
+      newOrder.splice(targetIndex, 0, draggedTask);
+      
+      // Update local state for immediate feedback
+      const updatedTasks = tasks.map(task => {
+        const newIndex = newOrder.findIndex(t => t.id === task.id);
+        if (newIndex !== -1) {
+          return { ...task, position: newIndex };
+        }
+        return task;
+      });
+      
+      setTasks(updatedTasks);
+      
+      // Update positions in the backend
+      const updatePromises = newOrder.map(async (task, index) => {
+        try {
+          await updateTaskPosition(task.id, index);
+        } catch (error) {
+          console.error(`Error updating task position for ${task.id}:`, error);
+        }
+      });
+      
+      await Promise.all(updatePromises);
+      await refreshTasks();
+      
+    } catch (err) {
+      console.error('Error reordering tasks:', err);
       setError(err.message);
       throw err;
     }
@@ -491,7 +558,6 @@ const handleDragStart = (e, id, type = 'task', sourceColumnId = null, sourceRowI
   const dataString = JSON.stringify(data);
   e.dataTransfer.setData(`application/${type}`, dataString);
   
-  // For debugging, also set as plain text
   e.dataTransfer.setData('text/plain', dataString);
   
   e.dataTransfer.effectAllowed = 'move';
@@ -614,7 +680,8 @@ const handleDrop = (e, targetColumnId, targetRowId) => {
     handleDragStart,
     handleDragOver,
     handleDrop,
-    handleDragEnd
+    handleDragEnd,
+    handleTaskReorder
   };
   
   const value = {
