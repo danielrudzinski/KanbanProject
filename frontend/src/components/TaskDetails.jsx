@@ -510,14 +510,14 @@ function TaskDetails({ task, onClose }) {
               <p>Czy na pewno chcesz usunąć podzadanie: <strong>{subtaskToDelete.title}</strong>?</p>
               <div className="confirmation-actions">
                 <button 
-                  onClick={cancelDeleteSubtask}
-                  className="cancel-btn"
+                  onClick={handleDeleteSubtask}
+                  className="confirm-btn"
                 >
                   Tak
                 </button>
                 <button 
-                  onClick={handleDeleteSubtask}
-                  className="confirm-btn"
+                  onClick={cancelDeleteSubtask}
+                  className="cancel-btn"
                 >
                   Nie
                 </button>
