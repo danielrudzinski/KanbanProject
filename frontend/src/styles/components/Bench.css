@@ -1,0 +1,123 @@
+.bench-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    display: flex;
+    transition: transform 0.3s ease;
+    z-index: 100;
+  }
+
+  .bench-container.open {
+    transform: translateX(0);
+  }
+  
+  .bench-container:not(.open) {
+    transform: translateX(-200px); 
+  }
+  
+  .bench-container.open + .content-container {
+    margin-left: 200px;
+    transition: margin-left 0.3s ease;
+  }
+  
+  .bench-toggle {
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    width: 30px;
+    height: 60px;
+    background-color: #4a6fa5;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .bench {
+    width: 200px;
+    height: 100%;
+    background-color: #f0f4f8;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .bench h3 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    color: #2c3e50;
+  }
+  
+  .user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 10px;
+  }
+  
+  .user-card {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: grab;
+    transition: all 0.2s;
+  }
+  
+  .user-card:hover {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  .user-card:active {
+    cursor: grabbing;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 10px;
+    background-color: #ddd;
+  }
+  
+  .avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .user-info {
+    flex: 1;
+  }
+  
+  .user-name {
+    font-weight: 500;
+    color: #2c3e50;
+  }
+  
+  .user-role {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+  }
+  
+  .loading, .error {
+    padding: 15px;
+    text-align: center;
+    color: #7f8c8d;
+  }
+  
+  .error {
+    color: #e74c3c;
+  }

@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import TaskDetails from './TaskDetails';
-import { getUserAvatar } from '../services/api';
+import { getUserAvatar, assignUserToTask } from '../services/api';
 import '../styles/components/Task.css';
 
 function Task({ task, columnId }) {
-  const { deleteTask, dragAndDrop } = useKanban();
+  const { deleteTask, dragAndDrop, refreshTasks } = useKanban();
   const [showDetails, setShowDetails] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
   const taskRef = useRef(null);
 
   const { handleDragStart, handleDragEnd } = dragAndDrop;
@@ -116,27 +117,23 @@ function Task({ task, columnId }) {
     e.preventDefault();
     e.stopPropagation();
     
-    // Check if we're dragging a task
-    if (e.dataTransfer.types.includes('application/task')) {
-      // Add visual cue for dropping
-      taskRef.current.classList.add('task-drag-over');
+    // Check if we're dragging a task or a user
+    if (e.dataTransfer.types.includes('application/task') || 
+        e.dataTransfer.types.includes('application/user')) {
+      setIsDragOver(true);
     }
   };
   
   const onDragLeave = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    // Remove visual cue
-    taskRef.current.classList.remove('task-drag-over');
+    setIsDragOver(false);
   };
   
-  const onDrop = (e) => {
+  const onDrop = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    // Remove visual cue
-    taskRef.current.classList.remove('task-drag-over');
+    setIsDragOver(false);
     
     // Check if we're dropping a task
     if (e.dataTransfer.types.includes('application/task')) {
@@ -158,6 +155,39 @@ function Task({ task, columnId }) {
         console.error('Error processing task drop for reordering:', err);
       }
     }
+    
+    // Check if we're dropping a user
+    if (e.dataTransfer.types.includes('application/user')) {
+      try {
+        const dataString = e.dataTransfer.getData('application/user');
+        const userData = JSON.parse(dataString);
+        
+        if (userData.type === 'user') {
+          const userId = userData.userId;
+          
+          console.log(`Assigning user ${userId} to task ${task.id}`);
+          
+          // Call API to assign user
+          await assignUserToTask(task.id, parseInt(userId));
+          
+          // Update local state - assuming we want to append to existing users
+          const updatedUserIds = task.userIds ? [...task.userIds] : [];
+          if (!updatedUserIds.includes(userId)) {
+            updatedUserIds.push(userId);
+            
+            // Update the task in the local state
+            const updatedTask = {
+              ...task,
+              userIds: updatedUserIds
+            };
+            
+            refreshTasks();
+          }
+        }
+      } catch (err) {
+        console.error('Error processing user drop:', err);
+      }
+    }
   };
   
   const onDragEndHandler = (e) => {
@@ -173,7 +203,7 @@ function Task({ task, columnId }) {
     <>
       <div
         ref={taskRef}
-        className="task"
+        className={`task ${isDragOver ? 'user-drag-over' : ''}`}
         draggable="true"
         onClick={handleTaskClick}
         onDragStart={onDragStartHandler}

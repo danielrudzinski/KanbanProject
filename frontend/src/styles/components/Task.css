@@ -380,8 +380,13 @@
   }
 }
 
-.task.task-drag-over {
-  border: 2px dashed #3498db;
-  background-color: rgba(52, 152, 219, 0.1);
-  transform: scale(1.05);
+.task.user-drag-over {
+  background-color: rgba(74, 111, 165, 0.1);
+  border: 2px dashed #4a6fa5;
+  box-shadow: 0 0 8px rgba(74, 111, 165, 0.3);
+  transform: scale(1.03);
+}
+
+.task.dragging {
+  opacity: 0.6;
 }

@@ -5,6 +5,7 @@ import AddColumnForm from './components/AddColumnForm';
 import AddRowForm from './components/AddRowForm';
 import WipLimitControl from './components/WipLimitControl';
 import UsersManagement from './components/UsersManagement';
+import Bench from './components/Bench'; // Import the new Bench component
 import './styles/App.css';
 import { useState } from 'react';
 
@@ -84,6 +85,8 @@ function KanbanBoard() {
       {activeForm === 'wip' && <WipLimitControl onClose={() => setActiveForm(null)} />}
       {activeForm === 'column' && <AddColumnForm onClose={() => setActiveForm(null)} />}
       {activeForm === 'row' && <AddRowForm onClose={() => setActiveForm(null)} />}
+
+      <Bench />
 
       <Board />
     </div>
