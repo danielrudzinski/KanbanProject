@@ -223,7 +223,7 @@ export function KanbanProvider({ children }) {
       const sortedRows = rowsData.sort((a, b) => a.position - b.position);
       setRows(sortedRows);
 
-      refreshBoard();
+      refreshTasks();
       
       setLoading(false);
     } catch (err) {
