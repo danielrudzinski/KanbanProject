@@ -652,14 +652,23 @@ export const uploadUserAvatar = async (userId, file) => {
 
 export const getUserAvatar = async (userId) => {
   try {
-    const response = await fetch(`${API_ENDPOINTS.USERS}/${userId}/avatar`);
+    const response = await fetch(`/users/${userId}/avatar`, {
+      headers: {
+        'Accept': 'image/*, application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
+    
     if (!response.ok) {
-      throw new Error(`Error fetching avatar: ${response.status}`);
+      console.warn(`Could not fetch avatar for user ${userId}: ${response.status}`);
+      return null;
     }
-    return response;  // Return the full response for blob handling
+    
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
   } catch (error) {
-    console.error(`Error fetching avatar for user ${userId}:`, error);
-    throw error;
+    console.warn(`Error fetching avatar for user ${userId}:`, error);
+    return null;
   }
 };
 

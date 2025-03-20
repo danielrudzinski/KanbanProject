@@ -195,7 +195,6 @@ export function KanbanProvider({ children }) {
 
   const refreshTasks = async () => {
     try {
-      setLoading(true);
       
       // Only fetch and update tasks
       const tasksData = await fetchTasks();

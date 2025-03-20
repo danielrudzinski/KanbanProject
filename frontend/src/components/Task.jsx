@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import TaskDetails from './TaskDetails';
+import { getUserAvatar } from '../services/api';
 import '../styles/components/Task.css';
 
 function Task({ task, columnId }) {
@@ -12,33 +13,11 @@ function Task({ task, columnId }) {
 
   const { handleDragStart, handleDragEnd } = dragAndDrop;
 
-  const fetchUserAvatar = async (userId) => {
-    try {
-        const response = await fetch(`/users/${userId}/avatar`, {
-            headers: {
-                'Accept': 'image/*, application/json',
-                'Cache-Control': 'no-cache'
-            }
-        });
-        
-        if (!response.ok) {
-            console.warn(`Could not fetch avatar for user ${userId}: ${response.status}`);
-            return null;
-        }
-        
-        const blob = await response.blob();
-        return URL.createObjectURL(blob);
-    } catch (error) {
-        console.warn(`Error fetching avatar for user ${userId}:`, error);
-        return null;
-    }
-  };
-
   useEffect(() => {
     // If task has a user assigned, fetch their avatar
     if (task.userIds && task.userIds.length > 0) {
       // Get the first assigned user's avatar for display in the task card
-      fetchUserAvatar(task.userIds[0]).then(url => {
+      getUserAvatar(task.userIds[0]).then(url => {
         if (url) {
           setAvatarUrl(url);
         }

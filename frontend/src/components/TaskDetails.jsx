@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
+import { useKanban } from '../context/KanbanContext';
 import { createPortal } from 'react-dom';
-import { fetchUsers, assignUserToTask, fetchTask } from '../services/api';
+import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, fetchSubTasks, addSubTask, toggleSubTaskCompletion, deleteSubTask } from '../services/api';
 import '../styles/components/TaskDetails.css';
 
 function TaskDetails({ task, onClose }) {
+  const { refreshTasks } = useKanban();
   const [users, setUsers] = useState([]);
   const [assignedUsers, setAssignedUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState('');
@@ -15,133 +17,16 @@ function TaskDetails({ task, onClose }) {
   const [showAssignForm, setShowAssignForm] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [subtaskToDelete, setSubtaskToDelete] = useState(null);
+  const [showUserDeleteConfirmation, setShowUserDeleteConfirmation] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   const panelRef = useRef(null);
-
-  const removeUserFromTask = async (taskId, userId) => {
-    try {
-      const response = await fetch(`/tasks/${taskId}/user/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error removing user: ${response.status}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error(`Error removing user from task ${taskId}:`, error);
-      throw error;
-    }
-  };
-
-  const fetchUserAvatar = async (userId) => {
-    try {
-      const response = await fetch(`/users/${userId}/avatar`, {
-        headers: {
-          'Accept': 'image/*, application/json',
-          'Cache-Control': 'no-cache'
-        }
-      });
-      
-      if (!response.ok) {
-        console.warn(`Could not fetch avatar for user ${userId}: ${response.status}`);
-        return null;
-      }
-      
-      const blob = await response.blob();
-      return URL.createObjectURL(blob);
-    } catch (error) {
-      console.warn(`Error fetching avatar for user ${userId}:`, error);
-      return null;
-    }
-  };
-
-  const fetchSubtasks = async (taskId) => {
-    try {
-      const response = await fetch(`/subtasks/task/${taskId}`);
-      if (!response.ok) {
-        throw new Error(`Error fetching subtasks: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching subtasks for task ${taskId}:`, error);
-      return [];
-    }
-  };
-
-  const addSubtask = async (taskId, title) => {
-    try {
-      const response = await fetch('/subtasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          title,
-          completed: false,
-          task: {
-            id: taskId
-          }
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error adding subtask: ${response.status}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error adding subtask:', error);
-      throw error;
-    }
-  };
-
-  const toggleSubtaskCompletion = async (subtaskId) => {
-    try {
-      const response = await fetch(`/subtasks/${subtaskId}/change`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error toggling subtask completion: ${response.status}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error(`Error toggling subtask ${subtaskId} completion:`, error);
-      throw error;
-    }
-  };
-
-  const deleteSubtask = async (subtaskId) => {
-    try {
-      const response = await fetch(`/subtasks/${subtaskId}`, {
-        method: 'DELETE'
-      });
-      
-      if (!response.ok && response.status !== 404) {
-        throw new Error(`Error deleting subtask: ${response.status}`);
-      }
-      
-      return true;
-    } catch (error) {
-      console.error(`Error deleting subtask ${subtaskId}:`, error);
-      throw error;
-    }
-  };
   
   // Update loadTaskData to include subtasks loading
   const loadTaskData = async () => {
     try {
       const taskData = await fetchTask(task.id);
       const allUsers = await fetchUsers();
-      const taskSubtasks = await fetchSubtasks(task.id);
+      const taskSubtasks = await fetchSubTasks(task.id);
       
       setUsers(allUsers);
       setSubtasks(taskSubtasks);
@@ -154,7 +39,7 @@ function TaskDetails({ task, onClose }) {
 
         // Load avatars for assigned users
         const avatarPromises = assigned.map(async (user) => {
-          const avatarUrl = await fetchUserAvatar(user.id);
+          const avatarUrl = await getUserAvatar(user.id);
           if (avatarUrl) {
             setAvatarPreviews(prev => ({
               ...prev,
@@ -175,11 +60,11 @@ function TaskDetails({ task, onClose }) {
     }
   };
 
-  const handleAddSubtask = async () => {
+  const handleaddSubTask = async () => {
     if (!newSubtaskTitle.trim()) return;
     
     try {
-      await addSubtask(task.id, newSubtaskTitle.trim());
+      await addSubTask(task.id, newSubtaskTitle.trim());
       setNewSubtaskTitle('');
       await loadTaskData(); // Refresh task data including subtasks
       
@@ -195,7 +80,7 @@ function TaskDetails({ task, onClose }) {
 
   const handleToggleSubtask = async (subtaskId) => {
     try {
-      await toggleSubtaskCompletion(subtaskId);
+      await toggleSubTaskCompletion(subtaskId);
       
       // Update the UI by toggling the completion status locally
       setSubtasks(prev => prev.map(subtask => {
@@ -213,7 +98,7 @@ function TaskDetails({ task, onClose }) {
     }
   };
 
-  const confirmDeleteSubtask = (subtaskId) => {
+  const confirmdeleteSubTask = (subtaskId) => {
     // Find the subtask to delete
     const subtask = subtasks.find(s => s.id === subtaskId);
     if (subtask) {
@@ -222,11 +107,11 @@ function TaskDetails({ task, onClose }) {
     }
   };
 
-  const handleDeleteSubtask = async () => {
+  const handledeleteSubTask = async () => {
     if (!subtaskToDelete) return;
     
     try {
-      await deleteSubtask(subtaskToDelete.id);
+      await deleteSubTask(subtaskToDelete.id);
       
       // Update the UI by removing the deleted subtask
       setSubtasks(prev => prev.filter(subtask => subtask.id !== subtaskToDelete.id));
@@ -247,7 +132,7 @@ function TaskDetails({ task, onClose }) {
     }
   };
 
-  const cancelDeleteSubtask = () => {
+  const canceldeleteSubTask = () => {
     setShowDeleteConfirmation(false);
     setSubtaskToDelete(null);
   };
@@ -269,30 +154,53 @@ function TaskDetails({ task, onClose }) {
     );
   };
 
-  const handleRemoveUser = async (userId) => {
+  const confirmRemoveUser = (userId) => {
+    // Find the user to delete
+    const user = assignedUsers.find(u => u.id === userId);
+    if (user) {
+      setUserToDelete(user);
+      setShowUserDeleteConfirmation(true);
+    }
+  };
+
+  const handleRemoveUser = async () => {
+    if (!userToDelete) return;
+    
     try {
-      await removeUserFromTask(task.id, userId);
+      await removeUserFromTask(task.id, userToDelete.id);
       
       // Revoke the object URL for the removed user's avatar to prevent memory leaks
-      if (avatarPreviews[userId]) {
-        URL.revokeObjectURL(avatarPreviews[userId]);
+      if (avatarPreviews[userToDelete.id]) {
+        URL.revokeObjectURL(avatarPreviews[userToDelete.id]);
         setAvatarPreviews(prev => {
           const newPreviews = {...prev};
-          delete newPreviews[userId];
+          delete newPreviews[userToDelete.id];
           return newPreviews;
         });
       }
       
       await loadTaskData(); // Refresh task data after removal
-      
+      refreshTasks(); // Refresh tasks in the context
+
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
       }, 3000);
+      
+      // Close the confirmation dialog
+      setShowUserDeleteConfirmation(false);
+      setUserToDelete(null);
     } catch (error) {
       console.error('Error removing user:', error);
       alert('Wystąpił błąd podczas usuwania użytkownika');
+      setShowUserDeleteConfirmation(false);
+      setUserToDelete(null);
     }
+  };
+
+  const cancelRemoveUser = () => {
+    setShowUserDeleteConfirmation(false);
+    setUserToDelete(null);
   };
 
   const handleAssignUser = async () => {
@@ -302,7 +210,7 @@ function TaskDetails({ task, onClose }) {
       await assignUserToTask(task.id, parseInt(selectedUserId));
       
       // Fetch the avatar for the newly assigned user
-      const avatarUrl = await fetchUserAvatar(parseInt(selectedUserId));
+      const avatarUrl = await getUserAvatar(parseInt(selectedUserId));
       if (avatarUrl) {
         setAvatarPreviews(prev => ({
           ...prev,
@@ -311,7 +219,8 @@ function TaskDetails({ task, onClose }) {
       }
       
       await loadTaskData(); // Refresh task data after assignment
-      
+      refreshTasks(); // Refresh tasks in the context
+
       setSuccess(true);
       setSelectedUserId('');
       setShowAssignForm(false);
@@ -438,7 +347,7 @@ function TaskDetails({ task, onClose }) {
                   {renderUserAvatar(user)}
                   <button 
                     className="remove-user-btn"
-                    onClick={() => handleRemoveUser(user.id)}
+                    onClick={() => confirmRemoveUser(user.id)}
                     title="Usuń użytkownika"
                   >
                     ×
@@ -462,7 +371,7 @@ function TaskDetails({ task, onClose }) {
               className="subtask-input"
             />
             <button 
-              onClick={handleAddSubtask}
+              onClick={handleaddSubTask}
               disabled={!newSubtaskTitle.trim()}
               className="add-subtask-btn"
             >
@@ -489,7 +398,7 @@ function TaskDetails({ task, onClose }) {
                   </label>
                   <button
                     className="delete-subtask-btn"
-                    onClick={() => confirmDeleteSubtask(subtask.id)}
+                    onClick={() => confirmdeleteSubTask(subtask.id)}
                     title="Usuń podzadanie"
                   >
                     ×
@@ -502,7 +411,7 @@ function TaskDetails({ task, onClose }) {
           )}
         </div>
   
-        {/* Delete confirmation dialog */}
+        {/* Delete subtask confirmation dialog */}
         {showDeleteConfirmation && subtaskToDelete && (
           <div className="delete-confirmation-overlay">
             <div className="delete-confirmation-dialog">
@@ -510,13 +419,37 @@ function TaskDetails({ task, onClose }) {
               <p>Czy na pewno chcesz usunąć podzadanie: <strong>{subtaskToDelete.title}</strong>?</p>
               <div className="confirmation-actions">
                 <button 
-                  onClick={handleDeleteSubtask}
+                  onClick={handledeleteSubTask}
                   className="confirm-btn"
                 >
                   Tak
                 </button>
                 <button 
-                  onClick={cancelDeleteSubtask}
+                  onClick={canceldeleteSubTask}
+                  className="cancel-btn"
+                >
+                  Nie
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Delete user confirmation dialog */}
+        {showUserDeleteConfirmation && userToDelete && (
+          <div className="delete-confirmation-overlay">
+            <div className="delete-confirmation-dialog">
+              <h4>Potwierdź usunięcie</h4>
+              <p>Czy na pewno chcesz usunąć użytkownika: <strong>{userToDelete.name}</strong> z tego zadania?</p>
+              <div className="confirmation-actions">
+                <button 
+                  onClick={handleRemoveUser}
+                  className="confirm-btn"
+                >
+                  Tak
+                </button>
+                <button 
+                  onClick={cancelRemoveUser}
                   className="cancel-btn"
                 >
                   Nie
