@@ -3,17 +3,13 @@ import { useKanban } from '../context/KanbanContext';
 import '../styles/components/WipLimitControl.css';
 
 function WipLimitControl() {
-  const { columns, updateWipLimit } = useKanban();
-  const [selectedColumn, setSelectedColumn] = useState('');
+  const { columns, rows, updateWipLimit, updateRowWipLimit } = useKanban();
+  const [selectedItem, setSelectedItem] = useState('');
   const [wipLimit, setWipLimit] = useState('');
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  
-  // Find column by id
-  const getSelectedColumn = () => {
-    return columns.find(column => column.id === selectedColumn);
-  };
+  const [activeTab, setActiveTab] = useState('column'); // 'column' or 'row'
   
   // Toggle form visibility
   const toggleForm = () => {
@@ -21,34 +17,48 @@ function WipLimitControl() {
     setError(null);
     
     if (isFormVisible) {
-      setSelectedColumn('');
+      setSelectedItem('');
       setWipLimit('');
-      onClose();
     }
   };
   
-  // Handle column selection
-  const handleColumnChange = (e) => {
-    const columnId = e.target.value;
-    setSelectedColumn(columnId);
+  // Handle item selection (column or row)
+  const handleItemChange = (e) => {
+    const itemId = e.target.value;
+    setSelectedItem(itemId);
     
     // Pre-fill current WIP limit
-    if (columnId) {
-      const column = columns.find(col => col.id === columnId);
-      if (column) {
-        setWipLimit(column.wipLimit.toString());
+    if (itemId) {
+      if (activeTab === 'column') {
+        const column = columns.find(col => col.id === itemId);
+        if (column) {
+          setWipLimit(column.wipLimit.toString());
+        }
+      } else {
+        const row = rows.find(r => r.id === itemId);
+        if (row) {
+          setWipLimit(row.wipLimit.toString());
+        }
       }
     } else {
       setWipLimit('');
     }
   };
   
+  // Switch between column and row tabs
+  const switchTab = (tab) => {
+    setActiveTab(tab);
+    setSelectedItem('');
+    setWipLimit('');
+    setError(null);
+  };
+  
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!selectedColumn) {
-      setError('Wybierz kolumnę!');
+    if (!selectedItem) {
+      setError(activeTab === 'column' ? 'Wybierz kolumnę!' : 'Wybierz wiersz!');
       return;
     }
     
@@ -61,10 +71,14 @@ function WipLimitControl() {
       setIsSubmitting(true);
       setError(null);
       
-      await updateWipLimit(selectedColumn, parseInt(wipLimit));
+      if (activeTab === 'column') {
+        await updateWipLimit(selectedItem, parseInt(wipLimit));
+      } else {
+        await updateRowWipLimit(selectedItem, parseInt(wipLimit));
+      }
       
       setIsFormVisible(false);
-      setSelectedColumn('');
+      setSelectedItem('');
       setWipLimit('');
     } catch (err) {
       setError(err.message || 'Wystąpił błąd podczas aktualizacji limitu WIP');
@@ -73,8 +87,9 @@ function WipLimitControl() {
     }
   };
   
-  // Don't render if no columns available
-  if (!columns.length) {
+  // Don't render if no items available for the current tab
+  const hasItems = activeTab === 'column' ? columns.length > 0 : rows.length > 0;
+  if (!hasItems && (columns.length === 0 && rows.length === 0)) {
     return null;
   }
   
@@ -101,23 +116,55 @@ function WipLimitControl() {
               </button>
             </div>
             
+            <div className="tab-container">
+              <button 
+                type="button" 
+                className={`tab-btn ${activeTab === 'column' ? 'active' : ''}`}
+                onClick={() => switchTab('column')}
+                disabled={columns.length === 0}
+              >
+                Kolumny
+              </button>
+              <button 
+                type="button" 
+                className={`tab-btn ${activeTab === 'row' ? 'active' : ''}`}
+                onClick={() => switchTab('row')}
+                disabled={rows.length === 0}
+              >
+                Wiersze
+              </button>
+            </div>
+            
             {error && <div className="error-message">{error}</div>}
             
             <div className="form-group">
-              <label htmlFor="column-select">Wybierz kolumnę:</label>
+              <label htmlFor="item-select">
+                {activeTab === 'column' ? 'Wybierz kolumnę:' : 'Wybierz wiersz:'}
+              </label>
               <select
-                id="column-select"
-                value={selectedColumn}
-                onChange={handleColumnChange}
+                id="item-select"
+                value={selectedItem}
+                onChange={handleItemChange}
                 disabled={isSubmitting}
               >
-                <option value="">Wybierz kolumnę</option>
-                {columns.map(column => (
-                  <option key={column.id} value={column.id}>
-                    {column.name} 
-                    {column.wipLimit > 0 ? ` (Aktualny limit: ${column.wipLimit})` : ' (Bez limitu)'}
-                  </option>
-                ))}
+                <option value="">
+                  {activeTab === 'column' ? 'Wybierz kolumnę' : 'Wybierz wiersz'}
+                </option>
+                {activeTab === 'column' ? (
+                  columns.map(column => (
+                    <option key={column.id} value={column.id}>
+                      {column.name} 
+                      {column.wipLimit > 0 ? ` (Aktualny limit: ${column.wipLimit})` : ' (Bez limitu)'}
+                    </option>
+                  ))
+                ) : (
+                  rows.map(row => (
+                    <option key={row.id} value={row.id}>
+                      {row.name} 
+                      {row.wipLimit > 0 ? ` (Aktualny limit: ${row.wipLimit})` : ' (Bez limitu)'}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
             
@@ -133,14 +180,14 @@ function WipLimitControl() {
                 value={wipLimit}
                 onChange={(e) => setWipLimit(e.target.value)}
                 placeholder="0"
-                disabled={isSubmitting || !selectedColumn}
+                disabled={isSubmitting || !selectedItem}
               />
             </div>
             
             <div className="form-actions">
               <button 
                 type="submit"
-                disabled={isSubmitting || !selectedColumn}
+                disabled={isSubmitting || !selectedItem}
               >
                 {isSubmitting ? 'Aktualizowanie...' : 'Ustaw limit'}
               </button>

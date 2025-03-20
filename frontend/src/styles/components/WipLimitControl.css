@@ -96,3 +96,33 @@
     background-color: #a0c0e8;
     cursor: not-allowed;
   }
+
+  .tab-container {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .tab-btn {
+    padding: 8px 15px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    color: rgb(0, 0, 0);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    margin-right: 5px;
+    cursor: pointer;
+    font-weight: normal;
+  }
+  
+  .tab-btn.active {
+    background: #fff;
+    border-bottom: 1px solid #fff;
+    margin-bottom: -1px;
+    font-weight: bold;
+  }
+  
+  .tab-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
