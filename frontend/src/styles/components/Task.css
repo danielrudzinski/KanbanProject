@@ -379,3 +379,9 @@
     background-color: var(--gray-600);
   }
 }
+
+.task.task-drag-over {
+  border: 2px dashed #3498db;
+  background-color: rgba(52, 152, 219, 0.1);
+  transform: scale(1.05);
+}

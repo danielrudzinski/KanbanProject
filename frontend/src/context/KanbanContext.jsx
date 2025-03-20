@@ -14,7 +14,8 @@ import {
   deleteRow,
   updateTaskRow,
   updateColumnPosition,
-  updateRowPosition
+  updateRowPosition,
+  updateTaskPosition
 } from '../services/api';
 
 const KanbanContext = createContext();
@@ -126,34 +127,111 @@ export function KanbanProvider({ children }) {
     }
   };
 
+  const handleTaskReorder = async (draggedTaskId, targetTaskId) => {
+    try {
+      // Find both tasks
+      const draggedTask = tasks.find(t => t.id === draggedTaskId);
+      const targetTask = tasks.find(t => t.id === targetTaskId);
+      
+      if (!draggedTask || !targetTask) return;
+      
+      // Check if they're in the same column and row
+      if (draggedTask.columnId !== targetTask.columnId || 
+          draggedTask.rowId !== targetTask.rowId) {
+        // If not in the same container, let the normal move task handle it
+        return handleMoveTask(draggedTaskId, targetTask.columnId, targetTask.rowId);
+      }
+      
+      // Get all tasks in this column and row
+      const containerTasks = tasks.filter(
+        t => t.columnId === targetTask.columnId && t.rowId === targetTask.rowId
+      );
+      
+      // Sort tasks by position if available, otherwise use current order
+      const sortedTasks = [...containerTasks].sort((a, b) => 
+        (a.position !== undefined && b.position !== undefined) 
+          ? a.position - b.position 
+          : 0
+      );
+      
+      // Find indices
+      const draggedIndex = sortedTasks.findIndex(t => t.id === draggedTaskId);
+      const targetIndex = sortedTasks.findIndex(t => t.id === targetTaskId);
+      
+      // Reorder
+      const newOrder = [...sortedTasks];
+      newOrder.splice(draggedIndex, 1);
+      newOrder.splice(targetIndex, 0, draggedTask);
+      
+      // Update local state for immediate feedback
+      const updatedTasks = tasks.map(task => {
+        const newIndex = newOrder.findIndex(t => t.id === task.id);
+        if (newIndex !== -1) {
+          return { ...task, position: newIndex };
+        }
+        return task;
+      });
+      
+      setTasks(updatedTasks);
+      
+      // Update positions in the backend
+      const updatePromises = newOrder.map(async (task, index) => {
+        try {
+          await updateTaskPosition(task.id, index);
+        } catch (error) {
+          console.error(`Error updating task position for ${task.id}:`, error);
+        }
+      });
+      
+      await Promise.all(updatePromises);
+      await refreshTasks();
+      
+    } catch (err) {
+      console.error('Error reordering tasks:', err);
+      setError(err.message);
+      throw err;
+    }
+  };
+
   const refreshTasks = async () => {
     try {
       setLoading(true);
       
-      // Refresh all data to ensure consistency
-      const [columnsData, tasksData, rowsData] = await Promise.all([
-        fetchColumns(),
-        fetchTasks(),
-        fetchRows()
-      ]);
-      
-      // Sort columns by position
-      const sortedColumns = columnsData.sort((a, b) => a.position - b.position);
-      setColumns(sortedColumns);
-      
-      // Sort rows by position
-      const sortedRows = rowsData.sort((a, b) => a.position - b.position);
-      setRows(sortedRows);
-      
+      // Only fetch and update tasks
+      const tasksData = await fetchTasks();
       setTasks(tasksData);
       
       setLoading(false);
     } catch (err) {
-      console.error('Error refreshing data:', err);
+      console.error('Error refreshing tasks:', err);
       setError(err.message);
       setLoading(false);
     }
-  };  
+  };
+
+  const refreshBoard = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch and update columns
+      const columnsData = await fetchColumns();
+      const sortedColumns = columnsData.sort((a, b) => a.position - b.position);
+      setColumns(sortedColumns);
+      
+      // Fetch and update rows
+      const rowsData = await fetchRows();
+      const sortedRows = rowsData.sort((a, b) => a.position - b.position);
+      setRows(sortedRows);
+
+      refreshBoard();
+      
+      setLoading(false);
+    } catch (err) {
+      console.error('Error refreshing board data:', err);
+      setError(err.message);
+      setLoading(false);
+    }
+  };
   
   // Add a new column
   const handleAddColumn = async (name, wipLimit) => {
@@ -364,7 +442,7 @@ const handleDeleteRow = async (rowId) => {
     }
     
     // Force refresh the board data
-    await refreshTasks();
+    await refreshBoard();
     
   } catch (err) {
     console.error('Error deleting row:', err);
@@ -507,7 +585,6 @@ const handleDragStart = (e, id, type = 'task', sourceColumnId = null, sourceRowI
   const dataString = JSON.stringify(data);
   e.dataTransfer.setData(`application/${type}`, dataString);
   
-  // For debugging, also set as plain text
   e.dataTransfer.setData('text/plain', dataString);
   
   e.dataTransfer.effectAllowed = 'move';
@@ -630,7 +707,8 @@ const handleDrop = (e, targetColumnId, targetRowId) => {
     handleDragStart,
     handleDragOver,
     handleDrop,
-    handleDragEnd
+    handleDragEnd,
+    handleTaskReorder
   };
   
   const value = {
@@ -653,6 +731,7 @@ const handleDrop = (e, targetColumnId, targetRowId) => {
     moveColumn: handleMoveColumn,
     moveRow: handleMoveRow,
     refreshTasks,
+    refreshBoard,
     dragAndDrop // Export drag and drop handlers
   };
   

@@ -121,9 +121,6 @@ function Task({ task, columnId }) {
     const dataString = JSON.stringify(data);
     e.dataTransfer.setData('application/task', dataString);
     
-    // For debugging, also set as plain text
-    e.dataTransfer.setData('text/plain', dataString);
-    
     // For backwards compatibility
     e.dataTransfer.setData('taskId', task.id);
     e.dataTransfer.setData('columnId', columnId);
@@ -133,6 +130,54 @@ function Task({ task, columnId }) {
     // Add a class to indicate dragging
     if (taskRef.current) {
       taskRef.current.classList.add('dragging');
+    }
+  };
+
+  const onDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Check if we're dragging a task
+    if (e.dataTransfer.types.includes('application/task')) {
+      // Add visual cue for dropping
+      taskRef.current.classList.add('task-drag-over');
+    }
+  };
+  
+  const onDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Remove visual cue
+    taskRef.current.classList.remove('task-drag-over');
+  };
+  
+  const onDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Remove visual cue
+    taskRef.current.classList.remove('task-drag-over');
+    
+    // Check if we're dropping a task
+    if (e.dataTransfer.types.includes('application/task')) {
+      try {
+        const dataString = e.dataTransfer.getData('application/task');
+        const taskData = JSON.parse(dataString);
+        
+        // Extract the dragged task ID
+        const draggedTaskId = taskData.id;
+        
+        // Don't reorder if dropping on itself
+        if (draggedTaskId === task.id) {
+          return;
+        }
+        
+        // Call the context method to handle task reordering
+        dragAndDrop.handleTaskReorder(draggedTaskId, task.id);
+      } catch (err) {
+        console.error('Error processing task drop for reordering:', err);
+      }
     }
   };
   
@@ -154,6 +199,9 @@ function Task({ task, columnId }) {
         onClick={handleTaskClick}
         onDragStart={onDragStartHandler}
         onDragEnd={onDragEndHandler}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
         data-task-id={task.id}
         data-column-id={columnId}
         data-row-id={task.rowId || "null"}
