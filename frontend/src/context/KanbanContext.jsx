@@ -247,6 +247,30 @@ export function KanbanProvider({ children }) {
   // Delete column
   const handleDeleteColumn = async (columnId) => {
     try {
+      // Find an alternative column first
+      const alternativeColumn = columns.find(col => col.id !== columnId);
+      
+      if (!alternativeColumn) {
+        // If this is the last column, just delete it
+        await deleteColumn(columnId);
+        setColumns([]);
+        return;
+      }
+      
+      // Move tasks from deleted column to alternative column in the backend FIRST
+      const tasksToMove = tasks.filter(task => task.columnId === columnId);
+      
+      // Update all tasks in backend before deleting the column
+      for (const task of tasksToMove) {
+        try {
+          await updateTaskColumn(task.id, alternativeColumn.id);
+        } catch (updateErr) {
+          console.error(`Error updating task ${task.id} column:`, updateErr);
+          // Continue with other tasks even if one fails
+        }
+      }
+      
+      // Now delete the column from backend
       await deleteColumn(columnId);
       
       // Update column map
@@ -259,31 +283,23 @@ export function KanbanProvider({ children }) {
       }
       setColumnMap(updatedColumnMap);
       
-      // Remove column from state
+      // Update local state
       setColumns(columns.filter(column => column.id !== columnId));
       
-      // Move tasks to first column if needed
-      if (columns.length > 1) {
-        const firstColumn = columns.find(col => col.id !== columnId);
-        if (firstColumn) {
-          // Move tasks from deleted column to first column
-          const tasksToMove = tasks.filter(task => task.columnId === columnId);
-          
-          const updatedTasks = tasks.map(task => 
-            task.columnId === columnId 
-              ? { ...task, columnId: firstColumn.id } 
-              : task
-          );
-          
-          setTasks(updatedTasks);
-          
-          // Update tasks in backend
-          tasksToMove.forEach(async (task) => {
-            await updateTaskColumn(task.id, firstColumn.id);
-          });
-        }
-      }
+      // Update tasks in local state to match backend changes
+      const updatedTasks = tasks.map(task => 
+        task.columnId === columnId 
+          ? { ...task, columnId: alternativeColumn.id } 
+          : task
+      );
+      
+      setTasks(updatedTasks);
+      
+      // Force a refresh to ensure everything is in sync
+      await refreshTasks();
+      
     } catch (err) {
+      console.error('Error deleting column:', err);
       setError(err.message);
       throw err;
     }
