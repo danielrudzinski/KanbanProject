@@ -5,7 +5,7 @@ import Task from './Task';
 import '../styles/components/Board.css';
 
 function Board() {
-  const { columns, rows, tasks, loading, error, deleteRow, dragAndDrop } = useKanban();
+  const { columns, rows, tasks, loading, error, deleteRow, deleteColumn, dragAndDrop } = useKanban();
   const { handleDragOver, handleDrop } = dragAndDrop;
 
   if (loading) {
@@ -137,42 +137,56 @@ const getTasksByColumnAndRow = (columnId, rowId = null) => {
     );
   };
 
-  // Render column header with drag and drop handlers
-  const renderColumnHeader = (column) => {
-    const onDragStart = (e) => {
-      dragAndDrop.handleDragStart(e, column.id, 'column');
-    };
-    
-    const onDragOver = (e) => {
-      dragAndDrop.handleDragOver(e);
-    };
-    
-    const onDrop = (e) => {
-      dragAndDrop.handleDrop(e, column.id);
-    };
-    
-    return (
-      <th 
-        key={column.id} 
-        className="grid-column-header"
-        draggable="true"
-        onDragStart={onDragStart}
-        onDragOver={onDragOver}
-        onDrop={onDrop}
-        data-column-id={column.id}
-      >
-        <div className="column-title">
-          <span className="column-drag-handle">☰</span>
-          {column.name}
-        </div>
-        {column.wipLimit > 0 && (
-          <span className={`wip-limit ${tasks.filter(t => t.columnId === column.id).length > column.wipLimit ? 'exceeded' : ''}`}>
-            ({tasks.filter(t => t.columnId === column.id).length}/{column.wipLimit})
-          </span>
-        )}
-      </th>
-    );
+// Render column header with drag and drop handlers
+const renderColumnHeader = (column) => {
+  const onDragStart = (e) => {
+    dragAndDrop.handleDragStart(e, column.id, 'column');
   };
+  
+  const onDragOver = (e) => {
+    dragAndDrop.handleDragOver(e);
+  };
+  
+  const onDrop = (e) => {
+    dragAndDrop.handleDrop(e, column.id);
+  };
+  
+  return (
+    <th 
+      key={column.id} 
+      className="grid-column-header"
+      draggable="true"
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      data-column-id={column.id}
+    >
+      <div className="column-title">
+        <span className="column-drag-handle">☰</span>
+        {column.name}
+        <span className="task-count">
+          {tasks.filter(t => t.columnId === column.id).length}
+        </span>
+        <button 
+          className="delete-column-btn" 
+          title="Usuń kolumnę"
+          onClick={() => {
+            if (window.confirm('Czy na pewno chcesz usunąć tę kolumnę?')) {
+              deleteColumn(column.id);
+            }
+          }}
+        >
+          ×
+        </button>
+      </div>
+      {column.wipLimit > 0 && (
+        <span className={`wip-limit ${tasks.filter(t => t.columnId === column.id).length > column.wipLimit ? 'exceeded' : ''}`}>
+          ({tasks.filter(t => t.columnId === column.id).length}/{column.wipLimit})
+        </span>
+      )}
+    </th>
+  );
+}; 
 
   // If no rows, render the board with just columns
   if (rows.length === 0) {

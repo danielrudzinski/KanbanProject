@@ -13,6 +13,8 @@ function TaskDetails({ task, onClose }) {
   const [subtasks, setSubtasks] = useState([]);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [showAssignForm, setShowAssignForm] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [subtaskToDelete, setSubtaskToDelete] = useState(null);
   const panelRef = useRef(null);
 
   const removeUserFromTask = async (taskId, userId) => {
@@ -211,21 +213,43 @@ function TaskDetails({ task, onClose }) {
     }
   };
 
-  const handleDeleteSubtask = async (subtaskId) => {
+  const confirmDeleteSubtask = (subtaskId) => {
+    // Find the subtask to delete
+    const subtask = subtasks.find(s => s.id === subtaskId);
+    if (subtask) {
+      setSubtaskToDelete(subtask);
+      setShowDeleteConfirmation(true);
+    }
+  };
+
+  const handleDeleteSubtask = async () => {
+    if (!subtaskToDelete) return;
+    
     try {
-      await deleteSubtask(subtaskId);
+      await deleteSubtask(subtaskToDelete.id);
       
       // Update the UI by removing the deleted subtask
-      setSubtasks(prev => prev.filter(subtask => subtask.id !== subtaskId));
+      setSubtasks(prev => prev.filter(subtask => subtask.id !== subtaskToDelete.id));
       
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
       }, 3000);
+      
+      // Close the confirmation dialog
+      setShowDeleteConfirmation(false);
+      setSubtaskToDelete(null);
     } catch (error) {
       console.error('Error deleting subtask:', error);
       alert('Wystąpił błąd podczas usuwania podzadania');
+      setShowDeleteConfirmation(false);
+      setSubtaskToDelete(null);
     }
+  };
+
+  const cancelDeleteSubtask = () => {
+    setShowDeleteConfirmation(false);
+    setSubtaskToDelete(null);
   };
 
   const renderUserAvatar = (user) => {
@@ -444,7 +468,7 @@ function TaskDetails({ task, onClose }) {
             >
               Dodaj
             </button>
-            </div>
+          </div>
           
           {subtasks.length > 0 ? (
             <div className="subtasks-list">
@@ -465,7 +489,7 @@ function TaskDetails({ task, onClose }) {
                   </label>
                   <button
                     className="delete-subtask-btn"
-                    onClick={() => handleDeleteSubtask(subtask.id)}
+                    onClick={() => confirmDeleteSubtask(subtask.id)}
                     title="Usuń podzadanie"
                   >
                     ×
@@ -477,6 +501,30 @@ function TaskDetails({ task, onClose }) {
             <p className="no-subtasks">Brak podzadań</p>
           )}
         </div>
+  
+        {/* Delete confirmation dialog */}
+        {showDeleteConfirmation && subtaskToDelete && (
+          <div className="delete-confirmation-overlay">
+            <div className="delete-confirmation-dialog">
+              <h4>Potwierdź usunięcie</h4>
+              <p>Czy na pewno chcesz usunąć podzadanie: <strong>{subtaskToDelete.title}</strong>?</p>
+              <div className="confirmation-actions">
+                <button 
+                  onClick={handleDeleteSubtask}
+                  className="confirm-btn"
+                >
+                  Tak
+                </button>
+                <button 
+                  onClick={cancelDeleteSubtask}
+                  className="cancel-btn"
+                >
+                  Nie
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
   
         {success && (
           <div className="success-message">
