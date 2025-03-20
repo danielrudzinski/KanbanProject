@@ -31,7 +31,7 @@ public class Task {
     @JoinColumn(name = "column_id")
     private Column column;
     @ManyToOne
-    @JoinColumn(name = "row_id")
+    @JoinColumn(name = "row_id", nullable = true)
     private Row row;
     @ManyToMany
     @JoinTable(
