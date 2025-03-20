@@ -21,7 +21,7 @@ public class Row {
     private Integer position;
     @Column(name = "wip_limit")
     private Integer wipLimit;
-    @OneToMany(mappedBy = "row", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "row", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     List<Task> tasks;
 
 }
