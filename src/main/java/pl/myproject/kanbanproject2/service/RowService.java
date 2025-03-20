@@ -59,11 +59,14 @@ public class RowService {
     public void deleteRow(Integer id) {
         if (!rowRepository.existsById(id)) {
             throw new EntityNotFoundException("Nie ma wiersza o takim ID");
-
         }
-
-        rowRepository.deleteById(id);
+        try {
+            rowRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Błąd podczas usuwania wiersza: " + e.getMessage());
+        }
     }
+
 
     public RowDTO getRowById(Integer id) {
         return rowRepository.findById(id).
