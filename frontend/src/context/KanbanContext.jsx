@@ -197,30 +197,41 @@ export function KanbanProvider({ children }) {
     try {
       setLoading(true);
       
-      // Refresh all data to ensure consistency
-      const [columnsData, tasksData, rowsData] = await Promise.all([
-        fetchColumns(),
-        fetchTasks(),
-        fetchRows()
-      ]);
-      
-      // Sort columns by position
-      const sortedColumns = columnsData.sort((a, b) => a.position - b.position);
-      setColumns(sortedColumns);
-      
-      // Sort rows by position
-      const sortedRows = rowsData.sort((a, b) => a.position - b.position);
-      setRows(sortedRows);
-      
+      // Only fetch and update tasks
+      const tasksData = await fetchTasks();
       setTasks(tasksData);
       
       setLoading(false);
     } catch (err) {
-      console.error('Error refreshing data:', err);
+      console.error('Error refreshing tasks:', err);
       setError(err.message);
       setLoading(false);
     }
-  };  
+  };
+
+  const refreshBoard = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch and update columns
+      const columnsData = await fetchColumns();
+      const sortedColumns = columnsData.sort((a, b) => a.position - b.position);
+      setColumns(sortedColumns);
+      
+      // Fetch and update rows
+      const rowsData = await fetchRows();
+      const sortedRows = rowsData.sort((a, b) => a.position - b.position);
+      setRows(sortedRows);
+
+      refreshBoard();
+      
+      setLoading(false);
+    } catch (err) {
+      console.error('Error refreshing board data:', err);
+      setError(err.message);
+      setLoading(false);
+    }
+  };
   
   // Add a new column
   const handleAddColumn = async (name, wipLimit) => {
@@ -415,7 +426,7 @@ const handleDeleteRow = async (rowId) => {
     }
     
     // Force refresh the board data
-    await refreshTasks();
+    await refreshBoard();
     
   } catch (err) {
     console.error('Error deleting row:', err);
@@ -704,6 +715,7 @@ const handleDrop = (e, targetColumnId, targetRowId) => {
     moveColumn: handleMoveColumn,
     moveRow: handleMoveRow,
     refreshTasks,
+    refreshBoard,
     dragAndDrop // Export drag and drop handlers
   };
   
