@@ -1,6 +1,7 @@
 package pl.myproject.kanbanproject2.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +17,8 @@ public class SubTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String title;
-    @Lob
     private String description;
     private boolean completed;
     private Integer position;
