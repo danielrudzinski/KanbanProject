@@ -12,6 +12,7 @@ import pl.myproject.kanbanproject2.repository.TaskRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,7 @@ public class TaskService {
     public List<TaskDTO> getAllTasks() {
         List<TaskDTO> taskDTOS = taskRepository.findAll().stream()
                 .map(taskMapper::apply)
+                .sorted(Comparator.comparing(TaskDTO::position))
                 .collect(Collectors.toList());
         return taskDTOS;
     }
