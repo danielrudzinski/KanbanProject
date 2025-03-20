@@ -16,6 +16,7 @@ public class SubTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Lob
     private String title;
     @Lob
     private String description;
