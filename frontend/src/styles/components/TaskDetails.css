@@ -25,6 +25,15 @@
   animation: panel-appear 0.2s ease-out;
 }
 
+@keyframes overlay-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes panel-appear {
   from {
     opacity: 0;
@@ -33,15 +42,6 @@
   to {
     opacity: 1;
     transform: translate(-50%, -50%);
-  }
-}
-
-@keyframes overlay-appear {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 
@@ -428,6 +428,7 @@ h3, h4 {
 label {
   color: #000000;
 }
+
 .delete-confirmation-overlay {
   position: fixed;
   top: 0;
@@ -439,7 +440,10 @@ label {
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: overlay-appear 0.2s ease-out;
+  opacity: 1;
+  animation: overlay-appear 0.2s ease-out forwards;
+  will-change: opacity;
+  visibility: visible !important;
 }
 
 .delete-confirmation-dialog {
@@ -449,7 +453,22 @@ label {
   padding: 20px 24px;
   width: 90%;
   max-width: 400px;
-  animation: panel-appear 0.2s ease-out;
+  visibility: visible !important;
+  transform: translateY(0); 
+  opacity: 1;
+  animation: dialog-appear 0.2s ease-out forwards;
+  will-change: transform, opacity; 
+}
+
+@keyframes dialog-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .delete-confirmation-dialog h4 {
@@ -483,7 +502,7 @@ label {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.15s ease-in-out;
 }
 
 .cancel-btn {
