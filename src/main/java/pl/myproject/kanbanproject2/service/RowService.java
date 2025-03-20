@@ -79,7 +79,7 @@ public class RowService {
                 rowToDelete.setTasks(new ArrayList<>());
                 rowRepository.save(rowToDelete);
             }
-            
+
             rowRepository.deleteById(id);
         } catch (Exception e) {
             throw new RuntimeException("Błąd podczas usuwania wiersza: " + e.getMessage());

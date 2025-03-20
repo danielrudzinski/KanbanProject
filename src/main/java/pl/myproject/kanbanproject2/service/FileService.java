@@ -1,5 +1,6 @@
 package pl.myproject.kanbanproject2.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -7,7 +8,7 @@ import pl.myproject.kanbanproject2.model.FileEntity;
 import pl.myproject.kanbanproject2.repository.FileRepository;
 
 import java.io.IOException;
-
+@Transactional
 @Service
 public class FileService {
     private final FileRepository fileRepository;
