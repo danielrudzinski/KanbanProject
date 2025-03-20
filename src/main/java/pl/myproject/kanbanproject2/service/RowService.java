@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.myproject.kanbanproject2.dto.RowDTO;
 import pl.myproject.kanbanproject2.mapper.RowMapper;
 import pl.myproject.kanbanproject2.model.Row;
-import pl.myproject.kanbanproject2.model.Task;
 import pl.myproject.kanbanproject2.repository.RowRepository;
-import pl.myproject.kanbanproject2.repository.TaskRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,13 +16,11 @@ import java.util.stream.Collectors;
 @Service
 public class RowService {
     private final RowRepository rowRepository;
-    private final TaskRepository taskRepository;
     private final RowMapper rowMapper;
 
     @Autowired
-    public RowService(RowRepository rowRepository, TaskRepository taskRepository, RowMapper rowMapper) {
+    public RowService(RowRepository rowRepository, RowMapper rowMapper) {
         this.rowRepository = rowRepository;
-        this.taskRepository = taskRepository;
         this.rowMapper = rowMapper;
     }
 
@@ -61,30 +57,11 @@ public class RowService {
     }
 
     public void deleteRow(Integer id) {
-        deleteRow(id, false);
-    }
+        if (!rowRepository.existsById(id)) {
+            throw new EntityNotFoundException("Nie ma wiersza o takim ID");
 
-    @Transactional
-    public void deleteRow(Integer id, boolean cascade) {
-        Row row = rowRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma wiersza o takim ID"));
-        
-        // Find all tasks associated with this row
-        List<Task> tasksInRow = taskRepository.findByRowId(id);
-        
-        if (!tasksInRow.isEmpty()) {
-            if (cascade) {
-                // If cascade is true, remove row association from all tasks
-                for (Task task : tasksInRow) {
-                    task.setRow(null);
-                    taskRepository.save(task);
-                }
-            } else {
-                // If cascade is false, throw an exception
-                throw new IllegalStateException("Cannot delete row with associated tasks. Use cascade=true to remove row associations first.");
-            }
         }
-        
+
         rowRepository.deleteById(id);
     }
 
