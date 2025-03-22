@@ -12,7 +12,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background-color: #d1d1d1;
+  background-color: rgba(209, 253, 255, 0.3);
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
   font-weight: bold;
@@ -39,7 +39,7 @@
 .delete-row-btn {
   border: none;
   background: none;
-  color: #0e1b36;
+  color: #76777c;
   font-size: 18px;
   cursor: pointer;
   padding: 0 4px;
@@ -47,7 +47,7 @@
 }
 
 .delete-row-btn:hover {
-  color: #76777c;
+  color: #d1fdff;
 }
 
 .wip-limit {
@@ -62,7 +62,7 @@
 
 .delete-confirmation {
   background-color: #e2e2e2;
-  border: 1px solid #d1d1d1;
+  border: 1px solid #d1fdff;
   border-radius: 4px;
   padding: 12px;
   margin: 8px;
@@ -89,7 +89,7 @@
 }
 
 .confirmation-buttons button:last-child {
-  background-color: #d1d1d1;
+  background-color: #d1fdff;
   color: #0e1b36;
 }
 
@@ -98,4 +98,47 @@
   flex-wrap: wrap;
   padding: 8px;
   gap: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .row {
+    background-color: #0e1b36;
+  }
+  
+  .row-header {
+    background-color: rgba(209, 253, 255, 0.2);
+    color: #e2e2e2;
+  }
+  
+  .task-count {
+    background-color: #86d6ff;
+    color: #0e1b36;
+  }
+  
+  .delete-row-btn {
+    color: #76777c;
+  }
+  
+  .delete-row-btn:hover {
+    color: #d1fdff;
+  }
+  
+  .wip-limit.exceeded {
+    color: #d1fdff;
+  }
+  
+  .delete-confirmation {
+    background-color: #0e1b36;
+    border-color: #d1fdff;
+  }
+  
+  .confirmation-buttons button:first-child {
+    background-color: #e2e2e2;
+    color: #0e1b36;
+  }
+  
+  .confirmation-buttons button:last-child {
+    background-color: #86d6ff;
+    color: #0e1b36;
+  }
 }

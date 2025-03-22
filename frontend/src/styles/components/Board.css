@@ -29,7 +29,7 @@
 
 /* Corner cell (top-left empty cell) */
 .grid-corner {
-  background-color: #d1d1d1;
+  background-color: #76777c;
   border-radius: 4px;
   min-width: 120px;
   padding: 0.75rem;
@@ -76,7 +76,7 @@
 
 /* Grid cells */
 .grid-cell {
-  background-color: #e2e2e2;
+  background-color: #d1c6c6;
   padding: 0.5rem;
   border-radius: 4px;
   min-height: 100px;
@@ -97,10 +97,10 @@
 
 .task-count {
   font-size: 0.8rem;
-  background-color: #d1d1d1;
+  background-color: #76777c;
   padding: 0.1rem 0.3rem;
   border-radius: 3px;
-  color: #0e1b36;
+  color: #e2e2e2;
 }
 
 .delete-row-btn {
@@ -115,7 +115,7 @@
 }
 
 .delete-row-btn:hover {
-  color: #0e1b36;
+  color: #86d6ff;
 }
 
 /* Loading and error states */
@@ -148,16 +148,16 @@
 /* Dark mode styles */
 @media (prefers-color-scheme: dark) {
   .grid-corner {
-    background-color: #232429;
+    background-color: #76777c;
   }
   
   .grid-column-header {
-    background-color: rgba(134, 214, 255, 0.15);
+    background-color: rgba(134, 214, 255, 0.2);
     color: #e2e2e2;
   }
   
   .grid-row-header {
-    background-color: rgba(209, 253, 255, 0.15);
+    background-color: rgba(209, 253, 255, 0.2);
     color: #e2e2e2;
   }
   
@@ -166,12 +166,12 @@
   }
   
   .task-count {
-    background-color: #232429;
+    background-color: #76777c;
     color: #e2e2e2;
   }
   
   .wip-limit {
-    color: #a0a0a0;
+    color: #e2e2e2;
   }
 
   .wip-limit.exceeded {

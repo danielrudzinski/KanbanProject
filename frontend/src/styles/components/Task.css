@@ -407,6 +407,10 @@
   .success-message {
     background-color: #86d6ff;
   }
+  
+  .user-avatar img {
+    background-color: #0e1b36;
+  }
 }
 
 .task.user-drag-over {

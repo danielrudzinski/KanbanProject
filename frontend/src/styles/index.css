@@ -41,6 +41,15 @@
   --text-dark: #0e1b36;
   --text-dark-secondary: #3e3f44;
   
+  /* Adding variables for users.css */
+  --blue-dark: #0056b3;
+  --blue-light: #4dabf7;
+  --blue-primary: #0088ff;
+  --white: #ffffff;
+  --black-light: #1a1a1a;
+  --black-medium: #121212;
+  --gray-dark: #333333;
+  
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -49,21 +58,29 @@
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Poppins', 'Roboto', sans-serif;
+}
+
 body {
   margin: 0;
   display: flex;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #e2e2e2;
+  background-color: #ecdedef1;
   background-image: 
-    radial-gradient(circle at 20% 20%, rgba(134, 214, 255, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(209, 253, 255, 0.05) 0%, transparent 50%);
-  color: #0e1b36;
+    radial-gradient(circle at 20% 20%, rgba(0, 170, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(0, 255, 98, 0.05) 0%, transparent 50%);
+  color: #516899;
 }
 
 a {
   font-weight: 500;
-  color: #86d6ff;
+  color: #000000;
   text-decoration: inherit;
   transition: color 0.2s ease;
 }
@@ -102,65 +119,4 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 3px solid rgba(134, 214, 255, 0.3);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-  }
-  
-  body {
-    background-color: #0e1b36;
-    background-image: 
-      radial-gradient(circle at 20% 20%, rgba(134, 214, 255, 0.07) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(209, 253, 255, 0.07) 0%, transparent 50%);
-    color: #e2e2e2;
-  }
-  
-  h1 {
-    color: #e2e2e2;
-  }
-  
-  a {
-    color: #86d6ff;
-  }
-  
-  a:hover {
-    color: #d1fdff;
-  }
-  
-  button {
-    background-color: #232429;
-    color: #e2e2e2;
-  }
-  
-  button:hover {
-    background-color: #3e3f44;
-  }
-  
-  .column {
-    background-color: #0e1b36;
-    border-top: 4px solid #86d6ff;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-  }
-  
-  .task {
-    background-color: #232429;
-    color: #e2e2e2;
-    border-left: 3px solid #86d6ff;
-  }
-  
-  .add-task-container {
-    background-color: #0e1b36;
-  }
-  
-  .toggle-form-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    color: #e2e2e2;
-    padding: 0.5rem 1rem;
-    width: fit-content;
-}
 }
