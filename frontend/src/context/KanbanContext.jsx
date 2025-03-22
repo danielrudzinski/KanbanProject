@@ -15,7 +15,10 @@ import {
   updateTaskRow,
   updateColumnPosition,
   updateRowPosition,
-  updateTaskPosition
+  updateTaskPosition,
+  updateTaskName,
+  updateRowName,
+  updateColumnName,
 } from '../services/api';
 
 const KanbanContext = createContext();

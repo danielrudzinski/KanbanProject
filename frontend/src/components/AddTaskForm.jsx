@@ -1,16 +1,12 @@
 import { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
-import '../styles/components/AddTaskForm.css';
+import '../styles/components/Forms.css'; 
 
 function AddTaskForm() {
   const { addTask, refreshTasks } = useKanban();
   const [title, setTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  
-  const toggleForm = () => {
-    onClose();
-  };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,21 +33,27 @@ function AddTaskForm() {
   };
   
   return (
-    <div className="add-task-container">
+    <div className="form-container">
       <form onSubmit={handleSubmit}>
-        <h3>Dodaj nowe zadanie</h3>
+        <div className="form-header">
+          <h3>Dodaj nowe zadanie</h3>
+        </div>
         
         {error && <div className="error-message">{error}</div>}
         
         <div className="form-group">
+          <label htmlFor="task-title">Tytuł zadania:</label>
           <input
+            id="task-title"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Wpisz tytuł zadania"
             disabled={isSubmitting}
           />
-          
+        </div>
+        
+        <div className="form-actions">
           <button 
             type="submit"
             disabled={isSubmitting}

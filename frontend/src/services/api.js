@@ -133,6 +133,27 @@ export const deleteColumn = async (columnId) => {
   }
 };
 
+export const updateColumnName = async (id, name) => {
+  try {
+    const response = await fetch(`/columns/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to update column: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating column name:', error);
+    throw error;
+  }
+};
+
 // ====== TASK OPERATIONS ======
 export const fetchTasks = async () => {
   try {
@@ -399,6 +420,27 @@ export const updateTaskRow = async (taskId, rowId) => {
   }
 };
 
+export const updateTaskName = async (id, name) => {
+  try {
+    const response = await fetch(`/tasks/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to update task: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating task name:', error);
+    throw error;
+  }
+};
+
 // ====== ROW OPERATIONS ======
 export const fetchRows = async (retries = 3) => {
   while (retries > 0) {
@@ -518,6 +560,27 @@ export const deleteRow = async (rowId, cascade = false) => {
     return true;
   } catch (error) {
     console.error(`Error deleting row ${rowId}:`, error);
+    throw error;
+  }
+};
+
+export const updateRowName = async (id, name) => {
+  try {
+    const response = await fetch(`/rows/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to update row: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating row name:', error);
     throw error;
   }
 };
