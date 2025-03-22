@@ -141,4 +141,14 @@ public class UserService {
         userRepository.save(user);
         fileRepository.delete(avatar);
     }
+
+    public UserDTO updateWipLimit(Integer userId, Integer wipLimit) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+
+        user.setWipLimit(wipLimit);
+        User updatedUser = userRepository.save(user);
+
+        return userMapper.apply(updatedUser);
+    }
 }

@@ -106,7 +106,7 @@ public class UserController {
         }
     }
 
-    // Usuwanie awatara
+    
     @DeleteMapping("/{id}/avatar")
     public ResponseEntity<String> deleteAvatar(@PathVariable Integer id) {
         try {
@@ -116,4 +116,10 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PatchMapping("/{id}/wip-limit")
+    public ResponseEntity<UserDTO> updateWipLimit(@PathVariable Integer id, @RequestBody Integer wipLimit) {
+        UserDTO updatedUser = userService.updateWipLimit(id, wipLimit);
+        return ResponseEntity.ok(updatedUser);
+    }
+
 }
