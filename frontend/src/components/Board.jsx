@@ -1,6 +1,5 @@
 import { useKanban } from '../context/KanbanContext';
 import { useEffect } from 'react';
-import Column from './Column';
 import Task from './Task';
 import '../styles/components/Board.css';
 
@@ -28,22 +27,12 @@ function Board() {
     };
   }, [columns.length, rows.length]);
 
-// Filter tasks by column and optionally by row
-const getTasksByColumnAndRow = (columnId, rowId = null) => {
-  if (rows.length > 0) {
-    if (rowId === null) {
-      return tasks.filter(task => 
-        task.columnId === columnId && (task.rowId === null || task.rowId === undefined)
-      );
-    } else {
-      return tasks.filter(task => 
-        task.columnId === columnId && task.rowId === rowId
-      );
-    }
-  }
-  
-  return tasks.filter(task => task.columnId === columnId);
-};
+  // Filter tasks by column and row
+  const getTasksByColumnAndRow = (columnId, rowId = null) => {
+    return tasks.filter(task => 
+      task.columnId === columnId && task.rowId === rowId
+    );
+  };
 
   // Calculate task counts for each row
   const calculateTaskCounts = () => {
@@ -87,6 +76,17 @@ const getTasksByColumnAndRow = (columnId, rowId = null) => {
     }
   };
 
+  // Safe deleteRow function that prevents deleting the last row
+  const safeDeleteRow = (rowId) => {
+    if (rows.length > 1) {
+      if (window.confirm('Czy na pewno chcesz usunąć ten wiersz?')) {
+        deleteRow(rowId);
+      }
+    } else {
+      alert('Nie można usunąć ostatniego wiersza.');
+    }
+  };
+
   // Render the row header with drag and drop handlers
   const renderRowHeader = (row) => {
     const onDragStart = (e) => {
@@ -124,11 +124,7 @@ const getTasksByColumnAndRow = (columnId, rowId = null) => {
           <button 
             className="delete-row-btn" 
             title="Usuń wiersz"
-            onClick={() => {
-              if (window.confirm('Czy na pewno chcesz usunąć ten wiersz?')) {
-                deleteRow(row.id);
-              }
-            }}
+            onClick={() => safeDeleteRow(row.id)}
           >
             ×
           </button>
@@ -137,74 +133,56 @@ const getTasksByColumnAndRow = (columnId, rowId = null) => {
     );
   };
 
-// Render column header with drag and drop handlers
-const renderColumnHeader = (column) => {
-  const onDragStart = (e) => {
-    dragAndDrop.handleDragStart(e, column.id, 'column');
-  };
-  
-  const onDragOver = (e) => {
-    dragAndDrop.handleDragOver(e);
-  };
-  
-  const onDrop = (e) => {
-    dragAndDrop.handleDrop(e, column.id);
-  };
-  
-  return (
-    <th 
-      key={column.id} 
-      className="grid-column-header"
-      draggable="true"
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
-      data-column-id={column.id}
-    >
-      <div className="column-title">
-        <span className="column-drag-handle">☰</span>
-        {column.name}
-        <span className="task-count">
-          {tasks.filter(t => t.columnId === column.id).length}
-        </span>
-        <button 
-          className="delete-column-btn" 
-          title="Usuń kolumnę"
-          onClick={() => {
-            if (window.confirm('Czy na pewno chcesz usunąć tę kolumnę?')) {
-              deleteColumn(column.id);
-            }
-          }}
-        >
-          ×
-        </button>
-      </div>
-      {column.wipLimit > 0 && (
-        <span className={`wip-limit ${tasks.filter(t => t.columnId === column.id).length > column.wipLimit ? 'exceeded' : ''}`}>
-          ({tasks.filter(t => t.columnId === column.id).length}/{column.wipLimit})
-        </span>
-      )}
-    </th>
-  );
-}; 
-
-  // If no rows, render the board with just columns
-  if (rows.length === 0) {
+  // Render column header with drag and drop handlers
+  const renderColumnHeader = (column) => {
+    const onDragStart = (e) => {
+      dragAndDrop.handleDragStart(e, column.id, 'column');
+    };
+    
+    const onDragOver = (e) => {
+      dragAndDrop.handleDragOver(e);
+    };
+    
+    const onDrop = (e) => {
+      dragAndDrop.handleDrop(e, column.id);
+    };
+    
     return (
-      <div 
-        className="board"
-        onDragOver={onBoardDragOver}
+      <th 
+        key={column.id} 
+        className="grid-column-header"
+        draggable="true"
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+        data-column-id={column.id}
       >
-        {columns.map(column => (
-          <Column 
-            key={column.id}
-            column={column}
-            tasks={getTasksByColumnAndRow(column.id)}
-          />
-        ))}
-      </div>
+        <div className="column-title">
+          <span className="column-drag-handle">☰</span>
+          {column.name}
+          <span className="task-count">
+            {tasks.filter(t => t.columnId === column.id).length}
+          </span>
+          <button 
+            className="delete-column-btn" 
+            title="Usuń kolumnę"
+            onClick={() => {
+              if (window.confirm('Czy na pewno chcesz usunąć tę kolumnę?')) {
+                deleteColumn(column.id);
+              }
+            }}
+          >
+            ×
+          </button>
+        </div>
+        {column.wipLimit > 0 && (
+          <span className={`wip-limit ${tasks.filter(t => t.columnId === column.id).length > column.wipLimit ? 'exceeded' : ''}`}>
+            ({tasks.filter(t => t.columnId === column.id).length}/{column.wipLimit})
+          </span>
+        )}
+      </th>
     );
-  }
+  }; 
 
   // Render table cells with proper drag and drop handlers
   const renderCell = (column, row) => {
@@ -234,16 +212,16 @@ const renderColumnHeader = (column) => {
             key={task.id} 
             task={task}
             columnId={column.id}
-            rowId={row.id}  // Make sure rowId is passed here
+            rowId={row.id}
           />
         ))}
       </td>
     );
   };
 
-  // Otherwise, render the grid-based board with rows and columns
+  // Always render the grid-based board with rows and columns
   return (
-    <div className="board-grid">
+    <div className="board-grid" onDragOver={onBoardDragOver}>
       <table className="kanban-table">
         <thead>
           <tr>
@@ -255,7 +233,6 @@ const renderColumnHeader = (column) => {
           </tr>
         </thead>
         <tbody>
-          
           {/* Rows with headers and cells */}
           {enhancedRows.map(row => (
             <tr key={row.id}>

@@ -6,9 +6,14 @@ function Row({ row, children }) {
   const { deleteRow, dragAndDrop } = useKanban();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const { handleDragStart, handleDragOver, handleDrop } = dragAndDrop;
+  const { rows } = useKanban();
 
   const handleDeleteClick = () => {
-    setIsConfirmingDelete(true);
+    if (rows.length > 1) {
+      setIsConfirmingDelete(true);
+    } else {
+      alert('Nie można usunąć ostatniego wiersza.');
+    }
   };
 
   const handleConfirmDelete = () => {
