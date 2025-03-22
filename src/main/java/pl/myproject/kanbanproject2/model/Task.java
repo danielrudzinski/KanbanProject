@@ -23,6 +23,8 @@ public class Task {
     private Integer id;
     private String title;
     private Integer position;
+    private boolean completed;
+    private String description;
     @ElementCollection
     @CollectionTable(name = "task_labels", joinColumns = @JoinColumn(name = "task_id"))
     @jakarta.persistence.Column(name = "label")

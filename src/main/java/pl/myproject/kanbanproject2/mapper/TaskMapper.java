@@ -44,7 +44,10 @@ public class TaskMapper implements Function<Task, TaskDTO> {
                 columnId,
                 rowId,
                 userIds,
-                labels
+                labels,
+                task.isCompleted(),
+                task.getDescription()
+
         );
     }
 }
