@@ -2,16 +2,16 @@
   min-width: 300px;
   max-width: 350px;
   height: 600px;
-  background-color: var(--surface-light);
+  background-color: #e2e2e2;
   border-radius: 1rem;
   padding: 1.25rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(14, 27, 54, 0.1), 0 2px 4px -1px rgba(14, 27, 54, 0.06);
   display: flex;
   flex-direction: column;
   position: relative;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   user-select: none;
-  border-top: 5px solid var(--primary);
+  border-top: 5px solid #86d6ff;
   overflow: hidden;
   cursor: grab;
 }
@@ -23,8 +23,8 @@
 .column.column-dragging {
   opacity: 0.6;
   transform: scale(1.02);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(14, 27, 54, 0.1),
+              0 10px 10px -5px rgba(14, 27, 54, 0.04);
 }
 
 .column .task-list {
@@ -33,18 +33,18 @@
 
 .column:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 15px -3px rgba(14, 27, 54, 0.1), 0 4px 6px -2px rgba(14, 27, 54, 0.05);
 }
 
 .column.over-limit {
-  border-top-color: var(--error);
+  border-top-color: #ef4444;
   background-color: rgba(239, 68, 68, 0.05);
 }
 
 .column-dragging {
   opacity: 0.6;
   transform: scale(0.98);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 15px rgba(14, 27, 54, 0.1);
 }
 
 .column .task-list {
@@ -54,6 +54,7 @@
 .column-header {
   cursor: move;
   cursor: grab;
+  color: #0e1b36;
 }
 
 .column-header:active {
@@ -67,8 +68,8 @@
 }
 
 .task-count {
-  background-color: var(--primary-transparent);
-  color: var(--primary-dark);
+  background-color: rgba(134, 214, 255, 0.2);
+  color: #0e1b36;
   border-radius: 9999px;
   padding: 0.2rem 0.6rem;
   font-size: 0.75rem;
@@ -77,20 +78,20 @@
 
 .wip-limit {
   font-size: 0.75rem;
-  color: var(--gray-500);
+  color: #76777c;
   margin-top: 0.5rem;
   display: block;
 }
 
 .wip-limit.exceeded {
-  color: var(--error);
+  color: #ef4444;
   font-weight: 600;
 }
 
 .delete-column-btn {
   background: none;
   border: none;
-  color: var(--gray-400);
+  color: #76777c;
   font-size: 1.25rem;
   cursor: pointer;
   padding: 0.25rem;
@@ -104,17 +105,17 @@
 }
 
 .delete-column-btn:hover {
-  color: var(--surface-light);
-  background-color: var(--gray-100);
+  color: #0e1b36;
+  background-color: rgba(134, 214, 255, 0.2);
 }
 
 .delete-confirmation {
-  background-color: var(--surface-light);
-  border: 1px solid var(--gray-200);
+  background-color: #e2e2e2;
+  border: 1px solid #d1fdff;
   border-radius: 0.5rem;
   padding: 1rem;
   margin: 1rem 0;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 6px -1px rgba(14, 27, 54, 0.1);
   animation: slideIn 0.3s ease;
 }
 
@@ -136,7 +137,7 @@
 }
 
 .confirmation-buttons button:first-child {
-  background-color: var(--error);
+  background-color: #ef4444;
   color: white;
 }
 
@@ -145,12 +146,12 @@
 }
 
 .confirmation-buttons button:last-child {
-  background-color: var(--gray-100);
-  color: var(--gray-700);
+  background-color: #d1fdff;
+  color: #0e1b36;
 }
 
 .confirmation-buttons button:last-child:hover {
-  background-color: var(--gray-200);
+  background-color: #86d6ff;
 }
 
 .task-list {
@@ -161,7 +162,7 @@
   margin: 0 -0.5rem;
   padding: 0 0.5rem;
   scrollbar-width: thin;
-  scrollbar-color: var(--gray-300) transparent;
+  scrollbar-color: #76777c transparent;
 }
 
 .task-list::-webkit-scrollbar {
@@ -173,7 +174,7 @@
 }
 
 .task-list::-webkit-scrollbar-thumb {
-  background-color: var(--gray-300);
+  background-color: #76777c;
   border-radius: 9999px;
 }
 
@@ -184,7 +185,7 @@
   left: 0;
   right: 0;
   height: 30px;
-  background: linear-gradient(to top, var(--surface-light), transparent);
+  background: linear-gradient(to top, #e2e2e2, transparent);
   pointer-events: none;
 }
 
@@ -194,48 +195,50 @@
 
 @media (prefers-color-scheme: dark) {
   .column {
-    background-color: var(--surface-dark);
-    border-top-color: var(--primary);
+    background-color: #0e1b36;
+    border-top-color: #86d6ff;
   }
   
   .column-header {
-    border-bottom-color: var(--gray-700);
-    color: var(--gray-100);
+    border-bottom-color: #76777c;
+    color: #d1fdff;
   }
   
   .task-count {
-    background-color: rgba(99, 102, 241, 0.2);
-    color: var(--primary-light);
+    background-color: rgba(134, 214, 255, 0.2);
+    color: #d1fdff;
   }
   
   .wip-limit {
-    color: var(--gray-400);
+    color: #76777c;
   }
   
   .delete-confirmation {
-    background-color: var(--surface-dark);
-    border-color: var(--gray-700);
+    background-color: #0e1b36;
+    border-color: #76777c;
   }
   
   .confirmation-buttons button:last-child {
-    background-color: var(--gray-700);
-    color: var(--gray-300);
+    background-color: #76777c;
+    color: #e2e2e2;
   }
   
   .confirmation-buttons button:last-child:hover {
-    background-color: var(--gray-600);
+    background-color: #86d6ff;
+    color: #0e1b36;
   }
   
   .delete-column-btn:hover {
-    background-color: var(--gray-700);
+    background-color: rgba(134, 214, 255, 0.2);
+    color: #d1fdff;
   }
   
   .task-list::-webkit-scrollbar-thumb {
-    background-color: var(--gray-600);
+    background-color: #76777c;
   }
   
   .column::after {
-    background: linear-gradient(to top, var(--surface-dark), transparent);
+    background: linear-gradient(to top, #0e1b36, transparent);
   }
   
   .column.over-limit {

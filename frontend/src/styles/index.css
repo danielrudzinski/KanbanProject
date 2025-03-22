@@ -2,44 +2,44 @@
 
 :root {
   /* Modern Color Palette */
-  --primary: #6366f1;
-  --primary-light: #818cf8;
-  --primary-dark: #4f46e5;
-  --primary-transparent: rgba(99, 102, 241, 0.1);
+  --primary: #86d6ff;
+  --primary-light: #d1fdff;
+  --primary-dark: #68a8cc;
+  --primary-transparent: rgba(134, 214, 255, 0.1);
   
-  --secondary: #ec4899;
-  --secondary-light: #f472b6;
-  --secondary-dark: #db2777;
+  --secondary: #d1fdff;
+  --secondary-light: #e5feff;
+  --secondary-dark: #a5cad0;
   
-  --accent: #8b5cf6;
-  --accent-light: #a78bfa;
-  --accent-dark: #7c3aed;
+  --accent: #86d6ff;
+  --accent-light: #a8e0ff;
+  --accent-dark: #68a8cc;
   
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --info: #3b82f6;
+  --success: #86d6ff;
+  --warning: #d1fdff;
+  --error: #0e1b36;
+  --info: #86d6ff;
   
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
+  --gray-50: #e2e2e2;
+  --gray-100: #e2e2e2;
+  --gray-200: #d1d1d1;
+  --gray-300: #bcbcbc;
+  --gray-400: #a0a0a0;
+  --gray-500: #76777c;
+  --gray-600: #5a5b5f;
+  --gray-700: #3e3f44;
+  --gray-800: #232429;
+  --gray-900: #0e1b36;
   
-  --surface-light: #ffffff;
-  --surface-light-hover: #f9fafb;
-  --surface-dark: #1e1e2e;
-  --surface-dark-hover: #2a2a3a;
+  --surface-light: #e2e2e2;
+  --surface-light-hover: #d1d1d1;
+  --surface-dark: #0e1b36;
+  --surface-dark-hover: #152442;
   
-  --text-light: #f9fafb;
-  --text-light-secondary: #d1d5db;
-  --text-dark: #111827;
-  --text-dark-secondary: #4b5563;
+  --text-light: #e2e2e2;
+  --text-light-secondary: #bcbcbc;
+  --text-dark: #0e1b36;
+  --text-dark-secondary: #3e3f44;
   
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -54,28 +54,28 @@ body {
   display: flex;
   min-width: 320px;
   min-height: 100vh;
-  background-color: var(--gray-100);
+  background-color: #e2e2e2;
   background-image: 
-    radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
-  color: var(--gray-900);
+    radial-gradient(circle at 20% 20%, rgba(134, 214, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(209, 253, 255, 0.05) 0%, transparent 50%);
+  color: #0e1b36;
 }
 
 a {
   font-weight: 500;
-  color: var(--primary);
+  color: #86d6ff;
   text-decoration: inherit;
   transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--primary-dark);
+  color: #68a8cc;
 }
 
 h1 {
   font-size: 2.2rem;
   line-height: 1.1;
-  color: var(--gray-900);
+  color: #0e1b36;
   font-weight: 700;
   margin-bottom: 1.5rem;
 }
@@ -87,21 +87,21 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: var(--surface-light);
-  color: var(--gray-800);
+  background-color: #e2e2e2;
+  color: #0e1b36;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(14, 27, 54, 0.05);
 }
 
 button:hover {
-  border-color: var(--primary);
-  background-color: var(--surface-light-hover);
+  border-color: #86d6ff;
+  background-color: #d1d1d1;
 }
 
 button:focus,
 button:focus-visible {
-  outline: 3px solid var(--primary-transparent);
+  outline: 3px solid rgba(134, 214, 255, 0.3);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -110,48 +110,48 @@ button:focus-visible {
   }
   
   body {
-    background-color: var(--gray-900);
+    background-color: #0e1b36;
     background-image: 
-      radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.07) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.07) 0%, transparent 50%);
-    color: var(--gray-100);
+      radial-gradient(circle at 20% 20%, rgba(134, 214, 255, 0.07) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(209, 253, 255, 0.07) 0%, transparent 50%);
+    color: #e2e2e2;
   }
   
   h1 {
-    color: var(--gray-100);
+    color: #e2e2e2;
   }
   
   a {
-    color: var(--primary-light);
+    color: #86d6ff;
   }
   
   a:hover {
-    color: var(--accent-light);
+    color: #d1fdff;
   }
   
   button {
-    background-color: var(--gray-800);
-    color: var(--gray-100);
+    background-color: #232429;
+    color: #e2e2e2;
   }
   
   button:hover {
-    background-color: var(--gray-700);
+    background-color: #3e3f44;
   }
   
   .column {
-    background-color: var(--surface-dark);
-    border-top: 4px solid var(--primary);
+    background-color: #0e1b36;
+    border-top: 4px solid #86d6ff;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
   }
   
   .task {
-    background-color: var(--gray-800);
-    color: var(--gray-100);
-    border-left: 3px solid var(--accent);
+    background-color: #232429;
+    color: #e2e2e2;
+    border-left: 3px solid #86d6ff;
   }
   
   .add-task-container {
-    background-color: var(--surface-dark);
+    background-color: #0e1b36;
   }
   
   .toggle-form-btn {
@@ -159,7 +159,7 @@ button:focus-visible {
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    color: var(--text-light);
+    color: #e2e2e2;
     padding: 0.5rem 1rem;
     width: fit-content;
 }
