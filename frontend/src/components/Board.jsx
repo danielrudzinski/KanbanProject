@@ -147,6 +147,9 @@ function Board() {
       dragAndDrop.handleDrop(e, column.id);
     };
     
+    const columnTaskCount = tasks.filter(t => t.columnId === column.id).length;
+    const isOverLimit = column.wipLimit > 0 && columnTaskCount > column.wipLimit;
+    
     return (
       <th 
         key={column.id} 
@@ -160,9 +163,14 @@ function Board() {
         <div className="column-title">
           <span className="column-drag-handle">☰</span>
           {column.name}
-          <span className="task-count">
-            {tasks.filter(t => t.columnId === column.id).length}
-          </span>
+        </div>
+        <div className="column-actions">
+          <span className="task-count">{columnTaskCount}</span>
+          {column.wipLimit > 0 && (
+            <span className={`wip-limit ${isOverLimit ? 'exceeded' : ''}`}>
+              ({columnTaskCount}/{column.wipLimit})
+            </span>
+          )}
           <button 
             className="delete-column-btn" 
             title="Usuń kolumnę"
@@ -175,14 +183,9 @@ function Board() {
             ×
           </button>
         </div>
-        {column.wipLimit > 0 && (
-          <span className={`wip-limit ${tasks.filter(t => t.columnId === column.id).length > column.wipLimit ? 'exceeded' : ''}`}>
-            ({tasks.filter(t => t.columnId === column.id).length}/{column.wipLimit})
-          </span>
-        )}
       </th>
     );
-  }; 
+  };
 
   // Render table cells with proper drag and drop handlers
   const renderCell = (column, row) => {
