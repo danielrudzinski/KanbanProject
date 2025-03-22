@@ -28,7 +28,8 @@ public class UserMapper implements Function<User, UserDTO> {
                 user.getName(),
                 user.getTasks().stream()
                         .map(taskMapper)
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toSet()),
+                user.getWipLimit()
         );
     }
 }

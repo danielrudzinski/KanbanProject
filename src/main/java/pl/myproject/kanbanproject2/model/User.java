@@ -24,6 +24,7 @@ public class User {
     private String email;
     private String password;
     private String name;
+    private Integer wipLimit;
     @ManyToMany(mappedBy = "users")
     @JsonIgnore
     private Set<Task> tasks = new HashSet<>();

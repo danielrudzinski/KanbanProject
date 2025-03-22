@@ -65,7 +65,9 @@ public class UserService {
         if (user.getName() != null) {
             existingUser.setName(user.getName());
         }
-
+        if (user.getWipLimit() != null) {
+            existingUser.setWipLimit(user.getWipLimit());
+        }
         return userRepository.save(existingUser);
     }
 
@@ -79,7 +81,9 @@ public class UserService {
         if (userDTO.name() != null) {
             existingUser.setName(userDTO.name());
         }
-
+        if (userDTO.wipLimit() != null) {
+            existingUser.setWipLimit(userDTO.wipLimit());
+        }
         User updatedUser = userRepository.save(existingUser);
         return userMapper.apply(updatedUser);
     }
