@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(14, 27, 54, 0.5);
   z-index: 1000;
   animation: overlay-appear 0.2s ease-out;
 }
@@ -15,14 +15,14 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: 90%;
-  max-width: 550px; /* Increased from 500px */
-  max-height: 85vh; /* Increased from 80vh */
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 550px;
+  max-height: 85vh;
+  background-color: #e2e2e2;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(14, 27, 54, 0.25);
   z-index: 1001;
   overflow-y: auto;
-  animation: panel-appear 0.2s ease-out;
+  animation: panel-appear 0.3s ease-out;
 }
 
 @keyframes overlay-appear {
@@ -54,7 +54,7 @@
 }
 
 .task-details-panel::-webkit-scrollbar-thumb {
-  background-color: #ccc;
+  background-color: #76777c;
   border-radius: 9999px;
 }
 
@@ -70,9 +70,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid #eee;
-  background-color: #f8f9fa;
+  padding: 18px 22px;
+  border-bottom: 1px solid #76777c;
+  background-color: #d1fdff;
+  border-radius: 12px 12px 0 0;
 }
 
 .panel-header h3 {
@@ -80,30 +81,34 @@
   font-size: 18px;
   font-weight: 600;
   flex: 1;
+  color: #0e1b36;
 }
 
 .panel-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .assign-user-icon {
   background: none;
   border: none;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #555;
-  border-radius: 4px;
+  color: #0e1b36;
+  border-radius: 6px;
   padding: 0;
+  transition: all 0.2s ease;
 }
 
 .assign-user-icon:hover {
-  background-color: #e9ecef;
+  background-color: #86d6ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
 }
 
 .assign-user-icon svg {
@@ -117,20 +122,22 @@
   font-size: 24px;
   line-height: 1;
   cursor: pointer;
-  color: #666;
+  color: #0e1b36;
   padding: 0 5px;
+  transition: all 0.2s ease;
 }
 
 .close-panel-btn:hover {
-  color: #f44336;
+  color: #76777c;
+  transform: scale(1.1);
 }
 
 /* User assignment dropdown */
 .assign-user-dropdown {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #eee;
-  padding: 12px 20px;
-  animation: dropdown-appear 0.2s ease-out;
+  background-color: #d1fdff;
+  border-bottom: 1px solid #76777c;
+  padding: 14px 22px;
+  animation: dropdown-appear 0.3s ease-out;
 }
 
 @keyframes dropdown-appear {
@@ -148,13 +155,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .dropdown-header h4 {
   margin: 0;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0e1b36;
 }
 
 .close-dropdown {
@@ -162,53 +170,78 @@
   border: none;
   font-size: 16px;
   cursor: pointer;
-  color: #666;
+  color: #0e1b36;
+  transition: color 0.2s ease;
+}
+
+.close-dropdown:hover {
+  color: #76777c;
 }
 
 .assign-user-dropdown select {
   width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  padding: 10px 12px;
+  border: 1px solid #76777c;
+  border-radius: 6px;
+  margin-bottom: 12px;
   font-size: 14px;
+  background-color: #e2e2e2;
+  color: #0e1b36;
+  transition: all 0.2s ease;
+}
+
+.assign-user-dropdown select:focus {
+  border-color: #86d6ff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(134, 214, 255, 0.25);
 }
 
 .assign-btn {
-  background-color: #4caf50;
-  color: #000000;
+  background-color: #86d6ff;
+  color: #0e1b36;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 10px 18px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.assign-btn:hover {
+  background-color: #d1fdff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
 }
 
 .assign-btn:disabled {
-  background-color: #ccc;
+  background-color: #76777c;
+  color: #e2e2e2;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Assigned users bar */
 .assigned-users-bar {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  border-bottom: 1px solid #eee;
-  background-color: #f8f9fa;
+  padding: 14px 22px;
+  border-bottom: 1px solid #76777c;
+  background-color: #d1fdff;
 }
 
 .assigned-users-bar span {
   font-size: 14px;
   font-weight: 500;
-  color: #555;
-  margin-right: 10px;
+  color: #0e1b36;
+  margin-right: 12px;
 }
 
 .avatar-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .avatar-item {
@@ -216,22 +249,28 @@
 }
 
 .avatar-item .user-avatar {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e2e2e2;
+  box-shadow: 0 2px 5px rgba(14, 27, 54, 0.15);
+  transition: all 0.2s ease;
+}
+
+.avatar-item .user-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(14, 27, 54, 0.2);
 }
 
 .avatar-item .remove-user-btn {
   position: absolute;
   top: -4px;
   right: -4px;
-  width: 12px;
-  height: 12px;
-  background-color: #f44336;
-  color: #000;
+  width: 14px;
+  height: 14px;
+  background-color: #0e1b36;
+  color: #e2e2e2;
   border: none;
   border-radius: 50%;
   font-size: 10px;
@@ -241,7 +280,7 @@
   justify-content: center;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: all 0.2s ease;
   padding: 0;
 }
 
@@ -255,57 +294,63 @@
   object-fit: cover;
 }
 
-/* Subtasks section - now the main focus */
+/* Subtasks section */
 .subtasks-section {
-  padding: 20px;
+  padding: 22px;
 }
 
 .subtasks-section h4 {
-  margin: 0 0 16px 0;
+  margin: 0 0 18px 0;
   font-size: 18px;
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #0e1b36;
 }
 
 .add-subtask-form {
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .subtask-input {
   flex-grow: 1;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px 0 0 4px;
+  padding: 12px 14px;
+  border: 1px solid #76777c;
+  border-radius: 6px 0 0 6px;
   font-size: 14px;
+  background-color: #e2e2e2;
+  color: #0e1b36;
+  transition: all 0.2s ease;
 }
 
 .subtask-input:focus {
   outline: none;
-  border-color: #4caf50;
+  border-color: #86d6ff;
+  box-shadow: 0 0 0 3px rgba(134, 214, 255, 0.25);
 }
 
 .add-subtask-btn {
-  background-color: #4caf50;
-  color: #000000;
+  background-color: #86d6ff;
+  color: #0e1b36;
   border: none;
-  padding: 10px 20px;
-  border-radius: 0 4px 4px 0;
+  padding: 12px 22px;
+  border-radius: 0 6px 6px 0;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .add-subtask-btn:hover {
-  background-color: #3d8b40;
+  background-color: #d1fdff;
 }
 
 .add-subtask-btn:disabled {
-  background-color: #ccc;
+  background-color: #76777c;
+  color: #e2e2e2;
   cursor: not-allowed;
 }
 
 .subtasks-list {
-  margin-top: 10px;
+  margin-top: 12px;
   max-height: 40vh;
   overflow-y: auto;
 }
@@ -313,22 +358,26 @@
 .subtask-item {
   display: flex;
   align-items: center;
-  padding: 12px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  transition: background-color 0.2s;
+  padding: 14px;
+  background-color: #d1fdff;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(14, 27, 54, 0.05);
 }
 
 .subtask-item:hover {
-  background-color: #f1f3f4;
+  background-color: #86d6ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
 }
 
 .subtask-checkbox {
-  margin-right: 12px;
+  margin-right: 14px;
   width: 18px;
   height: 18px;
   cursor: pointer;
+  accent-color: #0e1b36;
 }
 
 .subtask-item label {
@@ -337,12 +386,13 @@
   cursor: pointer;
   padding: 2px 0;
   font-size: 14px;
-  transition: color 0.2s;
+  color: #0e1b36;
+  transition: all 0.2s ease;
 }
 
 .subtask-item label.completed {
   text-decoration: line-through;
-  color: #999;
+  color: #76777c;
 }
 
 .delete-subtask-btn {
@@ -350,40 +400,41 @@
   border: none;
   font-size: 18px;
   cursor: pointer;
-  color: #000000;
-  width: 24px;
-  height: 24px;
+  color: #0e1b36;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .delete-subtask-btn:hover {
-  background-color: #ffebee;
-  color: #f44336;
+  background-color: rgba(14, 27, 54, 0.1);
+  color: #e53935;
+  transform: scale(1.1);
 }
 
 .no-subtasks {
   padding: 30px;
-  color: #999;
+  color: #76777c;
   font-style: italic;
   text-align: center;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  border: 1px dashed #ddd;
+  background-color: #d1fdff;
+  border-radius: 6px;
+  border: 1px dashed #76777c;
 }
 
 .success-message {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  padding: 12px 20px;
-  background-color: #4caf50;
-  color: #000000;
-  border-radius: 4px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 14px 22px;
+  background-color: #86d6ff;
+  color: #0e1b36;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(14, 27, 54, 0.15);
   animation: message-appear 0.3s ease-out;
   z-index: 1010;
 }
@@ -412,21 +463,21 @@
   }
   
   .subtask-input {
-    border-radius: 4px;
+    border-radius: 6px;
     margin-bottom: 8px;
   }
   
   .add-subtask-btn {
-    border-radius: 4px;
+    border-radius: 6px;
   }
 }
 
 h3, h4 {
-  color: #000000;
+  color: #0e1b36;
 }
 
 label {
-  color: #000000;
+  color: #0e1b36;
 }
 
 .delete-confirmation-overlay {
@@ -435,28 +486,28 @@ label {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(14, 27, 54, 0.7);
   z-index: 1010;
   display: flex;
   justify-content: center;
   align-items: center;
   opacity: 1;
-  animation: overlay-appear 0.2s ease-out forwards;
+  animation: overlay-appear 0.3s ease-out forwards;
   will-change: opacity;
   visibility: visible !important;
 }
 
 .delete-confirmation-dialog {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  padding: 20px 24px;
+  background-color: #e2e2e2;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(14, 27, 54, 0.3);
+  padding: 22px 24px;
   width: 90%;
   max-width: 400px;
   visibility: visible !important;
   transform: translateY(0); 
   opacity: 1;
-  animation: dialog-appear 0.2s ease-out forwards;
+  animation: dialog-appear 0.3s ease-out forwards;
   will-change: transform, opacity; 
 }
 
@@ -472,55 +523,59 @@ label {
 }
 
 .delete-confirmation-dialog h4 {
-  margin: 0 0 16px 0;
+  margin: 0 0 18px 0;
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: #0e1b36;
 }
 
 .delete-confirmation-dialog p {
-  margin: 0 0 20px 0;
+  margin: 0 0 22px 0;
   font-size: 14px;
-  line-height: 1.5;
-  color: #555;
+  line-height: 1.6;
+  color: #0e1b36;
 }
 
 .delete-confirmation-dialog strong {
-  color: #000000;
+  color: #0e1b36;
   font-weight: 600;
 }
 
 .confirmation-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 14px;
 }
 
 .confirmation-actions button {
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 10px 18px;
+  border-radius: 6px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease-in-out;
+  transition: all 0.2s ease;
 }
 
 .cancel-btn {
-  background-color: #f5f5f5;
-  color: #333;
-  border: 1px solid #ddd;
+  background-color: #e2e2e2;
+  color: #0e1b36;
+  border: 1px solid #76777c;
 }
 
 .cancel-btn:hover {
-  background-color: #e9e9e9;
+  background-color: #d1fdff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
 }
 
 .confirm-btn {
-  background-color: #f44336;
-  color: white;
+  background-color: #e53935;
+  color: #e2e2e2;
   border: none;
 }
 
 .confirm-btn:hover {
   background-color: #d32f2f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
 }

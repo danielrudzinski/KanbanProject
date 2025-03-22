@@ -29,7 +29,7 @@
 
 /* Corner cell (top-left empty cell) */
 .grid-corner {
-  background-color: var(--gray-200);
+  background-color: #76777c;
   border-radius: 4px;
   min-width: 120px;
   padding: 0.75rem;
@@ -37,12 +37,13 @@
 
 /* Column headers */
 .grid-column-header {
-  background-color: var(--primary-transparent);
+  background-color: rgba(134, 214, 255, 0.3);
   padding: 0.75rem;
   border-radius: 4px;
   font-weight: bold;
   text-align: center;
   min-width: 200px;
+  color: #0e1b36;
 }
 
 .grid-column-header .column-title {
@@ -53,7 +54,7 @@
 
 /* Row headers */
 .grid-row-header {
-  background-color: var(--accent-transparent);
+  background-color: rgba(209, 253, 255, 0.3);
   padding: 0.75rem;
   border-radius: 4px;
   font-weight: bold;
@@ -75,7 +76,7 @@
 
 /* Grid cells */
 .grid-cell {
-  background-color: var(--gray-100);
+  background-color: #d1c6c6;
   padding: 0.5rem;
   border-radius: 4px;
   min-height: 100px;
@@ -86,26 +87,26 @@
 /* WIP limit indicator */
 .wip-limit {
   font-size: 0.8rem;
-  color: var(--gray-600);
+  color: #76777c;
 }
 
 .wip-limit.exceeded {
-  color: var(--error);
+  color: #0e1b36;
   font-weight: bold;
 }
 
 .task-count {
   font-size: 0.8rem;
-  background-color: var(--gray-200);
+  background-color: #76777c;
   padding: 0.1rem 0.3rem;
   border-radius: 3px;
-  color: var(--gray-700);
+  color: #e2e2e2;
 }
 
 .delete-row-btn {
   background: none;
   border: none;
-  color: var(--gray-500);
+  color: #76777c;
   cursor: pointer;
   font-size: 1.2rem;
   line-height: 1;
@@ -114,7 +115,7 @@
 }
 
 .delete-row-btn:hover {
-  color: var(--error);
+  color: #86d6ff;
 }
 
 /* Loading and error states */
@@ -125,11 +126,11 @@
   align-items: center;
   height: 50vh;
   font-size: 1.2rem;
-  color: var(--gray-600);
+  color: #76777c;
 }
 
 .board-error {
-  color: var(--error);
+  color: #0e1b36;
 }
   
 /* Media query for smaller screens */
@@ -147,29 +148,37 @@
 /* Dark mode styles */
 @media (prefers-color-scheme: dark) {
   .grid-corner {
-    background-color: var(--gray-800);
+    background-color: #76777c;
   }
   
   .grid-column-header {
-    background-color: var(--primary-dark);
-    color: var(--text-light);
+    background-color: rgba(134, 214, 255, 0.2);
+    color: #e2e2e2;
   }
   
   .grid-row-header {
-    background-color: var(--gray-800);
-    color: var(--text-light);
+    background-color: rgba(209, 253, 255, 0.2);
+    color: #e2e2e2;
   }
   
   .grid-cell {
-    background-color: var(--gray-800);
+    background-color: #0e1b36;
   }
   
   .task-count {
-    background-color: var(--gray-700);
-    color: var(--gray-300);
+    background-color: #76777c;
+    color: #e2e2e2;
   }
   
   .wip-limit {
-    color: var(--gray-400);
+    color: #e2e2e2;
+  }
+
+  .wip-limit.exceeded {
+    color: #d1fdff;
+  }
+
+  .delete-row-btn:hover {
+    color: #d1fdff;
   }
 }
