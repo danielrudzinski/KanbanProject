@@ -28,7 +28,19 @@ export default defineConfig({
       '/users': {
         target: 'http://localhost:8080',
         changeOrigin: true,
-      }
+      },
+      '/rows': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/subtasks': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/files': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
     }
   }
 })
