@@ -121,7 +121,7 @@ function UsersManagement() {
           onClick={() => document.getElementById(`avatar-input-${user.id}`).click()}
           className="upload-avatar-btn"
         >
-          Zmień avatar
+          Zmień
         </button>
       </div>
     );
@@ -306,7 +306,7 @@ function UsersManagement() {
 
       <div className="users-container">
         <div className="users-header">
-          <span className="user-avatar">Avatar</span>
+          <span className="user-id">Avatar</span>
           <span className="user-id">ID</span>
           <span className="user-name">Imię i nazwisko</span>
           <span className="user-email">Email</span>
