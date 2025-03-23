@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import TaskDetails from './TaskDetails';
 import EditableText from './EditableText';
-import { getUserAvatar, assignUserToTask } from '../services/api';
+import { createPortal } from 'react-dom';
+import { getUserAvatar, assignUserToTask, fetchSubTasksByTaskId } from '../services/api';
 import '../styles/components/Task.css';
 
 function Task({ task, columnId }) {
@@ -11,9 +12,38 @@ function Task({ task, columnId }) {
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
+  const [hasUnfinishedSubtasks, setHasUnfinishedSubtasks] = useState(false);
   const taskRef = useRef(null);
+  const warningTimeoutRef = useRef(null);
 
   const { handleDragStart, handleDragEnd } = dragAndDrop;
+
+  // Check if task has unfinished subtasks - modified to be called more frequently
+  const checkUnfinishedSubtasks = async () => {
+    try {
+      const subtasks = await fetchSubTasksByTaskId(task.id);
+      const unfinishedExists = subtasks.some(subtask => !subtask.completed);
+      setHasUnfinishedSubtasks(unfinishedExists);
+      
+      // Show warning if there are unfinished subtasks
+      if (unfinishedExists) {
+        setShowWarning(true);
+        
+        // Auto-hide warning after 5 seconds
+        if (warningTimeoutRef.current) {
+          clearTimeout(warningTimeoutRef.current);
+        }
+        warningTimeoutRef.current = setTimeout(() => {
+          setShowWarning(false);
+        }, 5000);
+      } else {
+        setShowWarning(false);
+      }
+    } catch (error) {
+      console.error('Error checking subtasks:', error);
+    }
+  };
 
   useEffect(() => {
     // If task has a user assigned, fetch their avatar
@@ -26,20 +56,41 @@ function Task({ task, columnId }) {
       });
     }
 
+    // Check for unfinished subtasks when component mounts
+    checkUnfinishedSubtasks();
+
     // Clean up object URL when component unmounts
     return () => {
       if (avatarUrl) {
         URL.revokeObjectURL(avatarUrl);
       }
+      if (warningTimeoutRef.current) {
+        clearTimeout(warningTimeoutRef.current);
+      }
     };
-  }, [task.userIds]);
+  }, [task.userIds, task.id]);
+
+  // Add event listener to check for subtask completion events
+  useEffect(() => {
+    const handleSubtaskUpdate = () => {
+      checkUnfinishedSubtasks();
+    };
+
+    // Listen for a custom event that will be dispatched from TaskDetails
+    window.addEventListener('subtask-updated', handleSubtaskUpdate);
+
+    return () => {
+      window.removeEventListener('subtask-updated', handleSubtaskUpdate);
+    };
+  }, []);
 
   const handleTaskClick = (e) => {
     if (e.target.className === 'delete-btn' || 
         e.target.className === 'confirm-delete-btn' || 
         e.target.className === 'cancel-delete-btn' ||
         e.target.classList.contains('editable-text') ||
-        e.target.classList.contains('editable-text-input')) return;
+        e.target.classList.contains('editable-text-input') ||
+        e.target.classList.contains('warning-close-btn')) return;
     setShowDetails(!showDetails);
   };
 
@@ -114,6 +165,16 @@ function Task({ task, columnId }) {
     if (taskRef.current) {
       taskRef.current.classList.add('dragging');
     }
+
+    // Show warning only if task has unfinished subtasks
+    if (hasUnfinishedSubtasks) {
+      setShowWarning(true);
+      
+      // Auto-hide warning after 5 seconds
+      warningTimeoutRef.current = setTimeout(() => {
+        setShowWarning(false);
+      }, 5000);
+    }
   };
 
   const onDragOver = (e) => {
@@ -137,6 +198,12 @@ function Task({ task, columnId }) {
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(false);
+    
+    // Hide warning when task is dropped
+    setShowWarning(false);
+    if (warningTimeoutRef.current) {
+      clearTimeout(warningTimeoutRef.current);
+    }
     
     // Check if we're dropping a task
     if (e.dataTransfer.types.includes('application/task')) {
@@ -196,9 +263,23 @@ function Task({ task, columnId }) {
   const onDragEndHandler = (e) => {
     console.log('Task drag end');
     
+    // Hide warning when drag ends
+    setShowWarning(false);
+    if (warningTimeoutRef.current) {
+      clearTimeout(warningTimeoutRef.current);
+    }
+    
     // Remove the dragging class
     if (taskRef.current) {
       taskRef.current.classList.remove('dragging');
+    }
+  };
+
+  const handleCloseWarning = (e) => {
+    e.stopPropagation();
+    setShowWarning(false);
+    if (warningTimeoutRef.current) {
+      clearTimeout(warningTimeoutRef.current);
     }
   };
 
@@ -229,6 +310,8 @@ function Task({ task, columnId }) {
           />
           {renderUserAvatar()}
         </div>
+        
+        {/* Delete button */}
         <button 
           className="delete-btn" 
           title="Usuń zadanie"
@@ -236,6 +319,22 @@ function Task({ task, columnId }) {
         >
           ×
         </button>
+
+        {/* Inline warning for unfinished subtasks - now more compact */}
+        {hasUnfinishedSubtasks && showWarning && (
+          <div className="subtask-warning">
+            <div className="warning-icon">⚠️</div>
+            <div className="warning-message">
+              Nieukończone podzadania
+            </div>
+            <button 
+              className="warning-close-btn" 
+              onClick={handleCloseWarning}
+            >
+              ×
+            </button>
+          </div>
+        )}
       </div>
 
       {isConfirmingDelete && (
@@ -254,6 +353,7 @@ function Task({ task, columnId }) {
         <TaskDetails 
           task={task} 
           onClose={() => setShowDetails(false)}
+          onSubtaskUpdate={checkUnfinishedSubtasks} 
         />
       )}
     </>

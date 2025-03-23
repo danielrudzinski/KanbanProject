@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, fetchSubTasks, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId } from '../services/api';
 import '../styles/components/TaskDetails.css';
 
-function TaskDetails({ task, onClose }) {
+function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const { refreshTasks } = useKanban();
   const [users, setUsers] = useState([]);
   const [assignedUsers, setAssignedUsers] = useState([]);
@@ -72,6 +72,14 @@ function TaskDetails({ task, onClose }) {
       setNewSubtaskTitle('');
       await loadTaskData(); // Refresh task data including subtasks
       
+      // Notify parent component about subtask changes
+      if (onSubtaskUpdate) {
+        onSubtaskUpdate();
+      }
+      
+      // Dispatch event to notify other components
+      window.dispatchEvent(new CustomEvent('subtask-updated', { detail: { taskId: task.id } }));
+      
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
@@ -96,6 +104,15 @@ function TaskDetails({ task, onClose }) {
         }
         return subtask;
       }));
+      
+      // Notify parent component about subtask changes
+      if (onSubtaskUpdate) {
+        onSubtaskUpdate();
+      }
+      
+      // Dispatch event to notify other components
+      window.dispatchEvent(new CustomEvent('subtask-updated', { detail: { taskId: task.id } }));
+      
     } catch (error) {
       console.error('Error toggling subtask completion:', error);
       alert('Wystąpił błąd podczas zmiany statusu podzadania');
@@ -119,6 +136,14 @@ function TaskDetails({ task, onClose }) {
       
       // Update the UI by removing the deleted subtask
       setSubtasks(prev => prev.filter(subtask => subtask.id !== subtaskToDelete.id));
+      
+      // Notify parent component about subtask changes
+      if (onSubtaskUpdate) {
+        onSubtaskUpdate();
+      }
+      
+      // Dispatch event to notify other components
+      window.dispatchEvent(new CustomEvent('subtask-updated', { detail: { taskId: task.id } }));
       
       setSuccess(true);
       setTimeout(() => {
@@ -472,15 +497,15 @@ function TaskDetails({ task, onClose }) {
                     
                     <div className="subtask-actions">
                     <button
-  className="description-toggle-btn dark-bg-with-text"
-  onClick={() => toggleSubtaskExpansion(subtask.id)}
-  title={expandedSubtaskId === subtask.id ? "Ukryj opis" : "Pokaż opis"}
->
-  <span className={expandedSubtaskId === subtask.id ? "arrow-icon rotated" : "arrow-icon"}>
-    ▼
-  </span>
-  <span className="button-text">{expandedSubtaskId === subtask.id ? "Ukryj" : "Opis"}</span>
-</button>
+                      className="description-toggle-btn dark-bg-with-text"
+                      onClick={() => toggleSubtaskExpansion(subtask.id)}
+                      title={expandedSubtaskId === subtask.id ? "Ukryj opis" : "Pokaż opis"}
+                    >
+                    <span className={expandedSubtaskId === subtask.id ? "arrow-icon rotated" : "arrow-icon"}>
+                      ▼
+                    </span>
+                      <span className="button-text">{expandedSubtaskId === subtask.id ? "Ukryj" : "Opis"}</span>
+                    </button>
                       <button
                         className="delete-subtask-btn"
                         onClick={() => confirmdeleteSubTask(subtask.id)}
