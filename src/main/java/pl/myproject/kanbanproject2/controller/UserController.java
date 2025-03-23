@@ -116,10 +116,21 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @PatchMapping("/{id}/wip-limit")
     public ResponseEntity<UserDTO> updateWipLimit(@PathVariable Integer id, @RequestBody Integer wipLimit) {
         UserDTO updatedUser = userService.updateWipLimit(id, wipLimit);
         return ResponseEntity.ok(updatedUser);
+    }
+
+    @GetMapping("/{id}/wip-status")
+    public ResponseEntity<Boolean> checkWipStatus(@PathVariable Integer id) {
+        try {
+            boolean isWithinLimit = userService.checkWipStatus(id);
+            return ResponseEntity.ok(isWithinLimit);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

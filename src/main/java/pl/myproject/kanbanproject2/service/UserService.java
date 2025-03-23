@@ -152,4 +152,22 @@ public class UserService {
         return userMapper.apply(updatedUser);
     }
 
+    public boolean checkWipStatus(Integer userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        
+        // Handle null WIP limit by setting a default value
+        Integer wipLimit = user.getWipLimit();
+        if (wipLimit == null) {
+            return true; // If no limit is set, assume user can take more tasks
+            // Alternatively: return user.getTasks().size() < DEFAULT_WIP_LIMIT;
+        }
+        
+        // Count the user's active tasks
+        int activeTaskCount = user.getTasks().size(); // Or a more specific query if needed
+        
+        // Compare with the user's WIP limit
+        return activeTaskCount < wipLimit.intValue();
+    }
+
 }

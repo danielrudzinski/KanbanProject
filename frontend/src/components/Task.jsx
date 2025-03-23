@@ -11,6 +11,7 @@ function Task({ task, columnId }) {
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [assignmentError, setAssignmentError] = useState(null);
   const taskRef = useRef(null);
 
   const { handleDragStart, handleDragEnd } = dragAndDrop;
@@ -28,11 +29,22 @@ function Task({ task, columnId }) {
 
     // Clean up object URL when component unmounts
     return () => {
-      if (avatarUrl) {
+      if (avatarUrl && avatarUrl.startsWith('blob:')) {
         URL.revokeObjectURL(avatarUrl);
       }
     };
   }, [task.userIds]);
+
+  // Clear assignment error after 5 seconds
+  useEffect(() => {
+    if (assignmentError) {
+      const timer = setTimeout(() => {
+        setAssignmentError(null);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [assignmentError]);
 
   const handleTaskClick = (e) => {
     if (e.target.className === 'delete-btn' || 
@@ -168,27 +180,30 @@ function Task({ task, columnId }) {
         if (userData.type === 'user') {
           const userId = userData.userId;
           
-          console.log(`Assigning user ${userId} to task ${task.id}`);
+          console.log(`Attempting to assign user ${userId} to task ${task.id}`);
           
-          // Call API to assign user
-          await assignUserToTask(task.id, parseInt(userId));
-          
-          // Update local state - assuming we want to append to existing users
-          const updatedUserIds = task.userIds ? [...task.userIds] : [];
-          if (!updatedUserIds.includes(userId)) {
-            updatedUserIds.push(userId);
+          try {
+            // Call API to assign user - now with WIP check
+            await assignUserToTask(task.id, parseInt(userId));
             
-            // Update the task in the local state
-            const updatedTask = {
-              ...task,
-              userIds: updatedUserIds
-            };
+            // Update local state - assuming we want to append to existing users
+            const updatedUserIds = task.userIds ? [...task.userIds] : [];
+            if (!updatedUserIds.includes(userId)) {
+              updatedUserIds.push(userId);
+            }
             
+            // Refresh tasks to get updated data
             refreshTasks();
+            setAssignmentError(null);
+          } catch (error) {
+            // Display error message related to WIP limit
+            setAssignmentError(error.message || 'Error assigning user to task');
+            console.error('Error assigning user:', error.message);
           }
         }
       } catch (err) {
         console.error('Error processing user drop:', err);
+        setAssignmentError('Error processing user assignment');
       }
     }
   };
@@ -236,6 +251,13 @@ function Task({ task, columnId }) {
         >
           ×
         </button>
+        
+        {/* Error message for WIP limit */}
+        {assignmentError && (
+          <div className="assignment-error">
+            {assignmentError}
+          </div>
+        )}
       </div>
 
       {isConfirmingDelete && (

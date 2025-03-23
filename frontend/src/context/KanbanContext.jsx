@@ -19,6 +19,8 @@ import {
   updateTaskName,
   updateRowName,
   updateColumnName,
+  getUserWipLimit,
+  updateUserWipLimit,
 } from '../services/api';
 
 const KanbanContext = createContext();
@@ -371,6 +373,38 @@ export function KanbanProvider({ children }) {
       setError('Failed to update WIP limit. Please try again.');
     }
   };
+
+  // get user WIP limit
+const handlegetUserWipLimit = async (userId) => {
+  try {
+    return await getUserWipLimit(userId);
+  } catch (err) {
+    console.error('Error checking user WIP limit:', err);
+    setError(err.message);
+    throw err;
+  }
+};
+
+// Update user WIP limit
+const handleUpdateUserWipLimit = async (userId, wipLimit) => {
+  try {
+    const result = await updateUserWipLimit(userId, wipLimit);
+    
+    // If we're storing user data in state, you might want to update it here
+    // This would depend on how you're handling user data elsewhere
+    setUsers(prevUsers => 
+      prevUsers.map(user => 
+        user.id === userId ? { ...user, wipLimit } : user
+      )
+    );
+    
+    return result;
+  } catch (err) {
+    console.error('Error updating user WIP limit:', err);
+    setError(err.message);
+    throw err;
+  }
+};
   
   // Update row WIP limit
   const handleUpdateRowWipLimit = async (rowId, newLimit) => {
@@ -801,6 +835,8 @@ const handleDrop = (e, targetColumnId, targetRowId) => {
     updateTaskName: handleUpdateTaskName,
     updateColumnName: handleUpdateColumnName,
     updateRowName: handleUpdateRowName,
+    getUserWipLimit: handlegetUserWipLimit,
+    updateUserWipLimit: handleUpdateUserWipLimit,
     dragAndDrop // Export drag and drop handlers
   };
   
