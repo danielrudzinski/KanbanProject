@@ -357,7 +357,7 @@
 
 .subtask-item {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding: 14px;
   background-color: #d1fdff;
   border-radius: 6px;
@@ -372,27 +372,76 @@
   box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
 }
 
+.subtask-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
 .subtask-checkbox {
-  margin-right: 14px;
-  width: 18px;
+  margin-left: 1px;
+  width: 16px; 
   height: 18px;
   cursor: pointer;
   accent-color: #0e1b36;
+  flex: 0 0 auto; 
 }
 
 .subtask-item label {
   flex-grow: 1;
-  margin: 0;
+  margin: 0 0 0 8px;
   cursor: pointer;
   padding: 2px 0;
   font-size: 14px;
   color: #0e1b36;
   transition: all 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .subtask-item label.completed {
   text-decoration: line-through;
   color: #76777c;
+}
+
+.subtask-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* New description toggle button */
+.description-toggle-btn {
+  background: none;
+  border: none;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #0e1b36;
+  transition: all 0.2s ease;
+}
+
+.description-toggle-btn:hover {
+  background-color: rgba(14, 27, 54, 0.1);
+  transform: scale(1.1);
+}
+
+.description-toggle-btn svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.description-toggle-btn .icon-rotated {
+  transform: rotate(180deg);
 }
 
 .delete-subtask-btn {
@@ -414,6 +463,151 @@
   background-color: rgba(14, 27, 54, 0.1);
   color: #e53935;
   transform: scale(1.1);
+}
+
+/* Styling for subtask description */
+.subtask-description-container {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #76777c;
+  animation: description-appear 0.3s ease-out;
+}
+
+@keyframes description-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.description-display {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.description-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.description-header h5 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0e1b36;
+}
+
+.edit-description-btn {
+  background: none;
+  border: none;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #0e1b36;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.edit-description-btn:hover {
+  background-color: rgba(14, 27, 54, 0.1);
+  transform: scale(1.1);
+}
+
+.edit-description-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.description-content {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #0e1b36;
+  word-break: break-word;
+}
+
+.empty-description {
+  margin: 0;
+  font-size: 14px;
+  font-style: italic;
+  color: #76777c;
+}
+
+/* Description editing form */
+.description-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.description-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #76777c;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #e2e2e2;
+  color: #0e1b36;
+  resize: vertical;
+  min-height: 80px;
+  transition: all 0.2s ease;
+}
+
+.description-textarea:focus {
+  outline: none;
+  border-color: #86d6ff;
+  box-shadow: 0 0 0 3px rgba(134, 214, 255, 0.25);
+}
+
+.description-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.save-description-btn,
+.cancel-edit-btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.save-description-btn {
+  background-color: #86d6ff;
+  color: #0e1b36;
+  border: none;
+}
+
+.save-description-btn:hover {
+  background-color: #d1fdff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
+}
+
+.cancel-edit-btn {
+  background-color: #e2e2e2;
+  color: #0e1b36;
+  border: 1px solid #76777c;
+}
+
+.cancel-edit-btn:hover {
+  background-color: #d1fdff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
 }
 
 .no-subtasks {
@@ -469,6 +663,15 @@
   
   .add-subtask-btn {
     border-radius: 6px;
+  }
+  
+  .description-edit-actions {
+    flex-direction: column;
+  }
+  
+  .save-description-btn,
+  .cancel-edit-btn {
+    width: 100%;
   }
 }
 
@@ -578,4 +781,52 @@ label {
   background-color: #d32f2f;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
+}
+
+/* New styling for expanded subtask items */
+.subtask-item.expanded {
+  background-color: #86d6ff;
+}
+
+/* Additional styling for subtasks list scrollbar */
+.subtasks-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.subtasks-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.subtasks-list::-webkit-scrollbar-thumb {
+  background-color: #76777c;
+  border-radius: 9999px;
+}
+
+.dark-bg-with-text {
+  width: auto;
+  padding: 2px 8px;
+  background-color: #d1fdff;
+  border: 1px solid #86d6ff;
+  color: #0e1b36;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dark-bg-with-text:hover {
+  background-color: #86d6ff;
+}
+
+.arrow-icon {
+  font-size: 10px;
+  transition: transform 0.2s ease;
+}
+
+.arrow-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.button-text {
+  font-size: 12px;
+  font-weight: 500;
 }

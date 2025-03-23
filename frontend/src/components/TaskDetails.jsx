@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useContext } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { createPortal } from 'react-dom';
-import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, fetchSubTasks, addSubTask, toggleSubTaskCompletion, deleteSubTask } from '../services/api';
+import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, fetchSubTasks, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask } from '../services/api';
 import '../styles/components/TaskDetails.css';
 
 function TaskDetails({ task, onClose }) {
@@ -19,7 +19,11 @@ function TaskDetails({ task, onClose }) {
   const [subtaskToDelete, setSubtaskToDelete] = useState(null);
   const [showUserDeleteConfirmation, setShowUserDeleteConfirmation] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [expandedSubtaskId, setExpandedSubtaskId] = useState(null);
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [subtaskDescription, setSubtaskDescription] = useState('');
   const panelRef = useRef(null);
+  const descriptionInputRef = useRef(null);
   
   // Update loadTaskData to include subtasks loading
   const loadTaskData = async () => {
@@ -135,6 +139,74 @@ function TaskDetails({ task, onClose }) {
   const canceldeleteSubTask = () => {
     setShowDeleteConfirmation(false);
     setSubtaskToDelete(null);
+  };
+
+  const toggleSubtaskExpansion = async (subtaskId) => {
+    if (expandedSubtaskId === subtaskId) {
+      // If already expanded, collapse it
+      setExpandedSubtaskId(null);
+      setEditingDescription(false);
+    } else {
+      // If not expanded, expand it and fetch its description
+      setExpandedSubtaskId(subtaskId);
+      setEditingDescription(false);
+      
+      try {
+        const subtaskData = await fetchSubTask(subtaskId);
+        setSubtaskDescription(subtaskData.description || '');
+      } catch (error) {
+        console.error('Error fetching subtask description:', error);
+        setSubtaskDescription('');
+      }
+    }
+  };
+
+  const startEditingDescription = () => {
+    setEditingDescription(true);
+    // Focus on the textarea after it renders
+    setTimeout(() => {
+      if (descriptionInputRef.current) {
+        descriptionInputRef.current.focus();
+      }
+    }, 0);
+  };
+
+  const saveSubtaskDescription = async () => {
+    if (!expandedSubtaskId) return;
+    
+    try {
+      await updateSubTask(expandedSubtaskId, { description: subtaskDescription });
+      
+      // Update the local state
+      setSubtasks(prev => prev.map(subtask => {
+        if (subtask.id === expandedSubtaskId) {
+          return {
+            ...subtask,
+            description: subtaskDescription
+          };
+        }
+        return subtask;
+      }));
+      
+      setEditingDescription(false);
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error saving subtask description:', error);
+      alert('Wystąpił błąd podczas zapisywania opisu podzadania');
+    }
+  };
+
+  const cancelEditingDescription = () => {
+    setEditingDescription(false);
+    
+    // Restore the original description
+    const currentSubtask = subtasks.find(s => s.id === expandedSubtaskId);
+    if (currentSubtask) {
+      setSubtaskDescription(currentSubtask.description || '');
+    }
   };
 
   const renderUserAvatar = (user) => {
@@ -382,27 +454,93 @@ function TaskDetails({ task, onClose }) {
           {subtasks.length > 0 ? (
             <div className="subtasks-list">
               {subtasks.map(subtask => (
-                <div key={subtask.id} className="subtask-item">
-                  <input
-                    type="checkbox"
-                    checked={subtask.completed}
-                    onChange={() => handleToggleSubtask(subtask.id)}
-                    id={`subtask-${subtask.id}`}
-                    className="subtask-checkbox"
-                  />
-                  <label 
-                    htmlFor={`subtask-${subtask.id}`}
-                    className={subtask.completed ? 'completed' : ''}
-                  >
-                    {subtask.title}
-                  </label>
-                  <button
-                    className="delete-subtask-btn"
-                    onClick={() => confirmdeleteSubTask(subtask.id)}
-                    title="Usuń podzadanie"
-                  >
-                    ×
-                  </button>
+                <div key={subtask.id} className={`subtask-item ${expandedSubtaskId === subtask.id ? 'expanded' : ''}`}>
+                  <div className="subtask-header">
+                    <input
+                      type="checkbox"
+                      checked={subtask.completed}
+                      onChange={() => handleToggleSubtask(subtask.id)}
+                      id={`subtask-${subtask.id}`}
+                      className="subtask-checkbox"
+                    />
+                    <label 
+                      htmlFor={`subtask-${subtask.id}`}
+                      className={subtask.completed ? 'completed' : ''}
+                    >
+                      {subtask.title}
+                    </label>
+                    
+                    <div className="subtask-actions">
+                    <button
+  className="description-toggle-btn dark-bg-with-text"
+  onClick={() => toggleSubtaskExpansion(subtask.id)}
+  title={expandedSubtaskId === subtask.id ? "Ukryj opis" : "Pokaż opis"}
+>
+  <span className={expandedSubtaskId === subtask.id ? "arrow-icon rotated" : "arrow-icon"}>
+    ▼
+  </span>
+  <span className="button-text">{expandedSubtaskId === subtask.id ? "Ukryj" : "Opis"}</span>
+</button>
+                      <button
+                        className="delete-subtask-btn"
+                        onClick={() => confirmdeleteSubTask(subtask.id)}
+                        title="Usuń podzadanie"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {expandedSubtaskId === subtask.id && (
+                    <div className="subtask-description-container">
+                      {editingDescription ? (
+                        <div className="description-edit-form">
+                          <textarea 
+                            ref={descriptionInputRef}
+                            value={subtaskDescription} 
+                            onChange={(e) => setSubtaskDescription(e.target.value)}
+                            placeholder="Wprowadź opis podzadania"
+                            className="description-textarea"
+                            rows={4}
+                          ></textarea>
+                          <div className="description-edit-actions">
+                            <button 
+                              onClick={saveSubtaskDescription}
+                              className="save-description-btn"
+                            >
+                              Zapisz
+                            </button>
+                            <button 
+                              onClick={cancelEditingDescription}
+                              className="cancel-edit-btn"
+                            >
+                              Anuluj
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="description-display">
+                          <div className="description-header">
+                            <h5>Opis:</h5>
+                            <button 
+                              onClick={startEditingDescription}
+                              className="edit-description-btn"
+                              title="Edytuj opis"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                              </svg>
+                            </button>
+                          </div>
+                          {subtaskDescription ? (
+                            <p className="description-content">{subtaskDescription}</p>
+                          ) : (
+                            <p className="empty-description">Brak opisu. Kliknij ikonę edycji, aby dodać opis.</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
