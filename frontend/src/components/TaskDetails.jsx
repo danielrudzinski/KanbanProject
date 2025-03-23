@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useContext } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { createPortal } from 'react-dom';
-import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, fetchSubTasks, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask } from '../services/api';
+import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, fetchSubTasks, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId } from '../services/api';
 import '../styles/components/TaskDetails.css';
 
 function TaskDetails({ task, onClose }) {
@@ -30,7 +30,7 @@ function TaskDetails({ task, onClose }) {
     try {
       const taskData = await fetchTask(task.id);
       const allUsers = await fetchUsers();
-      const taskSubtasks = await fetchSubTasks(task.id);
+      const taskSubtasks = await fetchSubTasksByTaskId(task.id);
       
       setUsers(allUsers);
       setSubtasks(taskSubtasks);
