@@ -209,3 +209,129 @@
     color: #d1fdff;
   }
 }
+
+.column-title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.column-name-input {
+  background-color: #fff;
+  border: 1px solid #86d6ff;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: inherit;
+  font-weight: inherit;
+  color: #0e1b36;
+  width: calc(100% - 1.5rem); /* Account for the drag handle */
+  box-sizing: border-box;
+}
+
+.column-name-input:focus {
+  outline: none;
+  border-color: #d1fdff;
+  box-shadow: 0 0 0 2px rgba(134, 214, 255, 0.3);
+}
+
+.column-title span:not(.column-drag-handle) {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (prefers-color-scheme: dark) {
+  .column-name-input {
+    background-color: #1a2944;
+    border-color: #86d6ff;
+    color: #e2e2e2;
+  }
+  
+  .column-name-input:focus {
+    border-color: #d1fdff;
+  }
+}
+
+/* Row name input styling */
+.row-title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.row-name-input {
+  background-color: #fff;
+  border: 1px solid #86d6ff;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: inherit;
+  font-weight: inherit;
+  color: #0e1b36;
+  width: calc(100% - 1.5rem); /* Account for the drag handle */
+  box-sizing: border-box;
+}
+
+.row-name-input:focus {
+  outline: none;
+  border-color: #d1fdff;
+  box-shadow: 0 0 0 2px rgba(134, 214, 255, 0.3);
+}
+
+.row-title span:not(.row-drag-handle) {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Task title input styling */
+.task-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.task-title-input {
+  background-color: #fff;
+  border: 1px solid #86d6ff;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: inherit;
+  font-weight: inherit;
+  color: #0e1b36;
+  width: calc(100% - 2rem); /* Account for avatar space */
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.task-title-input:focus {
+  outline: none;
+  border-color: #d1fdff;
+  box-shadow: 0 0 0 2px rgba(134, 214, 255, 0.3);
+}
+
+.task-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dark mode styles for inputs */
+@media (prefers-color-scheme: dark) {
+  .row-name-input,
+  .task-title-input {
+    background-color: #1a2944;
+    border-color: #86d6ff;
+    color: #e2e2e2;
+  }
+  
+  .row-name-input:focus,
+  .task-title-input:focus {
+    border-color: #d1fdff;
+  }
+}

@@ -249,3 +249,27 @@
     background: linear-gradient(to top, rgba(239, 68, 68, 0.1), transparent);
   }
 }
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.header-top .column-title {
+  flex: 1;
+  margin: 0 0.5rem;
+  min-width: 0; /* Important for text overflow to work */
+}
+
+.header-top .column-name {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-top .column-name-input {
+  width: 100%; /* Take full width of the flex container */
+}

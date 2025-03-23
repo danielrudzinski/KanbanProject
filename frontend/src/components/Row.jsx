@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
+import EditableText from './EditableText';
 import '../styles/components/Row.css';
 
 function Row({ row, children }) {
-  const { deleteRow, dragAndDrop } = useKanban();
+  const { deleteRow, dragAndDrop, updateRowName } = useKanban();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const { handleDragStart, handleDragOver, handleDrop } = dragAndDrop;
   const { rows } = useKanban();
@@ -48,7 +49,14 @@ function Row({ row, children }) {
       <div className="row-header">
         <div className="header-left">
           <span className="row-drag-handle">☰</span>
-          {row.name}
+          <EditableText 
+            id={row.id} 
+            text={row.name} 
+            onUpdate={updateRowName} 
+            className="row-name"
+            inputClassName="row-name-input"
+            type="row"
+          />
           <span className="task-count">{row.taskCount || 0}</span>
           <button 
             className="delete-row-btn" 

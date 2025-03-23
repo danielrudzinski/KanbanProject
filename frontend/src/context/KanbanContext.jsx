@@ -95,6 +95,70 @@ export function KanbanProvider({ children }) {
     loadData();
   }, []);
   
+  // Update task name
+  const handleUpdateTaskName = async (taskId, newName) => {
+    try {
+      await updateTaskName(taskId, newName);
+      setTasks(tasks.map(task => 
+        task.id === taskId ? { ...task, title: newName } : task
+      ));
+      return true;
+    } catch (err) {
+      console.error('Error updating task name:', err);
+      setError(err.message);
+      return false;
+    }
+  };
+
+  // Update column name
+  const handleUpdateColumnName = async (columnId, newName) => {
+    try {
+      await updateColumnName(columnId, newName);
+      
+      // Update columns in state
+      setColumns(columns.map(column => 
+        column.id === columnId ? { ...column, name: newName } : column
+      ));
+      
+      // Also update columnMap if needed
+      const updatedColumn = columns.find(column => column.id === columnId);
+      if (updatedColumn) {
+        const oldKey = updatedColumn.name.toLowerCase().replace(/\s+/g, '-');
+        const newKey = newName.toLowerCase().replace(/\s+/g, '-');
+        
+        setColumnMap(prevMap => {
+          const newMap = { ...prevMap };
+          if (newMap[oldKey]) {
+            delete newMap[oldKey];
+            newMap[newKey] = columnId;
+          }
+          return newMap;
+        });
+      }
+      
+      return true;
+    } catch (err) {
+      console.error('Error updating column name:', err);
+      setError(err.message);
+      return false;
+    }
+  };
+
+  // Update row name
+  const handleUpdateRowName = async (rowId, newName) => {
+    try {
+      await updateRowName(rowId, newName);
+      setRows(rows.map(row => 
+        row.id === rowId ? { ...row, name: newName } : row
+      ));
+      return true;
+    } catch (err) {
+      console.error('Error updating row name:', err);
+      setError(err.message);
+      return false;
+    }
+  };
+
   // Add a new task
   const handleAddTask = async (title, rowId) => {
     try {
@@ -734,6 +798,9 @@ const handleDrop = (e, targetColumnId, targetRowId) => {
     moveRow: handleMoveRow,
     refreshTasks,
     refreshBoard,
+    updateTaskName: handleUpdateTaskName,
+    updateColumnName: handleUpdateColumnName,
+    updateRowName: handleUpdateRowName,
     dragAndDrop // Export drag and drop handlers
   };
   

@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import TaskDetails from './TaskDetails';
+import EditableText from './EditableText';
 import { getUserAvatar, assignUserToTask } from '../services/api';
 import '../styles/components/Task.css';
 
 function Task({ task, columnId }) {
-  const { deleteTask, dragAndDrop, refreshTasks } = useKanban();
+  const { deleteTask, dragAndDrop, refreshTasks, updateTaskName } = useKanban();
   const [showDetails, setShowDetails] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
@@ -36,7 +37,9 @@ function Task({ task, columnId }) {
   const handleTaskClick = (e) => {
     if (e.target.className === 'delete-btn' || 
         e.target.className === 'confirm-delete-btn' || 
-        e.target.className === 'cancel-delete-btn') return;
+        e.target.className === 'cancel-delete-btn' ||
+        e.target.classList.contains('editable-text') ||
+        e.target.classList.contains('editable-text-input')) return;
     setShowDetails(!showDetails);
   };
 
@@ -216,7 +219,14 @@ function Task({ task, columnId }) {
         data-row-id={task.rowId || "null"}
       >
         <div className="task-content">
-          <div className="task-title">{task.title}</div>
+          <EditableText 
+            id={task.id} 
+            text={task.title} 
+            onUpdate={updateTaskName} 
+            className="task-title"
+            inputClassName="task-title-input"
+            type="task"
+          />
           {renderUserAvatar()}
         </div>
         <button 

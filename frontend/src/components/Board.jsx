@@ -1,10 +1,24 @@
 import { useKanban } from '../context/KanbanContext';
 import { useEffect } from 'react';
 import Task from './Task';
+import EditableText from './EditableText';
 import '../styles/components/Board.css';
 
 function Board() {
-  const { columns, rows, tasks, loading, error, deleteRow, deleteColumn, dragAndDrop } = useKanban();
+  const { 
+    columns, 
+    rows, 
+    tasks, 
+    loading, 
+    error, 
+    deleteRow, 
+    deleteColumn, 
+    dragAndDrop,
+    updateColumnName,
+    updateRowName,
+    updateTaskName
+  } = useKanban();
+  
   const { handleDragOver, handleDrop } = dragAndDrop;
 
   if (loading) {
@@ -112,7 +126,14 @@ function Board() {
       >
         <div className="row-title">
           <span className="row-drag-handle">☰</span>
-          {row.name}
+          <EditableText 
+            id={row.id} 
+            text={row.name} 
+            onUpdate={updateRowName} 
+            className="row-name"
+            inputClassName="row-name-input"
+            type="row"
+          />
         </div>
         <div className="row-actions">
           <span className="task-count">{row.taskCount || 0}</span>
@@ -162,7 +183,14 @@ function Board() {
       >
         <div className="column-title">
           <span className="column-drag-handle">☰</span>
-          {column.name}
+          <EditableText 
+            id={column.id} 
+            text={column.name} 
+            onUpdate={updateColumnName} 
+            className="column-name"
+            inputClassName="column-name-input"
+            type="column"
+          />
         </div>
         <div className="column-actions">
           <span className="task-count">{columnTaskCount}</span>

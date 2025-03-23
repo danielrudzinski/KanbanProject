@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import Task from './Task';
+import EditableText from './EditableText';
 import '../styles/components/Column.css';
 
 function Column({ column, tasks}) {
-  const { deleteColumn, dragAndDrop } = useKanban();
+  const { deleteColumn, dragAndDrop, updateColumnName } = useKanban();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   
@@ -73,7 +74,14 @@ function Column({ column, tasks}) {
       <div className="column-header">
         <div className="header-top">
           <span className="column-drag-handle">☰</span>
-          {column.name}
+          <EditableText 
+            id={column.id} 
+            text={column.name} 
+            onUpdate={updateColumnName} 
+            className="column-name"
+            inputClassName="column-name-input"
+            type="column"
+          />
           <span className="task-count">{tasks.length}</span>
           <button 
             className="delete-column-btn" 
