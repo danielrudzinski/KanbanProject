@@ -29,7 +29,7 @@
 
 /* Corner cell (top-left empty cell) */
 .grid-corner {
-  background-color: #92d7e4;
+  background-color: #76777c;
   border-radius: 4px;
   min-width: 120px;
   padding: 0.75rem;
