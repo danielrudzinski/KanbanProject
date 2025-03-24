@@ -21,27 +21,13 @@ function Task({ task, columnId }) {
 
   const { handleDragStart, handleDragEnd } = dragAndDrop;
 
-  // Check if task has unfinished subtasks - modified to be called more frequently
+  // Check if task has unfinished subtasks
   const checkUnfinishedSubtasks = async () => {
     try {
       const subtasks = await fetchSubTasksByTaskId(task.id);
       const unfinishedExists = subtasks.some(subtask => !subtask.completed);
       setHasUnfinishedSubtasks(unfinishedExists);
       
-      // Show warning if there are unfinished subtasks
-      if (unfinishedExists) {
-        setShowWarning(true);
-        
-        // Auto-hide warning after 5 seconds
-        if (warningTimeoutRef.current) {
-          clearTimeout(warningTimeoutRef.current);
-        }
-        warningTimeoutRef.current = setTimeout(() => {
-          setShowWarning(false);
-        }, 5000);
-      } else {
-        setShowWarning(false);
-      }
     } catch (error) {
       console.error('Error checking subtasks:', error);
     }
@@ -179,11 +165,15 @@ function Task({ task, columnId }) {
       taskRef.current.classList.add('dragging');
     }
 
-    // Show warning only if task has unfinished subtasks
+    // Show warning only if task has unfinished subtasks and is being dragged
     if (hasUnfinishedSubtasks) {
       setShowWarning(true);
       
       // Auto-hide warning after 5 seconds
+      if (warningTimeoutRef.current) {
+        clearTimeout(warningTimeoutRef.current);
+      }
+      
       warningTimeoutRef.current = setTimeout(() => {
         setShowWarning(false);
       }, 5000);
@@ -343,7 +333,7 @@ function Task({ task, columnId }) {
           </div>
         )}
 
-        {/* Inline warning for unfinished subtasks */}
+        {/* Inline warning for unfinished subtasks - only visible during drag operations */}
         {hasUnfinishedSubtasks && showWarning && (
           <div className="subtask-warning">
             <div className="warning-icon">⚠️</div>

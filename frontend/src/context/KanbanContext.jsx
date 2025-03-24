@@ -520,7 +520,7 @@ const handleDeleteRow = async (rowId) => {
       for (const task of tasksToUpdate) {
         // Use the existing updateTaskRow function with a special null handling
         try {
-          // Call our modified updateTaskRow that handles null values
+          // Call our updateTaskRow that handles null values
           await updateTaskRow(task.id, null);
         } catch (updateErr) {
           console.error('Error updating task row to null:', updateErr);
@@ -595,7 +595,7 @@ const handleDeleteRow = async (rowId) => {
     }
   };
 
-  // Move column - updated to persist position changes
+  // Move column 
   const handleMoveColumn = async (columnId, targetColumnId) => {
     try {
       // Find the index of both columns
@@ -630,7 +630,7 @@ const handleDeleteRow = async (rowId) => {
     }
   };
 
-  // Move row - updated to persist position changes
+  // Move row
   const handleMoveRow = async (rowId, targetRowId) => {
     try {
       // Find the index of both rows
