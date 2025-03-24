@@ -340,7 +340,8 @@ function Task({ task, columnId }) {
         {assignmentError && (
           <div className="assignment-error">
             {assignmentError}
-
+          </div>
+        )}
 
         {/* Inline warning for unfinished subtasks */}
         {hasUnfinishedSubtasks && showWarning && (
@@ -355,7 +356,6 @@ function Task({ task, columnId }) {
             >
               ×
             </button>
-
           </div>
         )}
       </div>
