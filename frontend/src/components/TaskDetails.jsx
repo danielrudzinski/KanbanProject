@@ -502,6 +502,9 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                       title={expandedSubtaskId === subtask.id ? "Ukryj opis" : "Pokaż opis"}
                     >
                     <span className={expandedSubtaskId === subtask.id ? "arrow-icon rotated" : "arrow-icon"}>
+                        ▼
+                    </span>
+                    <span className="button-text">{expandedSubtaskId === subtask.id ? "Ukryj" : "Opis"}</span>
                       ▼
                     </span>
                       <span className="button-text">{expandedSubtaskId === subtask.id ? "Ukryj" : "Opis"}</span>

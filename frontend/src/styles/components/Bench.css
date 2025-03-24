@@ -144,3 +144,84 @@
     background-color: #86d6ff;
   }
 }
+.user-wip-limit {
+  margin-top: 5px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+}
+
+.wip-limit-display {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+.wip-limit-display:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.edit-wip-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 5px;
+  color: #666;
+}
+
+.edit-wip-btn:hover {
+  color: #007bff;
+}
+
+.wip-limit-editor {
+  display: flex;
+  align-items: center;
+}
+
+.wip-limit-editor input {
+  width: 40px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 2px;
+}
+
+.save-wip-btn,
+.cancel-wip-btn {
+  background: none;
+  border: none;
+  padding: 0 3px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 3px;
+}
+
+.save-wip-btn {
+  color: #28a745;
+}
+
+.save-wip-btn:hover {
+  color: #218838;
+}
+
+.cancel-wip-btn {
+  color: #dc3545;
+}
+
+.cancel-wip-btn:hover {
+  color: #c82333;
+}
+
+.user-task-count {
+  margin-top: 3px;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.user-task-count.limit-reached {
+  color: #dc3545;
+  font-weight: bold;
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useKanban } from '../context/KanbanContext';
-import { fetchUsers, getUserAvatar } from '../services/api';
+import { fetchUsers, getUserAvatar, updateUserWipLimit } from '../services/api';
 import '../styles/components/Bench.css';
 
 function Bench() {
@@ -10,11 +10,20 @@ function Bench() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [avatarPreviews, setAvatarPreviews] = useState({});
+  const [editingWipLimit, setEditingWipLimit] = useState({});
+  const [wipLimits, setWipLimits] = useState({});
 
   const loadUsers = async () => {
     try {
       const allUsers = await fetchUsers();
       setUsers(allUsers);
+      
+      // Initialize WIP limits from data
+      const initialWipLimits = {};
+      allUsers.forEach(user => {
+        initialWipLimits[user.id] = user.wipLimit || 3; // Default to 3 if not set
+      });
+      setWipLimits(initialWipLimits);
       
       // Load avatars for all users
       const avatarPromises = allUsers.map(async (user) => {
@@ -63,7 +72,63 @@ function Bench() {
       type: 'user'
     }));
     e.dataTransfer.effectAllowed = 'copy';
+  };
 
+  // Start editing WIP limit
+  const startEditWipLimit = (userId) => {
+    setEditingWipLimit({
+      ...editingWipLimit,
+      [userId]: true
+    });
+  };
+
+  // Handle WIP limit change
+  const handleWipLimitChange = (userId, value) => {
+    setWipLimits({
+      ...wipLimits,
+      [userId]: parseInt(value) || 0
+    });
+  };
+
+  // Save WIP limit to backend
+  const saveWipLimit = async (userId) => {
+    try {
+      const newLimit = wipLimits[userId];
+      await updateUserWipLimit(userId, newLimit);
+      
+      // Update local user data
+      setUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === userId ? { ...user, wipLimit: newLimit } : user
+        )
+      );
+      
+      // Exit edit mode
+      setEditingWipLimit({
+        ...editingWipLimit,
+        [userId]: false
+      });
+      
+      // Refresh tasks to update UI
+      refreshTasks();
+    } catch (error) {
+      console.error('Error updating WIP limit:', error);
+    }
+  };
+
+  // Cancel editing
+  const cancelEditWipLimit = (userId) => {
+    // Reset to original value
+    setWipLimits({
+      ...wipLimits,
+      [userId]: users.find(u => u.id === userId).wipLimit || 3
+    });
+    
+    // Exit edit mode
+    setEditingWipLimit({
+      ...editingWipLimit,
+      [userId]: false
+    });
   };
 
   if (loading) {
@@ -122,6 +187,61 @@ function Bench() {
               <div className="user-info">
                 <div className="user-name">{user.name}</div>
                 {user.role && <div className="user-role">{user.role}</div>}
+                <div className="user-wip-limit">
+                  {editingWipLimit[user.id] ? (
+                    <div className="wip-limit-editor">
+                      <input 
+                        type="number" 
+                        min="1" 
+                        max="10"
+                        value={wipLimits[user.id] || 3} 
+                        onChange={(e) => handleWipLimitChange(user.id, e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <button 
+                        className="save-wip-btn" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          saveWipLimit(user.id);
+                        }}
+                        title="Zapisz limit WIP"
+                      >
+                        ✓
+                      </button>
+                      <button 
+                        className="cancel-wip-btn" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          cancelEditWipLimit(user.id);
+                        }}
+                        title="Anuluj"
+                      >
+                        ✗
+                      </button>
+                    </div>
+                  ) : (
+                    <div 
+                      className="wip-limit-display"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEditWipLimit(user.id);
+                      }}
+                    >
+                      <span>WIP Limit: {user.wipLimit || 3}</span>
+                      <button 
+                        className="edit-wip-btn" 
+                        title="Edytuj limit WIP"
+                      >
+                        ✎
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {user.taskCount && (
+                  <div className={`user-task-count ${(user.taskCount >= (user.wipLimit || 3)) ? 'limit-reached' : ''}`}>
+                    Zadania: {user.taskCount}/{user.wipLimit || 3}
+                  </div>
+                )}
               </div>
             </div>
           ))}

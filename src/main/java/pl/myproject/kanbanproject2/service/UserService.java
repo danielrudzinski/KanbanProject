@@ -152,4 +152,23 @@ public class UserService {
         return userMapper.apply(updatedUser);
     }
 
+    public boolean checkWipStatus(Integer userId) {
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            Integer wipLimit = user.getWipLimit();
+            if (wipLimit == null) {
+                return true;
+            }
+
+            int activeTaskCount = user.getTasks().size();
+            return activeTaskCount < wipLimit;
+        } catch (EntityNotFoundException e) {
+
+            return true;
+
+        }
+    }
+
 }

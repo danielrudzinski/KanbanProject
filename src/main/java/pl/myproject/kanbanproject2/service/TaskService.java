@@ -23,12 +23,14 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TaskMapper taskMapper;
+    private final UserService userService;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository, TaskMapper taskMapper) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, TaskMapper taskMapper, UserService userService) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.taskMapper = taskMapper;
+        this.userService = userService;
     }
 
     public Task addTask(Task task) {
@@ -95,6 +97,13 @@ public class TaskService {
     }
 
     public TaskDTO assignUserToTask(Integer taskId, Integer userId) {
+
+        boolean isWithinLimit = userService.checkWipStatus(userId);
+
+        if (!isWithinLimit) {
+            throw new RuntimeException("Nie można przypisać użytkownika.");
+        }
+
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 

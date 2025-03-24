@@ -276,6 +276,13 @@ export const updateTaskPosition = async (taskId, position) => {
 };
 
 export const assignUserToTask = async (taskId, userId) => {
+  const userWipStatus = await getUserWipLimit(userId);
+  console.log(`User WIP status:`, userWipStatus);
+  
+  if (userWipStatus.willExceedLimit) {
+    throw new Error(`WIP limit exceeded: ${userWipStatus.userName} has reached their maximum of ${userWipStatus.wipLimit} tasks.`);
+  }
+  
   try {
     const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}/user/${userId}`, {
       method: 'PUT',
@@ -285,15 +292,58 @@ export const assignUserToTask = async (taskId, userId) => {
     });
     
     if (!response.ok) {
-      throw new Error(`Error assigning user: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      if (errorData.error && errorData.error.includes('WIP limit')) {
+        throw new Error(`Limit WIP osiągnięty: Nie można przypisać więcej tasków temu userowi.`);
+      }
+      throw new Error(`${response.status}: Failed to assign user to task`);
     }
     
     return await response.json();
   } catch (error) {
-    console.error(`Error assigning user to task ${taskId}:`, error);
+    if (!error.message.includes('WIP limit')) {
+      console.error(`Error assigning user to task ${taskId}:`, error);
+      throw new Error(`Limit WIP osiągnięty: Nie można przypisać więcej tasków temu userowi.`);
+    }
     throw error;
   }
 };
+
+export async function getUserWipLimit(userId) {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.USERS}/${userId}/wip-status`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to check user WIP status');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error checking user WIP limit:', error);
+    throw error;
+  }
+}
+
+export async function updateUserWipLimit(userId, wipLimit) {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.USERS}/${userId}/wip-limit`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(wipLimit),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update user WIP limit');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating user WIP limit:', error);
+    throw error;
+  }
+}
 
 export const removeUserFromTask = async (taskId, userId) => {
   try {
