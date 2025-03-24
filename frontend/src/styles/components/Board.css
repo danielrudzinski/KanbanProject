@@ -335,3 +335,39 @@
     border-color: #d1fdff;
   }
 }
+
+.wip-exceeded {
+  background-color: rgba(255, 0, 0, 0.1);
+  border-color: #ff0000;
+}
+
+.wip-exceeded-cell {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid #ff0000;
+}
+
+.exceeded {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+.grid-column-header.wip-exceeded .column-title,
+.grid-row-header.wip-exceeded .row-title {
+  color: #ff0000;
+}
+
+/* Adjust existing styles for better visibility */
+.grid-cell {
+  transition: background-color 0.3s ease;
+}
+
+.task-count {
+  margin-right: 5px;
+}
+
+.wip-limit.exceeded {
+  margin-left: 5px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background-color: rgba(255, 0, 0, 0.1);
+}
