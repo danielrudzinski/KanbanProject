@@ -33,6 +33,13 @@ public class Task {
     @JoinColumn(name = "column_id")
     private Column column;
     @ManyToOne
+    @JoinColumn(name = "parent_task_id")
+    private Task parentTask;
+
+    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL)
+    private List<Task> childTasks = new ArrayList<>();
+
+    @ManyToOne
     @JoinColumn(name = "row_id", nullable = true)
     private Row row;
     @ManyToMany

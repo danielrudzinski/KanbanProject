@@ -115,4 +115,22 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PostMapping("/{parentId}/child")
+    public ResponseEntity<TaskDTO> addChildTask(@PathVariable Integer parentId, @RequestBody Task childTask) {
+        return ResponseEntity.ok(taskService.addChildTask(parentId, childTask));
+    }
+
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<TaskDTO> completeTask(@PathVariable Integer id) {
+        return ResponseEntity.ok(taskService.completeTask(id));
+    }
+    @GetMapping("/hierarchy")
+    public ResponseEntity<List<TaskDTO>> getRootTasks() {
+        return ResponseEntity.ok(taskService.getRootTasks());
+    }
+
+    @GetMapping("/{id}/withChildren")
+    public ResponseEntity<TaskDTO> getTaskWithChildren(@PathVariable Integer id) {
+        return ResponseEntity.ok(taskService.getTaskWithChildren(id));
+    }
 }

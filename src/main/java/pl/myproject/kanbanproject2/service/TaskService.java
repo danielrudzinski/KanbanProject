@@ -168,6 +168,7 @@ public class TaskService {
 
         return taskMapper.apply(task);
     }
+
     public TaskDTO updateTaskLabels(Integer taskId, List<String> labels) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
@@ -176,5 +177,66 @@ public class TaskService {
         Task updatedTask = taskRepository.save(task);
         return taskMapper.apply(updatedTask);
     }
- 
+
+    public TaskDTO addChildTask(Integer parentId, Task childTask) {
+        try {
+            Task parentTask = taskRepository.findById(parentId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono zadania rodzica o id: " + parentId));
+
+            childTask.setParentTask(parentTask);
+            Task savedChildTask = taskRepository.save(childTask);
+            parentTask.getChildTasks().add(savedChildTask);
+            taskRepository.save(parentTask);
+
+            return taskMapper.apply(savedChildTask);
+        } catch (Exception e) {
+            throw new RuntimeException("Błąd podczas dodawania zadania podrzędnego: " + e.getMessage(), e);
+        }
+    }
+
+    public TaskDTO completeTask(Integer taskId) {
+        try {
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono zadania o id: " + taskId));
+
+            if (!areAllChildTasksCompleted(task)) {
+                throw new IllegalStateException("Nie można zakończyć zadania, dopóki wszystkie zadania podrzędne nie zostaną zakończone.");
+            }
+
+            task.setCompleted(true);
+            Task completedTask = taskRepository.save(task);
+            return taskMapper.apply(completedTask);
+        } catch (Exception e) {
+            throw new RuntimeException("Błąd podczas kończenia zadania: " + e.getMessage(), e);
+        }
+    }
+
+    private boolean areAllChildTasksCompleted(Task task) {
+        return task.getChildTasks().stream().allMatch(Task::isCompleted);
+    }
+
+    public List<TaskDTO> getRootTasks() {
+        try {
+            // Pobierz tylko zadania bez rodzica
+            return taskRepository.findByParentTaskIsNull().stream()
+                    .map(taskMapper::apply) // To uwzględni zadania podrzędne
+                    .sorted(Comparator.comparing(TaskDTO::position))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Błąd podczas pobierania zadań głównych: " + e.getMessage(), e);
+        }
+    }
+
+    public TaskDTO getTaskWithChildren(Integer id) {
+        try {
+            Task task = taskRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id: " + id));
+
+            return taskMapper.apply(task); // To uwzględni zadania podrzędne
+        } catch (EntityNotFoundException e) {
+            throw e; // Przekaż dalej błąd dotyczący nieznalezionego zadania
+        } catch (Exception e) {
+            throw new RuntimeException("Błąd podczas pobierania zadania z podzadaniami: " + e.getMessage(), e);
+        }
+    }
 }
