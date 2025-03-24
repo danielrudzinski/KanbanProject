@@ -120,3 +120,102 @@ button:focus,
 button:focus-visible {
   outline: 3px solid rgba(134, 214, 255, 0.3);
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  button {
+    padding: 0.5em 1em;
+    font-size: 0.9em;
+  }
+  
+  body {
+    padding: 0 0.5rem;
+  }
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Adjust dark mode specific variables */
+    --surface-light: #121825;
+    --surface-light-hover: #1a2944;
+    --text-dark: #e2e2e2;
+    --text-dark-secondary: #bcbcbc;
+  }
+  
+  body {
+    background-color: #0e1b36;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(0, 170, 255, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(0, 255, 98, 0.03) 0%, transparent 50%);
+    color: #a0a0a0;
+  }
+  
+  a {
+    color: #86d6ff;
+  }
+  
+  a:hover {
+    color: #d1fdff;
+  }
+  
+  h1 {
+    color: #e2e2e2;
+  }
+  
+  button {
+    background-color: #1a2944;
+    color: #e2e2e2;
+    border-color: #232429;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  
+  button:hover {
+    border-color: #86d6ff;
+    background-color: #152442;
+  }
+  
+  button:focus,
+  button:focus-visible {
+    outline: 3px solid rgba(134, 214, 255, 0.2);
+  }
+  
+  input, select, textarea {
+    background-color: #1a2944;
+    color: #e2e2e2;
+    border-color: #3e3f44;
+  }
+  
+  input:focus, select:focus, textarea:focus {
+    border-color: #86d6ff;
+    outline: none;
+  }
+  
+  ::placeholder {
+    color: #76777c;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+  button:hover, a:hover, .menu-item:hover {
+    /* Reset hover states for touch devices */
+    transform: none;
+  }
+  
+  button:active, a:active, .menu-item:active {
+    /* Apply hover effects on active instead */
+    transform: translateY(-2px);
+    border-color: #86d6ff;
+  }
+  
+  /* Increase tap target sizes for mobile */
+  a, button, .nav-link, .menu-item {
+    padding: 0.7em 1.3em;
+  }
+}

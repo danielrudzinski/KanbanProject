@@ -29,7 +29,7 @@
 
 /* Corner cell (top-left empty cell) */
 .grid-corner {
-  background-color: #76777c;
+  background-color: #92d7e4;
   border-radius: 4px;
   min-width: 120px;
   padding: 0.75rem;
@@ -175,25 +175,25 @@
 /* Dark mode styles */
 @media (prefers-color-scheme: dark) {
   .grid-corner {
-    background-color: #76777c;
+    background-color: #1b1b1d;
   }
   
   .grid-column-header {
-    background-color: rgba(134, 214, 255, 0.2);
-    color: #e2e2e2;
+    background-color: rgb(0, 0, 0);
+    color: #ffffff;
   }
   
   .grid-row-header {
-    background-color: rgba(209, 253, 255, 0.2);
-    color: #e2e2e2;
+    background-color: rgb(0, 0, 0);
+    color: #ffffff;
   }
   
   .grid-cell {
-    background-color: #0e1b36;
+    background-color: #121825;
   }
   
   .task-count {
-    background-color: #76777c;
+    background-color: #3a3b3f;
     color: #e2e2e2;
   }
   
