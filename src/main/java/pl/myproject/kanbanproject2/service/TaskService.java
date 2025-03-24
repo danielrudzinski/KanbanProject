@@ -99,9 +99,9 @@ public class TaskService {
     public TaskDTO assignUserToTask(Integer taskId, Integer userId) {
 
         boolean isWithinLimit = userService.checkWipStatus(userId);
-    
+
         if (!isWithinLimit) {
-            throw new RuntimeException("Cannot assign task. User has reached their WIP limit.");
+            throw new RuntimeException("Nie można przypisać użytkownika.");
         }
 
         Task task = taskRepository.findById(taskId)

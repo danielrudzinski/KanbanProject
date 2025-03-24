@@ -125,12 +125,8 @@ public class UserController {
 
     @GetMapping("/{id}/wip-status")
     public ResponseEntity<Boolean> checkWipStatus(@PathVariable Integer id) {
-        try {
-            boolean isWithinLimit = userService.checkWipStatus(id);
-            return ResponseEntity.ok(isWithinLimit);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        boolean isWithinLimit = userService.checkWipStatus(id);
+        return ResponseEntity.ok(isWithinLimit);
     }
 
 }
