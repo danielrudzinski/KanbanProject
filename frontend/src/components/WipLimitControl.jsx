@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import '../styles/components/Forms.css';
 
-function WipLimitControl() {
+function WipLimitControl({ onClose }) {
   const { columns, rows, updateWipLimit, updateRowWipLimit } = useKanban();
   const [selectedItem, setSelectedItem] = useState('');
   const [wipLimit, setWipLimit] = useState('');
@@ -67,6 +67,9 @@ function WipLimitControl() {
       
       setSelectedItem('');
       setWipLimit('');
+      
+      // Close form after successful submission
+      if (onClose) onClose();
     } catch (err) {
       setError(err.message || 'Wystąpił błąd podczas aktualizacji limitu WIP');
     } finally {
@@ -85,6 +88,14 @@ function WipLimitControl() {
       <form onSubmit={handleSubmit}>
         <div className="form-header">
           <h3>Ustaw limit WIP</h3>
+          <button 
+            type="button" 
+            className="close-button" 
+            onClick={onClose}
+            aria-label="Zamknij formularz"
+          >
+            ×
+          </button>
         </div>
         
         <div className="tab-container">
@@ -160,6 +171,14 @@ function WipLimitControl() {
             disabled={isSubmitting || !selectedItem}
           >
             {isSubmitting ? 'Aktualizowanie...' : 'Ustaw limit'}
+          </button>
+          <button 
+            type="button" 
+            className="cancel-button"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Anuluj
           </button>
         </div>
       </form>

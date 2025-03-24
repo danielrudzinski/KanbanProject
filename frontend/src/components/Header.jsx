@@ -1,13 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import AddTaskForm from './AddTaskForm';
-import AddColumnForm from './AddColumnForm';
-import AddRowForm from './AddRowForm';
+import AddBoardItemForm from './AddRowColumnForm';
 import WipLimitControl from './WipLimitControl';
 import logo from '/kanban-logo.png';
 
 function Header() {
-  const [activeForm, setActiveForm] = useState(null); // 'task', 'column', 'row', or 'wip'
+  const [activeForm, setActiveForm] = useState(null); // 'task', 'boardItem', or 'wip'
 
   const handleFormToggle = (formType) => {
     setActiveForm(activeForm === formType ? null : formType);
@@ -45,22 +44,12 @@ function Header() {
 
           <button 
             className="nav-link"
-            onClick={() => handleFormToggle('column')}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" style={{ marginRight: '0.5rem', verticalAlign: 'middle' }}>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Dodaj kolumnę
-          </button>
-
-          <button 
-            className="nav-link"
-            onClick={() => handleFormToggle('row')}
+            onClick={() => handleFormToggle('boardItem')}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" style={{ marginRight: '0.5rem', verticalAlign: 'middle' }}>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
             </svg>
-            Dodaj wiersz
+            Dodaj wiersz/kolumnę
           </button>
 
           <Link to="/users" className="nav-link">
@@ -74,8 +63,7 @@ function Header() {
 
       {activeForm === 'task' && <AddTaskForm onClose={() => setActiveForm(null)} />}
       {activeForm === 'wip' && <WipLimitControl onClose={() => setActiveForm(null)} />}
-      {activeForm === 'column' && <AddColumnForm onClose={() => setActiveForm(null)} />}
-      {activeForm === 'row' && <AddRowForm onClose={() => setActiveForm(null)} />}
+      {activeForm === 'boardItem' && <AddBoardItemForm onClose={() => setActiveForm(null)} />}
     </>
   );
 }

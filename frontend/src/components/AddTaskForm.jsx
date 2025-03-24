@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import '../styles/components/Forms.css'; 
 
-function AddTaskForm() {
+function AddTaskForm({ onClose }) {
   const { addTask, refreshTasks } = useKanban();
   const [title, setTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,6 +25,9 @@ function AddTaskForm() {
       
       // Reset form
       setTitle('');
+      
+      // Close form after successful submission
+      if (onClose) onClose();
     } catch (err) {
       setError(err.message || 'Wystąpił błąd podczas dodawania zadania');
     } finally {
@@ -37,6 +40,14 @@ function AddTaskForm() {
       <form onSubmit={handleSubmit}>
         <div className="form-header">
           <h3>Dodaj nowe zadanie</h3>
+          <button 
+            type="button" 
+            className="close-button" 
+            onClick={onClose}
+            aria-label="Zamknij formularz"
+          >
+            ×
+          </button>
         </div>
         
         {error && <div className="error-message">{error}</div>}
@@ -59,6 +70,14 @@ function AddTaskForm() {
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Dodawanie...' : 'Dodaj zadanie'}
+          </button>
+          <button 
+            type="button" 
+            className="cancel-button"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Anuluj
           </button>
         </div>
       </form>
