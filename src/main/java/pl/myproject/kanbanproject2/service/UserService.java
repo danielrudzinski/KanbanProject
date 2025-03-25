@@ -31,6 +31,7 @@ public class UserService {
     }
 
     public List<UserDTO> getAllUsers() {
+
         List<UserDTO> userDTOS = userRepository.findAll().stream()
                 .map(userMapper::apply)
                 .collect(Collectors.toList());
