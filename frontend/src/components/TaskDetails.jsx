@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useContext } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { createPortal } from 'react-dom';
-import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, fetchSubTasks, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId } from '../services/api';
+import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, fetchSubTasks, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask } from '../services/api';
 import '../styles/components/TaskDetails.css';
 
 function TaskDetails({ task, onClose, onSubtaskUpdate }) {
@@ -22,8 +22,13 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const [expandedSubtaskId, setExpandedSubtaskId] = useState(null);
   const [editingDescription, setEditingDescription] = useState(false);
   const [subtaskDescription, setSubtaskDescription] = useState('');
+  
+  const [taskDescription, setTaskDescription] = useState('');
+  const [editingTaskDescription, setEditingTaskDescription] = useState(false);
+  
   const panelRef = useRef(null);
   const descriptionInputRef = useRef(null);
+  const taskDescriptionInputRef = useRef(null);
   
   // Update loadTaskData to include subtasks loading
   const loadTaskData = async () => {
@@ -35,13 +40,15 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       setUsers(allUsers);
       setSubtasks(taskSubtasks);
       
+      // Set task description
+      setTaskDescription(taskData.description || '');
+      
       if (taskData.userIds && taskData.userIds.length > 0) {
         const assigned = allUsers.filter(user => 
           taskData.userIds.includes(user.id)
         );
         setAssignedUsers(assigned);
 
-        // Load avatars for assigned users
         const avatarPromises = assigned.map(async (user) => {
           const avatarUrl = await getUserAvatar(user.id);
           if (avatarUrl) {
@@ -63,6 +70,44 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       setLoading(false);
     }
   };
+
+    // save task description
+    const saveTaskDescription = async () => {
+      try {
+        await updateTask(task.id, { description: taskDescription });
+        
+        setEditingTaskDescription(false);
+        setSuccess(true);
+        setTimeout(() => {
+          setSuccess(false);
+        }, 3000);
+      } catch (error) {
+        console.error('Error saving task description:', error);
+        alert('Wystąpił błąd podczas zapisywania opisu zadania');
+      }
+    };
+  
+    // start editing task description
+    const startEditingTaskDescription = () => {
+      setEditingTaskDescription(true);
+      setTimeout(() => {
+        if (taskDescriptionInputRef.current) {
+          taskDescriptionInputRef.current.focus();
+        }
+      }, 0);
+    };
+  
+    // cancel task description editing
+    const cancelEditingTaskDescription = () => {
+      setEditingTaskDescription(false);
+      
+      // Fetch the current task data to restore original description
+      fetchTask(task.id).then(taskData => {
+        setTaskDescription(taskData.description || '');
+      }).catch(error => {
+        console.error('Error fetching task data:', error);
+      });
+    };
 
   const handleaddSubTask = async () => {
     if (!newSubtaskTitle.trim()) return;
@@ -396,6 +441,58 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
             </button>
             <button className="close-panel-btn" onClick={onClose}>×</button>
           </div>
+        </div>
+                {/* Task Description Section */}
+          <div className="task-description-section">
+          <div className="description-header">
+            <h4>Opis zadania:</h4>
+            {!editingTaskDescription && (
+              <button 
+                onClick={startEditingTaskDescription}
+                className="edit-description-btn"
+                title="Edytuj opis zadania"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </button>
+            )}
+          </div>
+          
+          {editingTaskDescription ? (
+            <div className="description-edit-form">
+              <textarea 
+                ref={taskDescriptionInputRef}
+                value={taskDescription} 
+                onChange={(e) => setTaskDescription(e.target.value)}
+                placeholder="Wprowadź opis zadania"
+                className="description-textarea"
+                rows={4}
+              ></textarea>
+              <div className="description-edit-actions">
+                <button 
+                  onClick={saveTaskDescription}
+                  className="save-description-btn"
+                >
+                  Zapisz
+                </button>
+                <button 
+                  onClick={cancelEditingTaskDescription}
+                  className="cancel-edit-btn"
+                >
+                  Anuluj
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="description-display">
+              {taskDescription ? (
+                <p className="description-content">{taskDescription}</p>
+              ) : (
+                <p className="empty-description">Brak opisu. Kliknij ikonę edycji, aby dodać opis.</p>
+              )}
+            </div>
+          )}
         </div>
   
         {/* User assignment dropdown */}
