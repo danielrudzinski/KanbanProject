@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.web.ServletTestExecutionListener;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
+import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.dto.UserDTO;
 import pl.myproject.kanbanproject2.mapper.UserMapper;
 import pl.myproject.kanbanproject2.model.FileEntity;
@@ -23,10 +24,8 @@ import pl.myproject.kanbanproject2.repository.FileRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
 
 import java.nio.file.attribute.UserPrincipalNotFoundException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 import org.mockito.MockedStatic;
 import java.net.URI;
 
@@ -176,85 +175,9 @@ public class UserServiceTest {
         Assertions.assertEquals(testUser.getWipLimit(), result.getWipLimit());
         Mockito.verify(userRepository).save(testUser);
     }
+
+   
+
+
 }
 
-/*
-    @Test
-    void getUserById_shouldReturnUser() {
-        //given
-        Mockito.when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-        Mockito.when(userMapper.apply(testUser)).thenReturn(testUserDTO);
-        //when
-        ResponseEntity<UserDTO> response = userService.getUserById(testUser.getId());
-        //then
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals(testUserDTO, response.getBody());
-        Mockito.verify(userRepository).findById(testUser.getId());
-        Mockito.verify(userMapper).apply(testUser);
-
-    }
-    @Test
-    void getUserById_shouldReturnNotFoundWhenUserNotFound() {
-        // given
-        int nonExistentUserId = 2; // ID które nie istnieje
-        Mockito.when(userRepository.findById(2)).thenReturn(Optional.empty());
-
-        // when
-        ResponseEntity<UserDTO> response = userService.getUserById(nonExistentUserId);
-
-        // then
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        Assertions.assertNull(response.getBody());
-        Mockito.verify(userRepository).findById(nonExistentUserId);
-    }
-    @Test
-    void deleteUserShouldDeleteUser() {
-        //given
-        Mockito.when(userRepository.existsById(testUser.getId())).thenReturn(true);
-        //when
-        ResponseEntity<Void> response = userService.deleteUser(testUser.getId());
-        //then
-        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        Mockito.verify(userRepository).existsById(testUser.getId());
-        Mockito.verify(userRepository).deleteById(testUser.getId());
-
-    }
-    @Test
-    void addUserShouldAddUser() {
-        // given
-        Mockito.when(userRepository.save(testUser)).thenReturn(testUser);
-
-        // Use MockedStatic for static methods
-        try (MockedStatic<ServletUriComponentsBuilder> mockedStatic = Mockito.mockStatic(ServletUriComponentsBuilder.class)) {
-            ServletUriComponentsBuilder builder = Mockito.mock(ServletUriComponentsBuilder.class);
-            UriComponents uriComponents = Mockito.mock(UriComponents.class);
-
-            mockedStatic.when(ServletUriComponentsBuilder::fromCurrentRequest).thenReturn(builder);
-            Mockito.when(builder.path(Mockito.anyString())).thenReturn(builder);
-            Mockito.when(builder.buildAndExpand(testUser.getId())).thenReturn(uriComponents);
-            Mockito.when(uriComponents.toUri()).thenReturn(URI.create("http://test.com/users/1"));
-
-            // when
-            ResponseEntity<User> response = userService.addUser(testUser);
-
-            // then
-            Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-            Assertions.assertEquals(testUser, response.getBody());
-            Mockito.verify(userRepository).save(testUser);
-        }
-    }
-    @Test
-    void updateUserShouldUpdateUser() {
-        // given
-        Mockito.when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-        Mockito.when(userRepository.save(testUser)).thenReturn(testUser);
-        // when
-        ResponseEntity<User> response = userService.updateUser(testUser.getId(), testUser);
-        //then
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals(testUser, response.getBody());
-        Mockito.verify(userRepository).findById(testUser.getId());
-        Mockito.verify(userRepository).save(testUser);
-    }
-
-}*/
