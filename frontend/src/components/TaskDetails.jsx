@@ -3,6 +3,7 @@ import { useKanban } from '../context/KanbanContext';
 import { createPortal } from 'react-dom';
 import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, fetchSubTasks, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask } from '../services/api';
 import '../styles/components/TaskDetails.css';
+import TaskLabels from './TaskLabels';
 
 function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const { refreshTasks } = useKanban();
@@ -22,7 +23,8 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const [expandedSubtaskId, setExpandedSubtaskId] = useState(null);
   const [editingDescription, setEditingDescription] = useState(false);
   const [subtaskDescription, setSubtaskDescription] = useState('');
-  
+  const [taskLabels, setTaskLabels] = useState([]);
+
   const [taskDescription, setTaskDescription] = useState('');
   const [editingTaskDescription, setEditingTaskDescription] = useState(false);
   
@@ -42,6 +44,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       
       // Set task description
       setTaskDescription(taskData.description || '');
+      setTaskLabels(taskData.labels || []);
       
       if (taskData.userIds && taskData.userIds.length > 0) {
         const assigned = allUsers.filter(user => 
@@ -95,6 +98,10 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
           taskDescriptionInputRef.current.focus();
         }
       }, 0);
+    };
+
+    const handleLabelsChange = (updatedLabels) => {
+      setTaskLabels(updatedLabels);
     };
   
     // cancel task description editing
@@ -442,7 +449,18 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
             <button className="close-panel-btn" onClick={onClose}>×</button>
           </div>
         </div>
-                {/* Task Description Section */}
+
+        {/* TaskLabels section*/}
+        <div className="task-labels-section">
+          <h4>Etykiety</h4>
+          <TaskLabels
+            taskId={task.id}
+            initialLabels={taskLabels}
+            onLabelsChange={handleLabelsChange}
+          />
+        </div>
+          
+          {/* Task Description Section */}
           <div className="task-description-section">
           <div className="description-header">
             <h4>Opis zadania:</h4>

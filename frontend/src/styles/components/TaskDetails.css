@@ -830,3 +830,78 @@ label {
   font-size: 12px;
   font-weight: 500;
 }
+
+.task-labels-section {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.task-labels-section h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.task-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.labels-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: white;
+  user-select: none;
+}
+
+.add-label-button {
+  padding: 2px 8px;
+  border: 1px dashed #ccc;
+  border-radius: 12px;
+  background: none;
+  cursor: pointer;
+  color: #666;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.add-label-button:hover {
+  background-color: #f5f5f5;
+  border-color: #999;
+}
+
+.label-picker {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.label-picker div {
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.label-picker div:hover {
+  background-color: #f5f5f5;
+}
