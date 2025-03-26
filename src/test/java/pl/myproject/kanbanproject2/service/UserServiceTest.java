@@ -176,7 +176,58 @@ public class UserServiceTest {
         Mockito.verify(userRepository).save(testUser);
     }
 
-   
+    @Test
+    void updateUserShouldUpdateExistingUser() {
+        // given
+        User updatedUser = new User();
+        updatedUser.setName("Updated Name");
+        updatedUser.setEmail("updated@example.com");
+        updatedUser.setWipLimit(10);
+
+        Mockito.when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(updatedUser);
+
+        // when
+        User result = userService.updateUser(testUser.getId(), updatedUser);
+
+        // then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(updatedUser.getName(), result.getName());
+        Assertions.assertEquals(updatedUser.getEmail(), result.getEmail());
+        Assertions.assertEquals(updatedUser.getWipLimit(), result.getWipLimit());
+        Mockito.verify(userRepository).save(Mockito.any(User.class));
+    }
+    @Test
+    void patchUserShouldUpdateOnlyNonNullFields() {
+        // given
+        UserDTO patchUserDTO = new UserDTO(null, "patched@example.com", null, null, 7);
+
+        Mockito.when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        Mockito.when(userRepository.save(Mockito.any(User.class))).thenAnswer(invocation -> {
+            User savedUser = invocation.getArgument(0);
+            return savedUser;
+        });
+
+        Mockito.when(userMapper.apply(Mockito.any(User.class))).thenAnswer(invocation -> {
+            User user = invocation.getArgument(0);
+            return new UserDTO(user.getId(), user.getEmail(), user.getName(), new HashSet<>(), user.getWipLimit());
+        });
+
+        // when
+        UserDTO result = userService.patchUser(patchUserDTO, testUser.getId());
+
+        // then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("patched@example.com", result.email());
+        Assertions.assertEquals("Test User", result.name()); // Imię nie powinno się zmienić
+        Assertions.assertEquals(7, result.wipLimit());
+
+        Mockito.verify(userRepository).save(Mockito.any(User.class));
+    }
+
+
+
+
 
 
 }
