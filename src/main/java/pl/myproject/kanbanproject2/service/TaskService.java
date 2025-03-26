@@ -11,9 +11,10 @@ import pl.myproject.kanbanproject2.model.User;
 import pl.myproject.kanbanproject2.repository.TaskRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -42,7 +43,7 @@ public class TaskService {
 
         // Initialize labels if null
         if (task.getLabels() == null) {
-            task.setLabels(new ArrayList<>());
+            task.setLabels(new HashSet<>());
         }
 
         return taskRepository.save(task);
@@ -97,7 +98,6 @@ public class TaskService {
     }
 
     public TaskDTO assignUserToTask(Integer taskId, Integer userId) {
-
         boolean isWithinLimit = userService.checkWipStatus(userId);
 
         if (!isWithinLimit) {
@@ -148,7 +148,7 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
         if (task.getLabels() == null) {
-            task.setLabels(new ArrayList<>());
+            task.setLabels(new HashSet<>());
         }
 
         task.getLabels().add(label);
@@ -168,7 +168,8 @@ public class TaskService {
 
         return taskMapper.apply(task);
     }
-    public TaskDTO updateTaskLabels(Integer taskId, List<String> labels) {
+
+    public TaskDTO updateTaskLabels(Integer taskId, Set<String> labels) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
@@ -176,5 +177,4 @@ public class TaskService {
         Task updatedTask = taskRepository.save(task);
         return taskMapper.apply(updatedTask);
     }
- 
 }

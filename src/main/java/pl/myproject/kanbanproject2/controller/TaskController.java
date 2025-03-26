@@ -9,6 +9,7 @@ import pl.myproject.kanbanproject2.model.Task;
 import pl.myproject.kanbanproject2.service.TaskService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/tasks")
@@ -105,10 +106,11 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @PatchMapping("/{taskId}/labels")
     public ResponseEntity<TaskDTO> updateTaskLabels(
             @PathVariable Integer taskId,
-            @RequestBody List<String> labels) {
+            @RequestBody Set<String> labels) {
         try {
             return ResponseEntity.ok(taskService.updateTaskLabels(taskId, labels));
         } catch (EntityNotFoundException e) {

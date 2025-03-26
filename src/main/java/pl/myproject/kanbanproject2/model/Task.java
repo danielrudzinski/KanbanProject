@@ -28,7 +28,7 @@ public class Task {
     @ElementCollection
     @CollectionTable(name = "task_labels", joinColumns = @JoinColumn(name = "task_id"))
     @jakarta.persistence.Column(name = "label")
-    private List<String> labels;
+    private Set<String> labels;
     @ManyToOne
     @JoinColumn(name = "column_id")
     private Column column;
