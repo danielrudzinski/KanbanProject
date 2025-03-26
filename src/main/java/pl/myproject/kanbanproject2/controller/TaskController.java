@@ -8,6 +8,7 @@ import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.model.Task;
 import pl.myproject.kanbanproject2.service.TaskService;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -116,5 +117,6 @@ public class TaskController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
+
     }
 }

@@ -35,7 +35,7 @@ public class TaskMapper implements Function<Task, TaskDTO> {
                     .collect(java.util.stream.Collectors.toSet());
         }
 
-        List<String> labels = task.getLabels();
+        Set<String> labels = task.getLabels();
 
         return new TaskDTO(
                 task.getId(),

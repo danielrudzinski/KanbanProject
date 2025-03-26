@@ -154,9 +154,10 @@ public class ColumnServiceTest {
 
         // then
         Assertions.assertNotNull(result);
-        Assertions.assertEquals("name", result.name());
-        Assertions.assertEquals("Test User", result.name());
-        Assertions.assertEquals(7, result.wipLimit());
+        Assertions.assertEquals(1, result.id());
+        Assertions.assertEquals("New name", result.name()); // Use the original name from testColumn
+        Assertions.assertEquals(1, result.position()); // Use the original position from testColumn
+        Assertions.assertEquals(1, result.wipLimit()); // Use the original wipLimit from testColumn
 
         Mockito.verify(columnRepository).save(Mockito.any(Column.class));
 
