@@ -101,7 +101,17 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     };
 
     const handleLabelsChange = (updatedLabels) => {
-      setTaskLabels(updatedLabels);
+      const labelsArray = Array.isArray(updatedLabels) ? updatedLabels : [];
+      
+      const uniqueLabels = [...new Set(labelsArray)];
+      
+      if (uniqueLabels.length === labelsArray.length) {
+        setTaskLabels(uniqueLabels);
+        updateTask(task.id, { labels: uniqueLabels }).catch(error => {
+          console.error('Error updating task labels:', error);
+          alert('Wystąpił błąd podczas aktualizacji etykiet');
+        });
+      }
     };
   
     // cancel task description editing

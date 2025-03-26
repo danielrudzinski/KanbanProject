@@ -16,15 +16,25 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
 
   const handleAddLabel = async (labelName) => {
     try {
+      const labelExists = labels.some(existingLabel => 
+        existingLabel.toLowerCase() === labelName.toLowerCase()
+      );
+  
+      if (labelExists) {
+        alert('Ta etykieta została już dodana do zadania');
+        return;
+      }
+  
       await addLabelToTask(taskId, labelName);
       const updatedLabels = [...labels, labelName];
       setLabels(updatedLabels);
       onLabelsChange(updatedLabels);
     } catch (error) {
       console.error('Error adding label:', error);
+      alert('Wystąpił błąd podczas dodawania etykiety');
     }
   };
-
+  
   const handleRemoveLabel = async (labelName) => {
     try {
       await removeLabelFromTask(taskId, labelName);
@@ -33,6 +43,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
       onLabelsChange(updatedLabels);
     } catch (error) {
       console.error('Error removing label:', error);
+      alert('Wystąpił błąd podczas usuwania etykiety');
     }
   };
 
