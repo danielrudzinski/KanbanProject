@@ -136,7 +136,7 @@ public class ColumnServiceTest {
     @Test
     void patchColumnShouldPatchUser() {
         // given
-        ColumnDTO patchColumnDTO = new ColumnDTO(1,"column",1,1,new ArrayList<>());
+        ColumnDTO patchColumnDTO = new ColumnDTO(1, "New name", 1, 1, new ArrayList<>());
 
         Mockito.when(columnRepository.findById(testColumn.getId())).thenReturn(Optional.of(testColumn));
         Mockito.when(columnRepository.save(Mockito.any(Column.class))).thenAnswer(invocation -> {
@@ -146,7 +146,13 @@ public class ColumnServiceTest {
 
         Mockito.when(columnMapper.apply(Mockito.any(Column.class))).thenAnswer(invocation -> {
             Column column = invocation.getArgument(0);
-            return new ColumnDTO(column.getId(),column.getName(),column.getPosition(),column.getWipLimit(),new ArrayList<>());
+            return new ColumnDTO(
+                    column.getId(),
+                    column.getName(),
+                    column.getPosition(),
+                    column.getWipLimit(),
+                    new ArrayList<>()
+            );
         });
 
         // when
@@ -155,12 +161,11 @@ public class ColumnServiceTest {
         // then
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.id());
-        Assertions.assertEquals("New name", result.name()); // Use the original name from testColumn
-        Assertions.assertEquals(1, result.position()); // Use the original position from testColumn
-        Assertions.assertEquals(1, result.wipLimit()); // Use the original wipLimit from testColumn
+        Assertions.assertEquals("New name", result.name()); 
+        Assertions.assertEquals(1, result.position());
+        Assertions.assertEquals(1, result.wipLimit());
 
         Mockito.verify(columnRepository).save(Mockito.any(Column.class));
-
     }
 
 
