@@ -434,32 +434,24 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     <>
       <div className="task-details-overlay" onClick={onClose} />
       <div className="task-details-panel" ref={panelRef}>
-        <div className="panel-header">
-          <h3>{task.title}</h3>
-          <div className="panel-actions">
-            <button 
-              className="assign-user-icon" 
-              onClick={() => setShowAssignForm(!showAssignForm)}
-              title="Przypisz użytkownika"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </button>
-            <button className="close-panel-btn" onClick={onClose}>×</button>
-          </div>
+      {/* Header */}
+      <div className="panel-header">
+        <h3>{task.title}</h3>
+        <div className="panel-actions">
+          <button 
+            className="assign-user-icon" 
+            onClick={() => setShowAssignForm(!showAssignForm)}
+            title="Przypisz użytkownika"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </button>
+          <button className="close-panel-btn" onClick={onClose}>×</button>
         </div>
-
-        {/* TaskLabels section*/}
-        <div className="task-labels-section">
-          <h4>Etykiety</h4>
-          <TaskLabels
-            taskId={task.id}
-            initialLabels={taskLabels}
-            onLabelsChange={handleLabelsChange}
-          />
-        </div>
+      </div>
           
+      <div className="task-details-main">
           {/* Task Description Section */}
           <div className="task-description-section">
           <div className="description-header">
@@ -736,6 +728,15 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
             </div>
           </div>
         )}
+        </div>
+        <div className="task-labels-section">
+        <h4>Etykiety</h4>
+        <TaskLabels
+          taskId={task.id}
+          initialLabels={taskLabels}
+          onLabelsChange={handleLabelsChange}
+        />
+        </div>
   
         {success && (
           <div className="success-message">
