@@ -119,20 +119,38 @@ public class ColumnServiceTest {
     }
     @Test
     void addColumnShouldAddColumn() {
-        //given
-        Mockito.when(columnRepository.save(testColumn)).thenReturn(testColumn);
-        //when
-        Column result = columnService.addNewColumn(testColumn);
-        //then
+        // given
+        Column newColumn = new Column();
+        newColumn.setName("name");
+        newColumn.setId(1);
+        newColumn.setPosition(null);
+        newColumn.setWipLimit(1);
+
+        Column savedColumn = new Column();
+        savedColumn.setId(1);
+        savedColumn.setName("name");
+        savedColumn.setPosition(2);
+        savedColumn.setWipLimit(1);
+
+        // Mockowanie liczby kolumn w repozytorium
+        Mockito.when(columnRepository.count()).thenReturn(1L);
+        Mockito.when(columnRepository.save(Mockito.any(Column.class))).thenReturn(savedColumn);
+
+        // when
+        Column result = columnService.addNewColumn(newColumn);
+
         // then
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(testColumn.getId(), result.getId());
-        Assertions.assertEquals(testColumn.getName(), result.getName());
-        Assertions.assertEquals(testColumn.getTasks(), result.getTasks());
-        Assertions.assertEquals(testColumn.getWipLimit(), result.getWipLimit());
-        Assertions.assertEquals(testColumn.getPosition(), result.getPosition());
-        Mockito.verify(columnRepository).save(testColumn);
+        Assertions.assertEquals(savedColumn.getId(), result.getId());
+        Assertions.assertEquals(savedColumn.getName(), result.getName());
+        Assertions.assertEquals(savedColumn.getWipLimit(), result.getWipLimit());
+        Assertions.assertEquals(savedColumn.getPosition(), result.getPosition());
+
+        // Weryfikacja interakcji z repozytorium
+        Mockito.verify(columnRepository).count();
+        Mockito.verify(columnRepository).save(Mockito.any(Column.class));
     }
+
     @Test
     void patchColumnShouldPatchUser() {
         // given
@@ -161,12 +179,57 @@ public class ColumnServiceTest {
         // then
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.id());
-        Assertions.assertEquals("New name", result.name()); 
+        Assertions.assertEquals("New name", result.name());
         Assertions.assertEquals(1, result.position());
         Assertions.assertEquals(1, result.wipLimit());
 
         Mockito.verify(columnRepository).save(Mockito.any(Column.class));
     }
+    @Test
+    void updateColumnPositionShouldUpdatePosition() {
+        // given
+        int newPosition = 3;
 
+        Mockito.when(columnRepository.findById(testColumn.getId())).thenReturn(Optional.of(testColumn));
+        Mockito.when(columnRepository.save(Mockito.any(Column.class))).thenAnswer(invocation -> {
+            Column savedColumn = invocation.getArgument(0);
+            savedColumn.setPosition(newPosition);
+            return savedColumn;
+        });
+        Mockito.when(columnMapper.apply(Mockito.any(Column.class))).thenAnswer(invocation -> {
+            Column column = invocation.getArgument(0);
+            return new ColumnDTO(column.getId(), column.getName(), column.getPosition(), column.getWipLimit(), new ArrayList<>());
+        });
+
+        // when
+        ColumnDTO result = columnService.updateColumnPosition(testColumn.getId(), newPosition);
+
+        // then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(testColumn.getId(), result.id());
+        Assertions.assertEquals(newPosition, result.position());
+        Assertions.assertEquals(testColumn.getWipLimit(), result.wipLimit());
+        Assertions.assertEquals(testColumn.getName(), result.name());
+
+        Mockito.verify(columnRepository).findById(testColumn.getId());
+        Mockito.verify(columnRepository).save(Mockito.any(Column.class));
+        Mockito.verify(columnMapper).apply(Mockito.any(Column.class));
+    }
+
+    @Test
+    void updateColumnPositionShouldThrowExceptionWhenColumnNotFound() {
+        // given
+        int columnId = 99;
+        int newPosition = 5;
+
+        Mockito.when(columnRepository.findById(columnId)).thenReturn(Optional.empty());
+
+        // when & then
+        Assertions.assertThrows(EntityNotFoundException.class, () -> columnService.updateColumnPosition(columnId, newPosition));
+
+        Mockito.verify(columnRepository).findById(columnId);
+        Mockito.verify(columnRepository, Mockito.never()).save(Mockito.any(Column.class));
+        Mockito.verify(columnMapper, Mockito.never()).apply(Mockito.any(Column.class));
+    }
 
 }
