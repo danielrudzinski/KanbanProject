@@ -10,25 +10,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.web.ServletTestExecutionListener;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponents;
-import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.dto.UserDTO;
 import pl.myproject.kanbanproject2.mapper.UserMapper;
 import pl.myproject.kanbanproject2.model.FileEntity;
 import pl.myproject.kanbanproject2.model.User;
 import pl.myproject.kanbanproject2.repository.FileRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
-
-import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.util.*;
-
-import org.mockito.MockedStatic;
-import java.net.URI;
-
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {

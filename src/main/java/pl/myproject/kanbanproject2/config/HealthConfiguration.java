@@ -1,4 +1,4 @@
-package pl.myproject.kanbanproject2.config;
+/*package pl.myproject.kanbanproject2.config;
 
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -14,4 +14,4 @@ public class HealthConfiguration implements HealthIndicator {
                 .withDetail("status", "running")
                 .build();
     }
-}
+}*/
