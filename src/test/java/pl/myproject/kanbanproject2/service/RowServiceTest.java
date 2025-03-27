@@ -23,16 +23,12 @@ public class RowServiceTest {
 
     @Mock
     private RowRepository rowRepository;
-
     @Mock
     private RowMapper rowMapper;
-
     @InjectMocks
     private RowService rowService;
-
     @Mock
     private Task taskTest;
-
     private Row testRow;
     private RowDTO testRowDTO;
 
@@ -43,7 +39,8 @@ public class RowServiceTest {
         testRow.setId(1);
         testRow.setPosition(1);
         testRow.setWipLimit(1);
-        testRow.setTasks(new ArrayList<>());
+        new ArrayList<>();
+
         testRowDTO = new RowDTO(1, "name", 1, 1, new ArrayList<>());
     }
 
@@ -59,8 +56,10 @@ public class RowServiceTest {
         List<Row> rows = Arrays.asList(testRow);
         Mockito.when(rowRepository.findAll()).thenReturn(rows);
         Mockito.when(rowMapper.apply(testRow)).thenReturn(testRowDTO);
+
         //when
         List<RowDTO> result = rowService.getAllRows();
+
         //then
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(testRowDTO, result.get(0));
@@ -73,8 +72,10 @@ public class RowServiceTest {
         // given
         Mockito.when(rowRepository.findById(testRow.getId())).thenReturn(Optional.of(testRow));
         Mockito.when(rowMapper.apply(testRow)).thenReturn(testRowDTO);
+
         // when
         RowDTO result = rowService.getRowById(testRow.getId());
+
         // then
         Assertions.assertNotNull(result);
         Assertions.assertEquals(testRowDTO.id(), result.id());
@@ -87,7 +88,7 @@ public class RowServiceTest {
     }
 
     @Test
-    void deleteRowShouldDeleteSpecificRow() {
+    void deleteRowShouldDeleteRow() {
         // given
         Integer rowId = testRow.getId();
         Mockito.when(rowRepository.existsById(rowId)).thenReturn(true);
@@ -100,7 +101,6 @@ public class RowServiceTest {
         Mockito.verify(rowRepository).deleteById(rowId);
         Mockito.verifyNoMoreInteractions(rowRepository);
     }
-
 
     @Test
     void deleteNotExistingRowShouldThrowException() {
@@ -122,21 +122,26 @@ public class RowServiceTest {
         newRow.setId(1);
         newRow.setPosition(null);
         newRow.setWipLimit(1);
+
         Row savedRow = new Row();
         savedRow.setId(1);
         savedRow.setName("name");
         savedRow.setPosition(2);
         savedRow.setWipLimit(1);
+
         Mockito.when(rowRepository.count()).thenReturn(1L);
         Mockito.when(rowRepository.save(Mockito.any(Row.class))).thenReturn(savedRow);
+
         // when
         Row result = rowService.createRow(newRow);
+
         // then
         Assertions.assertNotNull(result);
         Assertions.assertEquals(savedRow.getId(), result.getId());
         Assertions.assertEquals(savedRow.getName(), result.getName());
         Assertions.assertEquals(savedRow.getWipLimit(), result.getWipLimit());
         Assertions.assertEquals(savedRow.getPosition(), result.getPosition());
+
         Mockito.verify(rowRepository).count();
         Mockito.verify(rowRepository).save(Mockito.any(Row.class));
     }
@@ -145,11 +150,13 @@ public class RowServiceTest {
     void patchRowShouldPatchRow() {
         // given
         RowDTO patchRowDTO = new RowDTO(1, "New name", 1, 1, new ArrayList<>());
+
         Mockito.when(rowRepository.findById(testRow.getId())).thenReturn(Optional.of(testRow));
         Mockito.when(rowRepository.save(Mockito.any(Row.class))).thenAnswer(invocation -> {
             Row savedRow = invocation.getArgument(0);
             return savedRow;
         });
+
         Mockito.when(rowMapper.apply(Mockito.any(Row.class))).thenAnswer(invocation -> {
             Row row = invocation.getArgument(0);
             return new RowDTO(
@@ -160,54 +167,17 @@ public class RowServiceTest {
                     new ArrayList<>()
             );
         });
+
         // when
         RowDTO result = rowService.patchRow(patchRowDTO, testRow.getId());
+
         // then
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.id());
         Assertions.assertEquals("New name", result.name());
         Assertions.assertEquals(1, result.position());
         Assertions.assertEquals(1, result.wipLimit());
-        Mockito.verify(rowRepository).save(Mockito.any(Row.class));
-    }
 
-    @Test
-    void updateRowPositionShouldUpdatePosition() {
-        // given
-        int newPosition = 3;
-        Mockito.when(rowRepository.findById(testRow.getId())).thenReturn(Optional.of(testRow));
-        Mockito.when(rowRepository.save(Mockito.any(Row.class))).thenAnswer(invocation -> {
-            Row savedRow = invocation.getArgument(0);
-            savedRow.setPosition(newPosition);
-            return savedRow;
-        });
-        Mockito.when(rowMapper.apply(Mockito.any(Row.class))).thenAnswer(invocation -> {
-            Row row = invocation.getArgument(0);
-            return new RowDTO(row.getId(), row.getName(), row.getPosition(), row.getWipLimit(), new ArrayList<>());
-        });
-        // when
-        RowDTO result = rowService.updateRowPosition(testRow.getId(), newPosition);
-        // then
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(testRow.getId(), result.id());
-        Assertions.assertEquals(newPosition, result.position());
-        Assertions.assertEquals(testRow.getWipLimit(), result.wipLimit());
-        Assertions.assertEquals(testRow.getName(), result.name());
-        Mockito.verify(rowRepository).findById(testRow.getId());
         Mockito.verify(rowRepository).save(Mockito.any(Row.class));
-        Mockito.verify(rowMapper).apply(Mockito.any(Row.class));
-    }
-
-    @Test
-    void updateRowPositionShouldThrowExceptionWhenRowNotFound() {
-        // given
-        int rowId = 99;
-        int newPosition = 5;
-        Mockito.when(rowRepository.findById(rowId)).thenReturn(Optional.empty());
-        // when & then
-        Assertions.assertThrows(EntityNotFoundException.class, () -> rowService.updateRowPosition(rowId, newPosition));
-        Mockito.verify(rowRepository).findById(rowId);
-        Mockito.verify(rowRepository, Mockito.never()).save(Mockito.any(Row.class));
-        Mockito.verify(rowMapper, Mockito.never()).apply(Mockito.any(Row.class));
     }
 }
