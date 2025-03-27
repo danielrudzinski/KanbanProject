@@ -61,29 +61,11 @@ public class RowService {
         return rowMapper.apply(updatedRow);
     }
 
-    public void deleteRow(Integer id) {
-        if (!rowRepository.existsById(id)) {
-            throw new EntityNotFoundException("Nie ma wiersza o takim ID");
+    public void deleteRow(Integer id){
+        if(!rowRepository.existsById(id)){
+            throw new EntityNotFoundException("Nie ma kolumny o takim id");
         }
-
-        try {
-            Row rowToDelete = rowRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Nie ma wiersza o takim ID"));
-
-            if (rowToDelete.getTasks() != null) {
-                List<Task> tasksToUpdate = new ArrayList<>(rowToDelete.getTasks());
-                for (Task task : tasksToUpdate) {
-                    task.setRow(null);
-                    taskRepository.save(task);
-                }
-                rowToDelete.setTasks(new ArrayList<>());
-                rowRepository.save(rowToDelete);
-            }
-
-            rowRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException("Błąd podczas usuwania wiersza: " + e.getMessage());
-        }
+        rowRepository.deleteById(id);
     }
 
 
