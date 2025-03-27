@@ -29,10 +29,7 @@ public class ColumnServiceTest {
     @InjectMocks
     private ColumnService columnService;
     @Mock
-    private ServletUriComponentsBuilder servletUriComponentsBuilder;
-    @Mock
     private Task taskTest;
-
     private Column testColumn;
     private ColumnDTO testColumnDTO;
 
@@ -94,17 +91,18 @@ public class ColumnServiceTest {
         Mockito.verify(columnMapper).apply(testColumn);
     }
     @Test
-    void deleteColumnsShouldDeleteAllColumns() {
-        //given
-        Mockito.when(columnRepository.existsById(testColumn.getId())).thenReturn(true);
-        //when
-        columnService.deleteColumn(testColumn.getId());
-        //then
-        Mockito.verify(columnRepository).existsById(testColumn.getId());
-        Mockito.verify(columnRepository).deleteById(testColumn.getId());
+    void deleteColumnShouldDeleteColumn() {
+        // given
+        Integer rowId = testColumn.getId();
+        Mockito.when(columnRepository.existsById(rowId)).thenReturn(true);
 
+        // when
+        columnService.deleteColumn(rowId);
 
-
+        // then
+        Mockito.verify(columnRepository).existsById(rowId);
+        Mockito.verify(columnRepository).deleteById(rowId);
+        Mockito.verifyNoMoreInteractions(columnRepository);
     }
     @Test
     void deleteNotExistingColumnShouldThrowException() {
