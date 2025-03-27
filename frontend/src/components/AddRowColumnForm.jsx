@@ -8,13 +8,13 @@ function AddRowColumnForm({ onClose }) {
   const [wipLimit, setWipLimit] = useState('0');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [itemType, setItemType] = useState('column'); // Default to column
+  const [activeTab, setActiveTab] = useState('column'); // Default to column
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!name.trim()) {
-      setError(`Nazwa ${itemType === 'column' ? 'kolumny' : 'wiersza'} jest wymagana!`);
+      setError(`Nazwa ${activeTab === 'column' ? 'kolumny' : 'wiersza'} jest wymagana!`);
       return;
     }
 
@@ -22,7 +22,7 @@ function AddRowColumnForm({ onClose }) {
       setIsSubmitting(true);
       setError(null);
 
-      if (itemType === 'column') {
+      if (activeTab === 'column') {
         await addColumn(name, wipLimit);
       } else {
         await addRow(name, parseInt(wipLimit) || 0);
@@ -35,10 +35,18 @@ function AddRowColumnForm({ onClose }) {
       // Close form after successful submission
       if (onClose) onClose();
     } catch (err) {
-      setError(err.message || `Wystąpił błąd podczas dodawania ${itemType === 'column' ? 'kolumny' : 'wiersza'}`);
+      setError(err.message || `Wystąpił błąd podczas dodawania ${activeTab === 'column' ? 'kolumny' : 'wiersza'}`);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Switch between column and row tabs
+  const switchTab = (tab) => {
+    setActiveTab(tab);
+    setName('');
+    setWipLimit('0');
+    setError(null);
   };
 
   return (
@@ -48,7 +56,7 @@ function AddRowColumnForm({ onClose }) {
           <h3>Dodaj nowy wiersz/kolumnę</h3>
           <button 
             type="button" 
-            className="close-button" 
+            className="close-form-btn" 
             onClick={onClose}
             aria-label="Zamknij formularz"
           >
@@ -56,46 +64,35 @@ function AddRowColumnForm({ onClose }) {
           </button>
         </div>
         
+        <div className="tab-container">
+          <button 
+            type="button" 
+            className={`tab-btn ${activeTab === 'column' ? 'active' : ''}`}
+            onClick={() => switchTab('column')}
+          >
+            Kolumny
+          </button>
+          <button 
+            type="button" 
+            className={`tab-btn ${activeTab === 'row' ? 'active' : ''}`}
+            onClick={() => switchTab('row')}
+          >
+            Wiersze
+          </button>
+        </div>
+        
         {error && <div className="error-message">{error}</div>}
         
         <div className="form-group">
-          <label>Wybierz typ:</label>
-          <div className="radio-group">
-            <label>
-              <input
-                type="radio"
-                name="itemType"
-                value="column"
-                checked={itemType === 'column'}
-                onChange={() => setItemType('column')}
-                disabled={isSubmitting}
-              />
-              Kolumna
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="itemType"
-                value="row"
-                checked={itemType === 'row'}
-                onChange={() => setItemType('row')}
-                disabled={isSubmitting}
-              />
-              Wiersz
-            </label>
-          </div>
-        </div>
-        
-        <div className="form-group">
           <label htmlFor="item-name">
-            Nazwa {itemType === 'column' ? 'kolumny' : 'wiersza'}:
+            Nazwa {activeTab === 'column' ? 'kolumny' : 'wiersza'}:
           </label>
           <input
             id="item-name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder={itemType === 'column' ? 'np. To Do' : 'np. Cechy, Funkcje, Projekty'}
+            placeholder={activeTab === 'column' ? 'np. To Do' : 'np. Cechy, Funkcje, Projekty'}
             disabled={isSubmitting}
           />
         </div>
@@ -120,7 +117,7 @@ function AddRowColumnForm({ onClose }) {
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Dodawanie...' : `Dodaj ${itemType === 'column' ? 'kolumnę' : 'wiersz'}`}
+            {isSubmitting ? 'Dodawanie...' : `Dodaj ${activeTab === 'column' ? 'kolumnę' : 'wiersz'}`}
           </button>
           <button 
             type="button" 
