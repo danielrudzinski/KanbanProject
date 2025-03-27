@@ -18,10 +18,10 @@ function Bench() {
       const allUsers = await fetchUsers();
       setUsers(allUsers);
       
-      // Initialize WIP limits from data
+      // Initialize WIP limits from data, default to Unlimited (null)
       const initialWipLimits = {};
       allUsers.forEach(user => {
-        initialWipLimits[user.id] = user.wipLimit || 3; // Default to 3 if not set
+        initialWipLimits[user.id] = user.wipLimit || null; 
       });
       setWipLimits(initialWipLimits);
       
@@ -84,9 +84,10 @@ function Bench() {
 
   // Handle WIP limit change
   const handleWipLimitChange = (userId, value) => {
+    // Allow setting to null (Unlimited) or a positive number
     setWipLimits({
       ...wipLimits,
-      [userId]: parseInt(value) || 0
+      [userId]: value === '' ? null : parseInt(value)
     });
   };
 
@@ -121,7 +122,7 @@ function Bench() {
     // Reset to original value
     setWipLimits({
       ...wipLimits,
-      [userId]: users.find(u => u.id === userId).wipLimit || 3
+      [userId]: users.find(u => u.id === userId).wipLimit || null
     });
     
     // Exit edit mode
@@ -192,9 +193,9 @@ function Bench() {
                     <div className="wip-limit-editor">
                       <input 
                         type="number" 
-                        min="1" 
-                        max="10"
-                        value={wipLimits[user.id] || 3} 
+                        min="1"
+                        value={wipLimits[user.id] || ''} 
+                        placeholder="Unlimited"
                         onChange={(e) => handleWipLimitChange(user.id, e.target.value)}
                         onClick={(e) => e.stopPropagation()}
                       />
@@ -227,7 +228,7 @@ function Bench() {
                         startEditWipLimit(user.id);
                       }}
                     >
-                      <span>WIP Limit: {user.wipLimit || 3}</span>
+                      <span>WIP Limit: {user.wipLimit ? user.wipLimit : 'Unlimited'}</span>
                       <button 
                         className="edit-wip-btn" 
                         title="Edytuj limit WIP"
@@ -238,8 +239,8 @@ function Bench() {
                   )}
                 </div>
                 {user.taskCount && (
-                  <div className={`user-task-count ${(user.taskCount >= (user.wipLimit || 3)) ? 'limit-reached' : ''}`}>
-                    Zadania: {user.taskCount}/{user.wipLimit || 3}
+                  <div className={`user-task-count ${(user.taskCount >= (user.wipLimit || Infinity)) ? 'limit-reached' : ''}`}>
+                    Zadania: {user.taskCount}/{user.wipLimit || 'Unlimited'}
                   </div>
                 )}
               </div>
