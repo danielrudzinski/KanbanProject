@@ -14,12 +14,12 @@ WORKDIR /app
 COPY --from=frontend-build /frontend/dist/ /app/src/main/resources/static/
 
 # Copy the backend source code and build files
-COPY pom.xml ./
-COPY src ./src/
+COPY backend/pom.xml ./
+COPY backend/src ./src/
     
 # Build and run the application
-COPY mvnw ./
-COPY .mvn ./.mvn/
+COPY backend/mvnw ./
+COPY backend/.mvn ./.mvn/
 RUN chmod +x mvnw
 RUN ./mvnw package -DskipTests
 EXPOSE 8080

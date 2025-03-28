@@ -35,8 +35,4 @@ build/
 hs_err_pid14848.log
 *.log
 /frontend/.vite
-<<<<<<< Updated upstream
-=======
-.env
->>>>>>> Stashed changes
-
+/backend/.mvn
