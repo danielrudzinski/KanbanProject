@@ -30,6 +30,7 @@
 - [🧪 Testing](#-testing)
 - [❓ Troubleshooting & FAQ](#-troubleshooting--faq)
 - [👥 Contributing](#-contributing)
+- [👨‍💻 Authors](#-authors)
 - [📄 License](#-license)
 
 ## 📋 Overview
@@ -187,6 +188,13 @@ The coverage report will be available at site>jacoco>index.html
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## 👨‍💻 Authors
+
+- **Daniel Rudziński** - ** - [GitHub Profile](https://github.com/danielrudzinski)
+- **Dominik Smoliński** - ** - [GitHub Profile](https://github.com/dominiksmolinski3)
+
+*Want to be added to this list? Check the [Contributing](#-contributing) section!*
 
 ## 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
