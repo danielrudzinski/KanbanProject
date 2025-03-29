@@ -1,0 +1,181 @@
+.task-labels {
+    position: relative;
+  }
+  
+  .labels-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  
+  .label {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin: 0 4px 4px 0;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .remove-label-button {
+    margin-left: 4px;
+    border: none;
+    background: none;
+    color: white;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+  
+  .add-label-button {
+    border: 1px dashed #76777c;
+    background: none;
+    cursor: pointer;
+    padding: 2px 8px;
+    font-size: 12px;
+    border-radius: 12px;
+    margin-right: 4px;
+  }
+  
+  .label-picker {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    min-width: 200px;
+  }
+  
+  .label-picker-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+  
+  .label-option {
+    padding: 4px 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .label-option:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  
+  .color-dot.custom {
+    border: 1px dashed #ccc;
+    background: transparent;
+  }
+  
+  .custom-label-option {
+    padding: 4px 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+  }
+  
+  .custom-label-form {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+  }
+  
+  .form-group {
+    margin-bottom: 8px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .form-group input[type="text"] {
+    width: 100%;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  .form-group input[type="color"] {
+    width: 100%;
+    height: 30px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .add-button {
+    padding: 6px 12px;
+    background-color: #86d6ff;
+    color: #0e1b36;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .add-button.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .cancel-button {
+    padding: 6px 12px;
+    background-color: #e2e2e2;
+    color: #0e1b36;
+    border: 1px solid #76777c;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .task-details-panel {
+    z-index: 1000;
+  }
+  
+  .label-picker {
+    z-index: 2000;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    min-width: 200px;
+  }
+
+  .animated {
+    animation-duration: 0.2s;
+    animation-fill-mode: both;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  .fadeIn {
+    animation-name: fadeIn;
+  }

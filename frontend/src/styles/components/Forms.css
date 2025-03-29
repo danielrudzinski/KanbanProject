@@ -80,59 +80,6 @@ html.dark .form-header h3 {
   border-radius: 2px;
 }
 
-.close-form-btn {
-  background: none;
-  border: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  cursor: pointer;
-  color: #76777c;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-html.dark .close-form-btn {
-  color: #9ca3af;
-}
-
-.close-form-btn:hover {
-  background-color: rgba(134, 214, 255, 0.1);
-  color: #0e1b36;
-  transform: rotate(90deg);
-}
-
-html.dark .close-form-btn:hover {
-  background-color: rgba(58, 134, 255, 0.2);
-  color: #f0f4f8;
-}
-
-.close-form-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(134, 214, 255, 0.2) 0%, transparent 70%);
-  opacity: 0;
-  transform: scale(0.5);
-  transition: all 0.3s ease;
-}
-
-html.dark .close-form-btn::before {
-  background: radial-gradient(circle, rgba(58, 134, 255, 0.3) 0%, transparent 70%);
-}
-
-.close-form-btn:hover::before {
-  opacity: 1;
-  transform: scale(1.2);
-}
-
 /* Form Group */
 .form-group {
   margin-bottom: 20px;
@@ -621,19 +568,6 @@ html.dark .modal-overlay {
   
   html:not(.light) .form-header h3 {
     color: #f0f4f8;
-  }
-  
-  html:not(.light) .close-form-btn {
-    color: #9ca3af;
-  }
-  
-  html:not(.light) .close-form-btn:hover {
-    background-color: rgba(58, 134, 255, 0.2);
-    color: #f0f4f8;
-  }
-  
-  html:not(.light) .close-form-btn::before {
-    background: radial-gradient(circle, rgba(58, 134, 255, 0.3) 0%, transparent 70%);
   }
   
   html:not(.light) .form-group label {
