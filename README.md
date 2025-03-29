@@ -113,7 +113,7 @@ cd backend
 3. Build and run the backend:
 
 ```bash
-./mvnw clean install
+./mvnw clean package
 ./mvnw spring-boot:run
 ```
 
