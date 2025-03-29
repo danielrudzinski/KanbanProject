@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import pl.myproject.kanbanproject2.model.FileEntity;
+import pl.myproject.kanbanproject2.model.File;
 import pl.myproject.kanbanproject2.repository.FileRepository;
 
 import java.io.IOException;
@@ -17,8 +17,8 @@ public class FileService {
         this.fileRepository = fileRepository;
     }
 
-    public FileEntity saveFile(MultipartFile file) throws IOException {
-        FileEntity fileEntity = new FileEntity(
+    public File saveFile(MultipartFile file) throws IOException {
+        File fileEntity = new File(
                 file.getOriginalFilename(),
                 file.getContentType(),
                 file.getBytes()
@@ -26,7 +26,7 @@ public class FileService {
         return fileRepository.save(fileEntity);
     }
 
-    public FileEntity getFile(Long id) {
+    public File getFile(Long id) {
         return fileRepository.findById(id).orElseThrow(() -> new RuntimeException("File not found"));
     }
     public void deleteFile(Long id) {

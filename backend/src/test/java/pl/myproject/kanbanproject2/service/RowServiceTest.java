@@ -10,8 +10,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.myproject.kanbanproject2.dto.ColumnDTO;
 import pl.myproject.kanbanproject2.dto.RowDTO;
 import pl.myproject.kanbanproject2.mapper.RowMapper;
+import pl.myproject.kanbanproject2.model.Column;
 import pl.myproject.kanbanproject2.model.Row;
 import pl.myproject.kanbanproject2.model.Task;
 import pl.myproject.kanbanproject2.repository.RowRepository;
@@ -179,5 +181,51 @@ public class RowServiceTest {
         Assertions.assertEquals(1, result.wipLimit());
 
         Mockito.verify(rowRepository).save(Mockito.any(Row.class));
+    }
+    @Test
+    void updateRowPositionShouldUpdatePosition() {
+        // given
+        int newPosition = 3;
+
+        Mockito.when(rowRepository.findById(testRow.getId())).thenReturn(Optional.of(testRow));
+        Mockito.when(rowRepository.save(Mockito.any(Row.class))).thenAnswer(invocation -> {
+            Row savedRow = invocation.getArgument(0);
+            savedRow.setPosition(newPosition);
+            return savedRow;
+        });
+        Mockito.when(rowMapper.apply(Mockito.any(Row.class))).thenAnswer(invocation -> {
+            Row row = invocation.getArgument(0);
+            return new RowDTO(row.getId(), row.getName(), row.getPosition(), row.getWipLimit(), new ArrayList<>());
+        });
+
+        // when
+        RowDTO result = rowService.updateRowPosition(testRow.getId(), newPosition);
+
+        // then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(testRow.getId(), result.id());
+        Assertions.assertEquals(newPosition, result.position());
+        Assertions.assertEquals(testRow.getWipLimit(), result.wipLimit());
+        Assertions.assertEquals(testRow.getName(), result.name());
+
+        Mockito.verify(rowRepository).findById(testRow.getId());
+        Mockito.verify(rowRepository).save(Mockito.any(Row.class));
+        Mockito.verify(rowMapper).apply(Mockito.any(Row.class));
+    }
+
+    @Test
+    void updateRowPositionShouldThrowExceptionWhenRowNotFound() {
+        // given
+        int rowId = 99;
+        int newPosition = 5;
+
+        Mockito.when(rowRepository.findById(rowId)).thenReturn(Optional.empty());
+
+        // when & then
+        Assertions.assertThrows(EntityNotFoundException.class, () -> rowService.updateRowPosition(rowId, newPosition));
+
+        Mockito.verify(rowRepository).findById(rowId);
+        Mockito.verify(rowRepository, Mockito.never()).save(Mockito.any(Row.class));
+        Mockito.verify(rowMapper, Mockito.never()).apply(Mockito.any(Row.class));
     }
 }

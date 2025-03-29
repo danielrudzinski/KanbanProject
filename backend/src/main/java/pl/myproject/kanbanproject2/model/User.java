@@ -1,6 +1,5 @@
 package pl.myproject.kanbanproject2.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,6 +29,6 @@ public class User {
     private Set<Task> tasks = new HashSet<>();
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "avatar_id")
-    private FileEntity avatar;
+    private File avatar;
 
 }

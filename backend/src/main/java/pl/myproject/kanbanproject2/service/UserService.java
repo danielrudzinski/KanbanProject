@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.myproject.kanbanproject2.dto.UserDTO;
 import pl.myproject.kanbanproject2.mapper.UserMapper;
-import pl.myproject.kanbanproject2.model.FileEntity;
+import pl.myproject.kanbanproject2.model.File;
 import pl.myproject.kanbanproject2.model.User;
 import pl.myproject.kanbanproject2.repository.FileRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
@@ -94,7 +94,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
         try {
-            FileEntity avatar = new FileEntity();
+            File avatar = new File();
             avatar.setName(file.getOriginalFilename());
             avatar.setType(file.getContentType());
             avatar.setData(file.getBytes());
@@ -137,7 +137,7 @@ public class UserService {
             throw new EntityNotFoundException("Użytkownik nie posiada avatara");
         }
 
-        FileEntity avatar = user.getAvatar();
+        File avatar = user.getAvatar();
         user.setAvatar(null);
         userRepository.save(user);
         fileRepository.delete(avatar);

@@ -3,7 +3,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "files")
-public class FileEntity {
+public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -14,9 +14,9 @@ public class FileEntity {
     @Lob // Pole przechowujące plik jako bajty
     private byte[] data;
 
-    public FileEntity() {}
+    public File() {}
 
-    public FileEntity(String name, String type, byte[] data) {
+    public File(String name, String type, byte[] data) {
         this.name = name;
         this.type = type;
         this.data = data;

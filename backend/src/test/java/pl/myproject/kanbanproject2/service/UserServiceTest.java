@@ -12,7 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pl.myproject.kanbanproject2.dto.UserDTO;
 import pl.myproject.kanbanproject2.mapper.UserMapper;
-import pl.myproject.kanbanproject2.model.FileEntity;
+import pl.myproject.kanbanproject2.model.File;
 import pl.myproject.kanbanproject2.model.User;
 import pl.myproject.kanbanproject2.repository.FileRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
@@ -33,7 +33,7 @@ public class UserServiceTest {
 
     private User testUser;
     private UserDTO testUserDTO;
-    private FileEntity testAvatar;
+    private File testAvatar;
 
     @BeforeEach
     void setUp() {
@@ -45,7 +45,7 @@ public class UserServiceTest {
         testUser.setWipLimit(5);
         testUser.setTasks(new HashSet<>());
 
-        testAvatar = new FileEntity();
+        testAvatar = new File();
         testAvatar.setId(1L);
         testAvatar.setName("avatar.jpg");
         testAvatar.setType("image/jpeg");
