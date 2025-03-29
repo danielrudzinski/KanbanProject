@@ -170,14 +170,15 @@ To run tests (from root folder):
 
 ``` bash
 cd backend
-./mvnw test
+./mvn test
 ```
 
 To generate a test coverage report:
 ```bash
-./mvnw verify
+./mvn clean test jacoco:report
+
 ```
-The coverage report will be available at index.html
+The coverage report will be available at site>jacoco>index.html
 
 ## 👥 Contributing
 
