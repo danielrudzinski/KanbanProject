@@ -1,0 +1,191 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/danielrudzinski/KanbanProject/main/frontend/public/kanban-logo.png" alt="KanbanProject Logo" width="200"/>
+</p>
+
+<h1 align="center">KanbanProject</h1>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version 1.0.0"/>
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License MIT"/>
+  <img src="https://img.shields.io/badge/java-23-orange" alt="Java 23"/>
+  <img src="https://img.shields.io/badge/react-latest-61DAFB" alt="React"/>
+</p>
+
+<p align="center">
+  A flexible Kanban board application designed to help teams visualize and manage their workflow efficiently. This project provides an interactive drag-and-drop interface for task management with support for multiple views, columns, rows, and WIP limits.
+</p>
+
+## 📋 Table of Contents
+
+- [📋 Overview](#-overview)
+- [✨ Features](#-features)
+- [🛠️ Technologies](#️-technologies)
+- [📦 Prerequisites](#-prerequisites)
+- [💻 Installation](#-installation)
+- [🚀 Running the Application](#running-the-application)
+  - [Using Docker](#using-docker)
+  - [Running Locally](#running-locally)
+- [📝 Usage](#-usage)
+- [🏗️ Project Structure](#️-project-structure)
+- [🧪 Testing](#-testing)
+- [❓ Troubleshooting & FAQ](#-troubleshooting--faq)
+- [👥 Contributing](#-contributing)
+- [📄 License](#-license)
+
+## 📋 Overview
+
+KanbanProject is a web-based task management system implementing Kanban methodology. It enables effective task visualization, workflow management, and productivity tracking through an intuitive drag-and-drop interface.
+
+## ✨ Features
+
+- 🔄 Interactive Kanban board with drag-and-drop functionality
+- 📊 Column and row-based work organization
+- ✏️ Task creation, editing, and deletion
+- 📋 Subtask support for breaking down complex tasks
+- ⚠️ Work In Progress (WIP) limits for columns, rows, and users
+- 👤 User assignments to tasks
+- 🏷️ Labels for task categorization
+- 🌙 Dark mode support
+
+## 🛠️ Technologies
+
+- **Backend**: Java 23 with Spring Boot
+- **Frontend**: React.js
+- **Database**: PostgreSQL
+- **Containerization**: Docker
+- **Testing**: JUnit, Mockito, JaCoCo for test coverage
+
+## 📦 Prerequisites
+
+- [Java 23](https://www.oracle.com/java/technologies/downloads/)
+- [Node.js 18](https://nodejs.org/) or higher
+- [npm](https://www.npmjs.com/) or [Yarn](https://yarnpkg.com/)
+- [PostgreSQL](https://www.postgresql.org/) (if running locally)
+- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) (if using containers)
+
+## 💻 Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/danielrudzinski/KanbanProject.git
+cd KanbanProject
+```
+
+## 🚀 Running the Application
+
+### 🐳 Using Docker
+
+The easiest way to run the application is using Docker, which handles all dependencies:
+
+1. Make sure Docker and Docker Compose are installed on your system
+2. From the project root directory, run:
+
+```bash
+docker-compose up -d
+```
+
+3. The application will be available at [http://localhost:8080](http://localhost:8080)
+4. To stop the application:
+
+```bash
+docker-compose down
+```
+
+### 💻 Running Locally
+
+#### Backend
+
+1. Navigate to the backend directory (from root folder):
+
+```bash
+cd backend
+```
+
+2. Configure the database:
+   - Update `src/main/resources/application.properties` with your PostgreSQL connection settings
+   Mainly these four lines (the first ones):
+      - spring.datasource.url= (leave this as it is, except SPRING_DATASOURCE_DB:kanban <- edit this with your db's name)
+      - server.port= (leave as is)
+      - spring.datasource.username= (your login username for postgresql)
+      - spring.datasource.password= (your passowrd for postgresql)
+
+3. Build and run the backend:
+
+```bash
+./mvnw clean install
+./mvnw spring-boot:run
+```
+
+The backend will start on [http://localhost:8080](http://localhost:8080)
+
+#### Frontend
+
+1. Navigate to the frontend directory (from root folder):
+
+```bash
+cd frontend
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Start the frontend application:
+
+```bash
+npm run dev
+```
+
+The frontend will be available at [http://localhost:5173](http://localhost:5173)
+
+## 📝 Usage
+
+1. Create columns representing your workflow stages (e.g., "To Do", "In Progress", "Done")
+2. Add rows for categorizing work types or projects
+3. Create tasks by clicking the "Add Task" button
+4. Drag and drop tasks between columns to update their status
+5. Click on a task to view details, add subtasks, or assign team members
+6. Configure WIP limits for columns to prevent overloading stages
+
+## 🏗️ Project Structure
+
+The project is organized into two main directories:
+
+- `/backend` - Java Spring Boot application
+   - /src/main/java - Java source code
+   - /src/main/resources - config files
+   - /src/test - test classes
+- `/frontend` - React.js web application
+   - /src/components - React components
+   - /src/services - API services
+   - /src/styles - CSS and styling
+
+## 🧪 Testing
+The project uses JUnit and Mockito for unit and integration testing. Test coverage is monitored with JaCoCo.
+
+To run tests (from root folder):
+
+``` bash
+cd backend
+./mvnw test
+```
+
+To generate a test coverage report:
+```bash
+./mvnw verify
+```
+The coverage report will be available at index.html
+
+## 👥 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
