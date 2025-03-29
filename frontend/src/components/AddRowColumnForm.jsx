@@ -56,7 +56,7 @@ function AddRowColumnForm({ onClose }) {
           <h3>Dodaj nowy wiersz/kolumnę</h3>
           <button 
             type="button" 
-            className="close-form-btn" 
+            className="close-button" 
             onClick={onClose}
             aria-label="Zamknij formularz"
           >
