@@ -119,7 +119,7 @@ public class TaskController {
         }
 
     }
-    @GetMapping
+    @GetMapping("/get/all/labels")
     public ResponseEntity<Set<String>> getAllLabels() {
         Set<String> labels = taskService.getAllLabels();
         return ResponseEntity.ok(labels);
