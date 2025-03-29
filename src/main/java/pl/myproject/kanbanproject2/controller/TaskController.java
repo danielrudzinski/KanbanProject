@@ -119,4 +119,9 @@ public class TaskController {
         }
 
     }
+    @GetMapping
+    public ResponseEntity<Set<String>> getAllLabels() {
+        Set<String> labels = taskService.getAllLabels();
+        return ResponseEntity.ok(labels);
+    }
 }

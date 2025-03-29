@@ -177,4 +177,19 @@ public class TaskService {
         Task updatedTask = taskRepository.save(task);
         return taskMapper.apply(updatedTask);
     }
+
+
+    public Set<String> getAllLabels() {
+        try {
+            List<Task> allTasks = taskRepository.findAll();
+            return allTasks.stream()
+                    .filter(task -> task.getLabels() != null)
+                    .flatMap(task -> task.getLabels().stream())
+                    .collect(Collectors.toSet());
+        } catch (Exception e) {
+
+            return new HashSet<>();
+
+        }
+    }
 }
