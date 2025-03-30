@@ -1,4 +1,4 @@
-/*package pl.myproject.kanbanproject2.config;
+package pl.myproject.kanbanproject2.config;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -25,4 +25,4 @@ public class KanbanConfig {
     public String dataSourcePassword() {
         return dotenv.get("SPRING_DATASOURCE_PASSWORD");
     }
-}*/
+}
