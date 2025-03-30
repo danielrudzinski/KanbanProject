@@ -9,6 +9,7 @@
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License MIT"/>
   <img src="https://img.shields.io/badge/java-23-orange" alt="Java 23"/>
   <img src="https://img.shields.io/badge/react-latest-61DAFB" alt="React"/>
+  <img src="https://img.shields.io/github/actions/workflow/status/danielrudzinski/KanbanProject/kanban-ci.yml?branch=main" alt="Build Status"/>
 </p>
 
 <p align="center">
