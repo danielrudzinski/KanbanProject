@@ -30,7 +30,7 @@ jobs:
         cache: maven
 
     - name: Set executable permissions for mvnw
-      run: chmod +x ./mvnw
+      run: chmod +x backend/mvnw
         
     - name: Build and test backend
       run: |
