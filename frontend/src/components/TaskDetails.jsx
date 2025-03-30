@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { createPortal } from 'react-dom';
 import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask } from '../services/api';
@@ -32,7 +32,8 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const descriptionInputRef = useRef(null);
   const taskDescriptionInputRef = useRef(null);
   
-  const loadTaskData = useCallback(async () => {
+  // Update loadTaskData to include subtasks loading
+  const loadTaskData = async () => {
     try {
       const taskData = await fetchTask(task.id);
       const allUsers = await fetchUsers();
@@ -50,7 +51,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
           taskData.userIds.includes(user.id)
         );
         setAssignedUsers(assigned);
-  
+
         const avatarPromises = assigned.map(async (user) => {
           const avatarUrl = await getUserAvatar(user.id);
           if (avatarUrl) {
@@ -60,7 +61,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
             }));
           }
         });
-  
+
         await Promise.all(avatarPromises);
       } else {
         setAssignedUsers([]);
@@ -71,7 +72,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       console.error('Error loading task data:', error);
       setLoading(false);
     }
-  }, [task.id]);
+  };
 
     // save task description
     const saveTaskDescription = async () => {
@@ -394,19 +395,15 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
 
   // Load data when component mounts
   useEffect(() => {
-    const loadData = async () => {
-      await loadTaskData();
-    };
+    loadTaskData();
     
-    loadData();
-    
-    // Cleanup function
+    // Cleanup function to revoke object URLs when component unmounts
     return () => {
       Object.values(avatarPreviews).forEach(url => {
         URL.revokeObjectURL(url);
       });
     };
-  }, [task.id, avatarPreviews, loadTaskData]);
+  }, [task.id]);
 
   // Position panel after it renders
   useEffect(() => {

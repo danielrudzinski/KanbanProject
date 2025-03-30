@@ -39,10 +39,10 @@ function Task({ task, columnId }) {
         }
       });
     }
-
+    
     // Check for unfinished subtasks when component mounts
     checkUnfinishedSubtasks();
-
+  
     // Clean up object URL when component unmounts
     return () => {
       if (avatarUrl && avatarUrl.startsWith('blob:')) {
@@ -52,7 +52,7 @@ function Task({ task, columnId }) {
         clearTimeout(warningTimeoutRef.current);
       }
     };
-  }, [task.userIds, task.id, avatarUrl, checkUnfinishedSubtasks]);
+  }, [task.userIds, task.id, checkUnfinishedSubtasks]);
 
   useEffect(() => {
     const handleSubtaskUpdate = () => {
