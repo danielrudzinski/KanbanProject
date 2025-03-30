@@ -426,6 +426,19 @@ export const updateTaskLabels = async (taskId, labels) => {
   }
 };
 
+export const getAllLabels = async () => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/get/all/labels`);
+    if (!response.ok) {
+      throw new Error(`Error fetching labels: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching all labels:', error);
+    throw error;
+  }
+};
+
 export const deleteTask = async (taskId) => {
   try {
     const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}`, {

@@ -51,8 +51,9 @@ function Bench() {
 
   useEffect(() => {
     loadUsers();
-    
-    // Cleanup function to revoke object URLs when component unmounts
+  }, []);
+
+  useEffect(() => {
     return () => {
       Object.values(avatarPreviews).forEach(url => {
         if (url && url.startsWith('blob:')) {
@@ -60,7 +61,7 @@ function Bench() {
         }
       });
     };
-  }, []);
+  }, [avatarPreviews]);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);

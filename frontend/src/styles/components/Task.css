@@ -520,3 +520,50 @@
   }
 
 }
+
+.task-labels-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-right: 8px;
+  margin-top: 4px;
+}
+
+.task-label-pill {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.label-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.task-label-count {
+  font-size: 10px;
+  background-color: #e2e2e2;
+  color: #0e1b36;
+  border-radius: 8px;
+  padding: 1px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  .task-label-pill {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .task-label-count {
+    background-color: #1a2944;
+    color: #e2e2e2;
+  }
+}

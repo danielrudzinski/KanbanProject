@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import '../styles/components/Users.css';
 
 function UsersManagement() {
@@ -16,8 +16,8 @@ function UsersManagement() {
         URL.revokeObjectURL(url);
       });
     };
-  }, []);
-
+  }, [loadUsers, avatarPreviews]);
+  
   const handleAvatarUpload = async (userId, file) => {
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/jpg'];
@@ -127,7 +127,7 @@ function UsersManagement() {
     );
   };
 
-  const fetchUserAvatar = async (userId) => {
+  const fetchUserAvatar = useCallback(async (userId) => {
     try {
       const response = await fetch(`/users/${userId}/avatar`, {
         headers: {
@@ -146,10 +146,10 @@ function UsersManagement() {
       console.warn(`Failed to load avatar for user ${userId}:`, error);
       return null;
     }
-  };
+  }, []);
 
   // Function to load users from backend
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       const response = await fetch('/users');
       if (!response.ok) {
@@ -175,7 +175,7 @@ function UsersManagement() {
       console.error('Błąd podczas ładowania użytkowników:', error);
       alert('Wystąpił błąd podczas ładowania użytkowników');
     }
-  };
+  }, [fetchUserAvatar]);
 
   // Function to add a new user
   const addUser = () => {

@@ -16,18 +16,9 @@ function Board() {
     dragAndDrop,
     updateColumnName,
     updateRowName,
-    updateTaskName
   } = useKanban();
   
-  const { handleDragOver, handleDrop } = dragAndDrop;
-
-  if (loading) {
-    return <div className="board-loading">Loading kanban board...</div>;
-  }
-
-  if (error) {
-    return <div className="board-error">Error: {error}</div>;
-  }
+  const { handleDragOver } = dragAndDrop;
 
   useEffect(() => {
     // Set CSS variable for column count
@@ -40,6 +31,14 @@ function Board() {
       document.documentElement.style.setProperty('--column-count', 3);
     };
   }, [columns.length, rows.length]);
+
+  if (loading) {
+    return <div className="board-loading">Loading kanban board...</div>;
+  }
+
+  if (error) {
+    return <div className="board-error">Error: {error}</div>;
+  }
 
   // Filter tasks by column and row
   const getTasksByColumnAndRow = (columnId, rowId = null) => {

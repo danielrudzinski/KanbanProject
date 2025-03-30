@@ -9,7 +9,7 @@ function Column({ column, tasks}) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   
-  const { handleDragStart, handleDragOver, handleDrop } = dragAndDrop;
+  const { handleDragOver, handleDrop } = dragAndDrop;
 
   const isOverLimit = column.wipLimit > 0 && tasks.length > column.wipLimit;
 

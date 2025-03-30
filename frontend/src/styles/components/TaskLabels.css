@@ -13,9 +13,112 @@
     border-radius: 12px;
     font-size: 12px;
     margin: 0 4px 4px 0;
-    color: white;
     display: inline-flex;
     align-items: center;
+    position: relative;
+    color: black;
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .label-color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  
+  .label-text {
+    margin-left: 5px;
+    font-size: 11px;
+    opacity: 0;
+    margin-right: 4px;
+    transition: opacity 0.3s ease;
+    color: black;
+  }
+  
+  .label:hover .label-text {
+    opacity: 1;
+  }
+  
+  .remove-label-button {
+    margin-left: 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .label:hover .remove-label-button {
+    opacity: 1;
+  }
+  
+  /* Label picker and sections */
+  .label-section {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .section-title {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+  
+  /* Dark mode adjustments */
+  @media (prefers-color-scheme: dark) {
+    .label {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .label:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    .section-title {
+      color: #aaa;
+    }
+    
+    .label-picker {
+      background-color: #1a2944;
+      border-color: #444;
+    }
+    
+    .label-option:hover {
+      background-color: #2a3a54;
+    }
+  }
+  
+  /* Tooltip styles */
+  [data-tooltip] {
+    position: relative;
+  }
+  
+  [data-tooltip]:before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 8px;
+    background-color: #333;
+    color: white;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none;
+    z-index: 1000;
+  }
+  
+  [data-tooltip]:hover:before {
+    opacity: 1;
+    visibility: visible;
   }
   
   .remove-label-button {

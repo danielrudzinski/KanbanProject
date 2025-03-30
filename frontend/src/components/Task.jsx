@@ -1,8 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import TaskDetails from './TaskDetails';
 import EditableText from './EditableText';
-import { createPortal } from 'react-dom';
 import { getUserAvatar, assignUserToTask, fetchSubTasksByTaskId } from '../services/api';
 import '../styles/components/Task.css';
 
@@ -19,19 +18,16 @@ function Task({ task, columnId }) {
   const taskRef = useRef(null);
   const warningTimeoutRef = useRef(null);
 
-  const { handleDragStart, handleDragEnd } = dragAndDrop;
-
   // Check if task has unfinished subtasks
-  const checkUnfinishedSubtasks = async () => {
+  const checkUnfinishedSubtasks = useCallback(async () => {
     try {
       const subtasks = await fetchSubTasksByTaskId(task.id);
       const unfinishedExists = subtasks.some(subtask => !subtask.completed);
       setHasUnfinishedSubtasks(unfinishedExists);
-      
     } catch (error) {
       console.error('Error checking subtasks:', error);
     }
-  };
+  }, [task.id]);
 
   useEffect(() => {
     // If task has a user assigned, fetch their avatar
@@ -56,9 +52,8 @@ function Task({ task, columnId }) {
         clearTimeout(warningTimeoutRef.current);
       }
     };
-  }, [task.userIds, task.id]);
+  }, [task.userIds, task.id, avatarUrl, checkUnfinishedSubtasks]);
 
-  // Add event listener to check for subtask completion events
   useEffect(() => {
     const handleSubtaskUpdate = () => {
       checkUnfinishedSubtasks();
@@ -70,7 +65,7 @@ function Task({ task, columnId }) {
     return () => {
       window.removeEventListener('subtask-updated', handleSubtaskUpdate);
     };
-  }, []);
+  }, [checkUnfinishedSubtasks]);
 
   // Clear assignment error after 5 seconds
   useEffect(() => {
@@ -266,7 +261,7 @@ function Task({ task, columnId }) {
     }
   };
   
-  const onDragEndHandler = (e) => {
+  const onDragEndHandler = () => {
     console.log('Task drag end');
     
     // Hide warning when drag ends
@@ -287,6 +282,62 @@ function Task({ task, columnId }) {
     if (warningTimeoutRef.current) {
       clearTimeout(warningTimeoutRef.current);
     }
+  };
+
+  const renderTaskLabels = () => {
+    if (!task.labels || task.labels.length === 0) return null;
+    
+    // We'll only show up to 3 labels in the compact view
+    const visibleLabels = task.labels.slice(0, 3);
+    const remainingCount = task.labels.length - 3;
+    
+    return (
+      <div className="task-labels-preview">
+        {visibleLabels.map((label) => {
+          const labelColor = getLabelColor(label);
+          return (
+            <div 
+              key={label} 
+              className="task-label-pill" 
+              title={label}
+              data-tooltip={label}
+            >
+              <span 
+                className="label-dot" 
+                style={{ backgroundColor: labelColor }}
+              ></span>
+            </div>
+          );
+        })}
+        {remainingCount > 0 && (
+          <div className="task-label-count" title={`${remainingCount} more label(s)`}>
+            +{remainingCount}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Helper function to get label color (consistent with TaskLabels)
+  const getLabelColor = (labelName) => {
+    // Try to get from localStorage first
+    const storedColors = localStorage.getItem('labelColors');
+    if (storedColors) {
+      const colorMap = JSON.parse(storedColors);
+      if (colorMap[labelName]) return colorMap[labelName];
+    }
+  
+    // Default colors based on predefined labels
+    const colorMap = {
+      'High Priority': '#FF4D4D',
+      'Medium Priority': '#FFA500',
+      'Low Priority': '#4CAF50',
+      'Bug': '#FF0000',
+      'Feature': '#2196F3',
+      'Documentation': '#9C27B0'
+    };
+  
+    return colorMap[labelName] || '#888888';
   };
 
   return (
@@ -314,6 +365,7 @@ function Task({ task, columnId }) {
             inputClassName="task-title-input"
             type="task"
           />
+          {renderTaskLabels()}
           {renderUserAvatar()}
         </div>
         
