@@ -1,4 +1,4 @@
-/*package pl.myproject.kanbanproject2.config;
+package pl.myproject.kanbanproject2.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,4 +42,4 @@ public class WebConfig implements WebMvcConfigurer {
             }
         }
     }
-}*/
+}
