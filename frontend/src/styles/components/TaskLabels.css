@@ -35,6 +35,11 @@
     transition: opacity 0.3s ease;
     color: black;
   }
+
+  .label .label-text {
+    color: black !important;
+    opacity: 1; 
+  }
   
   .label:hover .label-text {
     opacity: 1;
@@ -125,7 +130,7 @@
     margin-left: 4px;
     border: none;
     background: none;
-    color: white;
+    color: rgb(0, 0, 0);
     cursor: pointer;
     padding: 0 4px;
   }
