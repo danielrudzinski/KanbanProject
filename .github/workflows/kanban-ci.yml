@@ -28,6 +28,9 @@ jobs:
         java-version: '23'
         distribution: 'oracle'
         cache: maven
+
+    - name: Set executable permissions for mvnw
+      run: chmod +x ./mvnw
         
     - name: Build and test backend
       run: |
