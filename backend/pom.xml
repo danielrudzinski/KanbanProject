@@ -39,8 +39,6 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-
-        <!-- https://mvnrepository.com/artifact/io.github.cdimascio/dotenv-java -->
         <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
