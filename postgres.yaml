@@ -91,11 +91,11 @@ spec:
             - containerPort: 5432
           env:
             - name: POSTGRES_DB
-              value: kanban
+              value: ${{ secrets.POSTGRES_DB }}
             - name: POSTGRES_USER
-              value: postgres
+              value: ${{ secrets.POSTGRES_USER }}
             - name: POSTGRES_PASSWORD
-              value: asdasd123
+              value: ${{ secrets.POSTGRES_PASSWORD }}
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
           volumeMounts:

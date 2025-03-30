@@ -33,11 +33,11 @@ spec:
             - containerPort: 8080
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres:5432/kanban
+              value: jdbc:postgresql://postgres:5432/${{ secrets.POSTGRES_DB }}
             - name: SPRING_DATASOURCE_USERNAME
-              value: postgres
+              value: ${{ secrets.POSTGRES_USER }}
             - name: SPRING_DATASOURCE_PASSWORD
-              value: asdasd123
+              value: ${{ secrets.POSTGRES_PASSWORD }}
           resources:
             requests:
               memory: "512Mi"

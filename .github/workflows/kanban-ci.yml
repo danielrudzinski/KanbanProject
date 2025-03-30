@@ -13,14 +13,9 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_DB: kanban
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: asdasd123
-          SPRING_DATASOURCE_DB: kanban
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kanban
-          SPRING_DATASOURCE_PASSWORD: asdasd123
-          SPRING_DATASOURCE_PORT: 8080
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -36,6 +31,13 @@ jobs:
 
     - name: Set executable permissions for mvnw
       run: chmod +x backend/mvnw
+
+    - name: Create .env file
+      run: |
+        cd backend
+        echo "SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/${{ secrets.POSTGRES_DB }}" >> .env
+        echo "SPRING_DATASOURCE_USERNAME=${{ secrets.POSTGRES_USER }}" >> .env
+        echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
         
     - name: Build and test backend
       run: |

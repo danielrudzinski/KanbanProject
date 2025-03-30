@@ -1,0 +1,36 @@
+name: Kanban CD
+
+on:
+  push:
+    branches: [ main ]
+  # Optional: Run manually from GitHub UI
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+        
+    - name: Log in to ACR
+      uses: azure/docker-login@v1
+      with:
+        login-server: kanbanproject.azurecr.io
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+      
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          kanbanproject.azurecr.io/kanbanproject-app:latest
+          kanbanproject.azurecr.io/kanbanproject-app:${{ github.sha }}
+        cache-from: type=registry,ref=kanbanproject.azurecr.io/kanbanproject-app:latest
+        cache-to: type=inline
