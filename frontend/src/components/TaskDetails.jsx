@@ -101,6 +101,23 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       }, 0);
     };
 
+    const startEditingSubTaskDescription = () => {
+      if (!expandedSubtaskId) return;
+      
+      // Store original description for cancel operation
+      const currentSubtask = subtasks.find(s => s.id === expandedSubtaskId);
+      if (currentSubtask) {
+        setSubtaskDescription(currentSubtask.description || '');
+      }
+      
+      setEditingDescription(true);
+      setTimeout(() => {
+        if (descriptionInputRef.current) {
+          descriptionInputRef.current.focus();
+        }
+      }, 0);
+    };
+
     const handleLabelsChange = (updatedLabels) => {
       const labelsArray = Array.isArray(updatedLabels) ? updatedLabels : [];
       
@@ -650,7 +667,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                           <div className="description-header">
                             <h5>Opis:</h5>
                             <button 
-                              onClick={startEditingDescription}
+                              onClick={startEditingSubTaskDescription}
                               className="edit-description-btn"
                               title="Edytuj opis"
                             >
