@@ -490,7 +490,7 @@ export const updateTaskName = async (id, name) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ title: name }),
     });
     
     if (!response.ok) {

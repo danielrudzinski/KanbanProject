@@ -35,36 +35,63 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   // Update loadTaskData to include subtasks loading
   const loadTaskData = async () => {
     try {
+      setLoading(true);
+      
+      // Fetch the full task data
       const taskData = await fetchTask(task.id);
-      const allUsers = await fetchUsers();
-      const taskSubtasks = await fetchSubTasksByTaskId(task.id);
       
-      setUsers(allUsers);
-      setSubtasks(taskSubtasks);
+      // Load users assigned to the task - ensure we have an array
+      let assignedData = [];
+      try {
+        const response = await fetch(`/tasks/${task.id}/users`);
+        if (response.ok) {
+          const data = await response.json();
+          // Ensure assignedData is always an array
+          assignedData = Array.isArray(data) ? data : [];
+        }
+      } catch (error) {
+        console.error('Error fetching assigned users:', error);
+      }
       
-      // Set task description
-      setTaskDescription(taskData.description || '');
-      setTaskLabels(taskData.labels || []);
+      setAssignedUsers(assignedData);
       
-      if (taskData.userIds && taskData.userIds.length > 0) {
-        const assigned = allUsers.filter(user => 
-          taskData.userIds.includes(user.id)
-        );
-        setAssignedUsers(assigned);
-
-        const avatarPromises = assigned.map(async (user) => {
-          const avatarUrl = await getUserAvatar(user.id);
-          if (avatarUrl) {
-            setAvatarPreviews(prev => ({
-              ...prev,
-              [user.id]: avatarUrl
-            }));
+      // Load available users
+      const usersData = await fetchUsers();
+      setUsers(usersData || []);
+      
+      // Load subtasks
+      const subtasksData = await fetchSubTasksByTaskId(task.id);
+      setSubtasks(subtasksData || []);
+      
+      // Load task labels
+      const labelsData = taskData.labels || [];
+      setTaskLabels(labelsData);
+      
+      // Set the task description from the fetched data
+      const description = taskData.description || '';
+      setTaskDescription(description);
+      setOriginalTaskDescription(description);
+      
+      // Load avatar previews for users - only if we have assigned users
+      if (assignedData.length > 0) {
+        const avatarPromises = assignedData.map(async user => {
+          try {
+            const avatarUrl = await getUserAvatar(user.id);
+            return { userId: user.id, url: avatarUrl };
+          } catch (e) {
+            return { userId: user.id, url: null };
           }
         });
-
-        await Promise.all(avatarPromises);
-      } else {
-        setAssignedUsers([]);
+        
+        const avatarResults = await Promise.all(avatarPromises);
+        const avatarMap = {};
+        avatarResults.forEach(result => {
+          if (result.url) {
+            avatarMap[result.userId] = result.url;
+          }
+        });
+        
+        setAvatarPreviews(avatarMap);
       }
       
       setLoading(false);
@@ -73,13 +100,17 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       setLoading(false);
     }
   };
-
     // save task description
     const saveTaskDescription = async () => {
       try {
+        // Use the generic updateTask function to update the description field
         await updateTask(task.id, { description: taskDescription });
         
+        // Store locally as well
+        setOriginalTaskDescription(taskDescription);
         setEditingTaskDescription(false);
+        
+        // Show success message
         setSuccess(true);
         setTimeout(() => {
           setSuccess(false);
