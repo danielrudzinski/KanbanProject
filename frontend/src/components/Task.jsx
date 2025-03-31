@@ -287,7 +287,7 @@ function Task({ task, columnId }) {
   const renderTaskLabels = () => {
     if (!task.labels || task.labels.length === 0) return null;
     
-    // We'll only show up to 3 labels in the compact view
+    // We'll show up to 3 labels in the compact view
     const visibleLabels = task.labels.slice(0, 3);
     const remainingCount = task.labels.length - 3;
     
@@ -365,8 +365,10 @@ function Task({ task, columnId }) {
             inputClassName="task-title-input"
             type="task"
           />
-          {renderTaskLabels()}
-          {renderUserAvatar()}
+          <div className="task-info-container">
+            {renderTaskLabels()}
+            {renderUserAvatar()}
+          </div>
         </div>
         
         {/* Delete button */}

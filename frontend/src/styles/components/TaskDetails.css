@@ -238,7 +238,7 @@
 }
 
 .assigned-users-bar span {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #0e1b36;
   margin-right: 12px;
@@ -935,4 +935,22 @@ label {
     border-top: 1px solid #76777c;
     min-height: 150px;
   }
+}
+
+.task-description-section .description-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.task-description-section .description-header h4 {
+  margin: 0;
+  text-align: center;
+}
+
+.task-description-section .description-header .edit-description-btn {
+  position: absolute;
+  right: 0;
 }
