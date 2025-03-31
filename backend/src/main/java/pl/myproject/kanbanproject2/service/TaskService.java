@@ -92,6 +92,13 @@ public class TaskService {
         if (task.getLabels() != null) {
             existingTask.setLabels(task.getLabels());
         }
+        if (task.getDescription() != null) {
+            existingTask.setDescription(task.getDescription());
+        }
+        if (task.getPosition() != null) {
+            existingTask.setPosition(task.getPosition());
+        }
+
 
         Task savedTask = taskRepository.save(existingTask);
         return taskMapper.apply(savedTask);

@@ -82,6 +82,11 @@ public class SubTaskService {
         if (subTask.getPosition() != null) {
             existingSubTask.setPosition(subTask.getPosition());
         }
+        if(subTask.getDescription() != null){
+            existingSubTask.setDescription(subTask.getDescription());
+        }
+
+        
 
         SubTask savedSubTask = subTaskRepository.save(existingSubTask);
         return subTaskMapper.toDto(savedSubTask);
