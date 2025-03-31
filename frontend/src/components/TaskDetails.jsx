@@ -78,7 +78,8 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
           try {
             const avatarUrl = await getUserAvatar(user.id);
             return { userId: user.id, url: avatarUrl };
-          } catch (e) {
+          } catch (error) {
+            console.error('Error fetching user avatar:', error);
             return { userId: user.id, url: null };
           }
         });
