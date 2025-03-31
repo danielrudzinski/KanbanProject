@@ -86,7 +86,7 @@ public class SubTaskService {
             existingSubTask.setDescription(subTask.getDescription());
         }
 
-        
+
 
         SubTask savedSubTask = subTaskRepository.save(existingSubTask);
         return subTaskMapper.toDto(savedSubTask);
