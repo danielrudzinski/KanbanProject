@@ -27,6 +27,7 @@
 }
 
 .task-content {
+  display: flex;
   flex: 1;
   color: #0e1b36;
 }
@@ -42,7 +43,6 @@
   font-size: 1rem;
   cursor: pointer;
   padding: 0.25rem;
-  margin-left: 0.5rem;
   line-height: 1;
   visibility: hidden;
   opacity: 0;
@@ -53,6 +53,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  align-self: flex-start;
 }
 
 .task:hover .delete-btn {
@@ -206,7 +207,6 @@
 .task-content {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   width: 100%;
 }
 
@@ -215,11 +215,21 @@
   margin-right: 8px;
 }
 
+.task-info-container {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 4px;
+  gap: 8px;
+}
+
 .task-avatar {
   position: relative;
   min-width: 32px;
   height: 32px;
-  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .task-avatar img {
@@ -523,38 +533,37 @@
 
 .task-labels-preview {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 3px;
-  margin-right: 8px;
-  margin-top: 4px;
+  align-self: center;
 }
 
 .task-label-pill {
-  height: 12px;
-  width: 12px;
-  border-radius: 50%;
-  position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.05);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: transparent;
+  padding: 0;
 }
 
 .label-dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
+  margin: 0;
 }
 
 .task-label-count {
-  font-size: 10px;
+  font-size: 9px;
   background-color: #e2e2e2;
   color: #0e1b36;
   border-radius: 8px;
-  padding: 1px 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 1px 3px;
+  margin-top: 2px;
+  width: fit-content;
+  text-align: center;
 }
 
 @media (prefers-color-scheme: dark) {

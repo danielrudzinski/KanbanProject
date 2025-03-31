@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { addLabelToTask, removeLabelFromTask, getAllLabels } from '../services/api';
 import '../styles/components/TaskLabels.css';
+import { useKanban } from '../context/KanbanContext';
 
 // Keep the PREDEFINED_LABELS array for default options
 const PREDEFINED_LABELS = [
@@ -25,7 +26,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
   const [isFormReady, setIsFormReady] = useState(false);
   const [existingLabels, setExistingLabels] = useState([]);
   const [labelColors, setLabelColors] = useState({});
-  
+  const { refreshTasks } = useKanban();
   const buttonRef = useRef(null);
 
   // Fetch all existing labels when component mounts
@@ -124,6 +125,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
       }
       
       onLabelsChange(updatedLabels);
+      refreshTasks();
     } catch (error) {
       console.error('Error adding label:', error);
       alert('Wystąpił błąd podczas dodawania etykiety');

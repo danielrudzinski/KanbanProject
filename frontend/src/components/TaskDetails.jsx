@@ -24,7 +24,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const [editingDescription, setEditingDescription] = useState(false);
   const [subtaskDescription, setSubtaskDescription] = useState('');
   const [taskLabels, setTaskLabels] = useState([]);
-
+  const [originalTaskDescription, setOriginalTaskDescription] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const [editingTaskDescription, setEditingTaskDescription] = useState(false);
   
@@ -92,10 +92,28 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   
     // start editing task description
     const startEditingTaskDescription = () => {
+      setOriginalTaskDescription(taskDescription); 
       setEditingTaskDescription(true);
       setTimeout(() => {
         if (taskDescriptionInputRef.current) {
           taskDescriptionInputRef.current.focus();
+        }
+      }, 0);
+    };
+
+    const startEditingSubTaskDescription = () => {
+      if (!expandedSubtaskId) return;
+      
+      // Store original description for cancel operation
+      const currentSubtask = subtasks.find(s => s.id === expandedSubtaskId);
+      if (currentSubtask) {
+        setSubtaskDescription(currentSubtask.description || '');
+      }
+      
+      setEditingDescription(true);
+      setTimeout(() => {
+        if (descriptionInputRef.current) {
+          descriptionInputRef.current.focus();
         }
       }, 0);
     };
@@ -116,14 +134,8 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   
     // cancel task description editing
     const cancelEditingTaskDescription = () => {
+      setTaskDescription(originalTaskDescription); // Restore original value
       setEditingTaskDescription(false);
-      
-      // Fetch the current task data to restore original description
-      fetchTask(task.id).then(taskData => {
-        setTaskDescription(taskData.description || '');
-      }).catch(error => {
-        console.error('Error fetching task data:', error);
-      });
     };
 
   const handleaddSubTask = async () => {
@@ -246,16 +258,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         setSubtaskDescription('');
       }
     }
-  };
-
-  const startEditingDescription = () => {
-    setEditingDescription(true);
-    // Focus on the textarea after it renders
-    setTimeout(() => {
-      if (descriptionInputRef.current) {
-        descriptionInputRef.current.focus();
-      }
-    }, 0);
   };
 
   const saveSubtaskDescription = async () => {
@@ -665,7 +667,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                           <div className="description-header">
                             <h5>Opis:</h5>
                             <button 
-                              onClick={startEditingDescription}
+                              onClick={startEditingSubTaskDescription}
                               className="edit-description-btn"
                               title="Edytuj opis"
                             >
