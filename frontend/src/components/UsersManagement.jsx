@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import '../styles/components/Users.css';
 
 function UsersManagement() {
@@ -7,16 +7,73 @@ function UsersManagement() {
   const [password, setPassword] = useState('');
   const [users, setUsers] = useState([]);
   const [avatarPreviews, setAvatarPreviews] = useState({});
+  const avatarPreviewsRef = useRef({});
+
+  // Update ref when state changes
+  useEffect(() => {
+    avatarPreviewsRef.current = avatarPreviews;
+  }, [avatarPreviews]);
+
+  const fetchUserAvatar = useCallback(async (userId) => {
+    try {
+      const response = await fetch(`/users/${userId}/avatar`, {
+        headers: {
+          'Accept': 'image/*, application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch avatar');
+      }
+      
+      const blob = await response.blob();
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.warn(`Failed to load avatar for user ${userId}:`, error);
+      return null;
+    }
+  }, []);
+
+  // Function to load users from backend
+  const loadUsers = useCallback(async () => {
+    try {
+      const response = await fetch('/users');
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+      
+      const data = await response.json();
+      setUsers(data);
+  
+      // Load avatars for all users
+      const avatarPromises = data.map(async (user) => {
+        const avatarUrl = await fetchUserAvatar(user.id);
+        if (avatarUrl) {
+          setAvatarPreviews(prev => ({
+            ...prev,
+            [user.id]: avatarUrl
+          }));
+        }
+      });
+  
+      await Promise.all(avatarPromises);
+    } catch (error) {
+      console.error('Błąd podczas ładowania użytkowników:', error);
+      alert('Wystąpił błąd podczas ładowania użytkowników');
+    }
+  }, [fetchUserAvatar]);
 
   useEffect(() => {
     loadUsers();
+    
     return () => {
-      // Cleanup function to revoke object URLs when component unmounts
-      Object.values(avatarPreviews).forEach(url => {
+      // Use ref for cleanup to avoid dependency cycle
+      Object.values(avatarPreviewsRef.current).forEach(url => {
         URL.revokeObjectURL(url);
       });
     };
-  }, [loadUsers, avatarPreviews]);
+  }, [loadUsers]);
   
   const handleAvatarUpload = async (userId, file) => {
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -126,56 +183,6 @@ function UsersManagement() {
       </div>
     );
   };
-
-  const fetchUserAvatar = useCallback(async (userId) => {
-    try {
-      const response = await fetch(`/users/${userId}/avatar`, {
-        headers: {
-          'Accept': 'image/*, application/json',
-          'Cache-Control': 'no-cache'
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch avatar');
-      }
-      
-      const blob = await response.blob();
-      return URL.createObjectURL(blob);
-    } catch (error) {
-      console.warn(`Failed to load avatar for user ${userId}:`, error);
-      return null;
-    }
-  }, []);
-
-  // Function to load users from backend
-  const loadUsers = useCallback(async () => {
-    try {
-      const response = await fetch('/users');
-      if (!response.ok) {
-        throw new Error('Failed to fetch users');
-      }
-      
-      const data = await response.json();
-      setUsers(data);
-  
-      // Load avatars for all users
-      const avatarPromises = data.map(async (user) => {
-        const avatarUrl = await fetchUserAvatar(user.id);
-        if (avatarUrl) {
-          setAvatarPreviews(prev => ({
-            ...prev,
-            [user.id]: avatarUrl
-          }));
-        }
-      });
-  
-      await Promise.all(avatarPromises);
-    } catch (error) {
-      console.error('Błąd podczas ładowania użytkowników:', error);
-      alert('Wystąpił błąd podczas ładowania użytkowników');
-    }
-  }, [fetchUserAvatar]);
 
   // Function to add a new user
   const addUser = () => {
