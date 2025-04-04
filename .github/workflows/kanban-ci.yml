@@ -68,3 +68,12 @@ jobs:
       
     - name: Run linting
       run: cd frontend && npm run lint
+
+    - name: Run tests with coverage
+      run: cd frontend && npm run test:coverage
+      
+    - name: Upload test coverage
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-test-coverage
+        path: frontend/coverage
