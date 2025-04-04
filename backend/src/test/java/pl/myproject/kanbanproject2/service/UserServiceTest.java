@@ -10,12 +10,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 import pl.myproject.kanbanproject2.dto.UserDTO;
 import pl.myproject.kanbanproject2.mapper.UserMapper;
 import pl.myproject.kanbanproject2.model.File;
 import pl.myproject.kanbanproject2.model.User;
 import pl.myproject.kanbanproject2.repository.FileRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
+
+import java.io.IOException;
 import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -212,6 +215,194 @@ public class UserServiceTest {
 
         Mockito.verify(userRepository).save(Mockito.any(User.class));
     }
+    @Test
+    void getAvatarShouldReturnAvatarData() {
+        // given
+        Mockito.when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
 
+        // when
+        byte[] result = userService.getAvatar(testUser.getId());
+
+        // then
+        Assertions.assertNotNull(result);
+        Assertions.assertArrayEquals(testAvatar.getData(), result);
+        Mockito.verify(userRepository).findById(testUser.getId());
+    }
+
+    @Test
+    void getAvatarContentTypeShouldReturnCorrectType() {
+        // given
+        Mockito.when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // when
+        String result = userService.getAvatarContentType(testUser.getId());
+
+        // then
+        Assertions.assertEquals("image/jpeg", result);
+        Mockito.verify(userRepository).findById(testUser.getId());
+    }
+
+    @Test
+    void getNonExistingAvatarShouldThrowException() {
+        // given
+        User userWithoutAvatar = new User();
+        userWithoutAvatar.setId(2);
+        userWithoutAvatar.setAvatar(null);
+
+        Mockito.when(userRepository.findById(userWithoutAvatar.getId())).thenReturn(Optional.of(userWithoutAvatar));
+
+        // when & then
+        Assertions.assertThrows(EntityNotFoundException.class,
+                () -> userService.getAvatar(userWithoutAvatar.getId()));
+        Mockito.verify(userRepository).findById(userWithoutAvatar.getId());
+    }
+
+    @Test
+    void deleteAvatarShouldRemoveUserAvatar() {
+        // given
+        Mockito.when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // when
+        userService.deleteAvatar(testUser.getId());
+
+        // then
+        Mockito.verify(userRepository).findById(testUser.getId());
+        Mockito.verify(userRepository).save(testUser);
+        Mockito.verify(fileRepository).delete(testAvatar);
+        Assertions.assertNull(testUser.getAvatar());
+    }
+
+    @Test
+    void deleteNonExistingAvatarShouldThrowException() {
+        // given
+        User userWithoutAvatar = new User();
+        userWithoutAvatar.setId(2);
+        userWithoutAvatar.setAvatar(null);
+
+        Mockito.when(userRepository.findById(userWithoutAvatar.getId())).thenReturn(Optional.of(userWithoutAvatar));
+
+        // when & then
+        Assertions.assertThrows(EntityNotFoundException.class,
+                () -> userService.deleteAvatar(userWithoutAvatar.getId()));
+        Mockito.verify(userRepository).findById(userWithoutAvatar.getId());
+        Mockito.verify(userRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(fileRepository, Mockito.never()).delete(Mockito.any());
+    }
+
+    @Test
+    void updateWipLimitShouldUpdateLimit() {
+        // given
+        Integer newWipLimit = 10;
+
+        Mockito.when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        Mockito.when(userRepository.save(Mockito.any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        Mockito.when(userMapper.apply(testUser)).thenReturn(
+                new UserDTO(testUser.getId(), testUser.getEmail(), testUser.getName(), new HashSet<>(), newWipLimit));
+
+        // when
+        UserDTO result = userService.updateWipLimit(testUser.getId(), newWipLimit);
+
+        // then
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(newWipLimit, result.wipLimit());
+        Mockito.verify(userRepository).findById(testUser.getId());
+        Mockito.verify(userRepository).save(testUser);
+        Mockito.verify(userMapper).apply(testUser);
+    }
+
+    @Test
+    void checkWipStatusShouldReturnTrueWhenUnderLimit() {
+        // given
+        testUser.setWipLimit(5);
+        testUser.setTasks(new HashSet<>());  // pusty zestaw zadań
+
+        Mockito.when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // when
+        boolean result = userService.checkWipStatus(testUser.getId());
+
+        // then
+        Assertions.assertTrue(result);
+        Mockito.verify(userRepository).findById(testUser.getId());
+    }
+
+    @Test
+    void checkWipStatusShouldReturnFalseWhenAtLimit() {
+        // given
+        testUser.setWipLimit(0);  // limit 0
+
+        Mockito.when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // when
+        boolean result = userService.checkWipStatus(testUser.getId());
+
+        // then
+        Assertions.assertFalse(result);
+        Mockito.verify(userRepository).findById(testUser.getId());
+    }
+
+    @Test
+    void checkWipStatusShouldReturnTrueWhenNullLimit() {
+        // given
+        testUser.setWipLimit(null);  // brak limitu
+
+        Mockito.when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+
+        // when
+        boolean result = userService.checkWipStatus(testUser.getId());
+
+        // then
+        Assertions.assertTrue(result);
+        Mockito.verify(userRepository).findById(testUser.getId());
+    }
+
+    @Test
+    void checkWipStatusShouldReturnTrueWhenUserNotFound() {
+        // given
+        int nonExistingUserId = 999;
+        Mockito.when(userRepository.findById(nonExistingUserId))
+                .thenThrow(new EntityNotFoundException("User not found"));
+
+        // when
+        boolean result = userService.checkWipStatus(nonExistingUserId);
+
+        // then
+        Assertions.assertTrue(result);
+        Mockito.verify(userRepository).findById(nonExistingUserId);
+    }
+
+    @Test
+    void uploadAvatarTest() throws IOException {
+        // given
+        int userId = 1;
+        MultipartFile mockFile = Mockito.mock(MultipartFile.class);
+        User user = new User();
+        user.setId(userId);
+
+        File savedFile = new File();
+        savedFile.setId(1L);
+        savedFile.setName("test.jpg");
+        savedFile.setType("image/jpeg");
+        savedFile.setData(new byte[]{1, 2, 3});
+
+        try {
+            Mockito.when(mockFile.getOriginalFilename()).thenReturn("test.jpg");
+            Mockito.when(mockFile.getContentType()).thenReturn("image/jpeg");
+            Mockito.when(mockFile.getBytes()).thenReturn(new byte[]{1, 2, 3});
+            Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            Mockito.when(fileRepository.save(Mockito.any(File.class))).thenReturn(savedFile);
+
+            // when
+            userService.uploadAvatar(userId, mockFile);
+
+            // then
+            Assertions.assertNotNull(user.getAvatar());
+            Mockito.verify(userRepository).findById(userId);
+            Mockito.verify(fileRepository).save(Mockito.any(File.class));
+            Mockito.verify(userRepository).save(user);
+        } catch (IOException e) {
+            Assertions.fail("Test nie powinien rzucać wyjątku IOException");
+        }
+    }
 }
 
