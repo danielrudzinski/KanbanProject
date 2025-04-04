@@ -42,63 +42,81 @@ describe('Task Component', () => {
         jest.clearAllMocks();
     });
 
-    test('renders task with correct title', () => {
-        render(
-            <KanbanContext.Provider value={mockContextValue}>
-                <Task task={mockTask} columnId="col1" />
-            </KanbanContext.Provider>
-        );
+    test('renders task with correct title', async () => {
+        await act(async () => {
+            render(
+                <KanbanContext.Provider value={mockContextValue}>
+                    <Task task={mockTask} columnId="col1" />
+                </KanbanContext.Provider>
+            );
+        });
         
         expect(screen.getByText('Test Task')).toBeInTheDocument();
     });
 
-    test('shows delete confirmation when delete button is clicked', () => {
-        render(
-            <KanbanContext.Provider value={mockContextValue}>
-                <Task task={mockTask} columnId="col1" />
-            </KanbanContext.Provider>
-        );
+    test('shows delete confirmation when delete button is clicked', async () => {
+        await act(async () => {
+            render(
+                <KanbanContext.Provider value={mockContextValue}>
+                    <Task task={mockTask} columnId="col1" />
+                </KanbanContext.Provider>
+            );
+        });
         
         // Find and click the delete button
         const deleteButton = screen.getByTitle('Usuń zadanie');
-        fireEvent.click(deleteButton);
+        await act(async () => {
+            fireEvent.click(deleteButton);
+        });
         
         // Check if confirmation dialog appears
         expect(screen.getByText('Czy na pewno chcesz usunąć to zadanie?')).toBeInTheDocument();
     });
 
     test('calls deleteTask when confirming deletion', async () => {
-        render(
-            <KanbanContext.Provider value={mockContextValue}>
-                <Task task={mockTask} columnId="col1" />
-            </KanbanContext.Provider>
-        );
+        await act(async () => {
+            render(
+                <KanbanContext.Provider value={mockContextValue}>
+                    <Task task={mockTask} columnId="col1" />
+                </KanbanContext.Provider>
+            );
+        });
     
         const deleteButton = screen.getByTitle('Usuń zadanie');
-        fireEvent.click(deleteButton);
+        await act(async () => {
+            fireEvent.click(deleteButton);
+        });
     
         const confirmButton = screen.getByText('Tak');
-        fireEvent.click(confirmButton);
-    
+        await act(async () => {
+            fireEvent.click(confirmButton);
+        });
+
         await waitFor(() => {
             expect(mockContextValue.deleteTask).toHaveBeenCalledWith('1');
         });
     });
 
-    test('cancels deletion when cancel button is clicked', () => {
-        render(
-            <KanbanContext.Provider value={mockContextValue}>
-                <Task task={mockTask} columnId="col1" />
-            </KanbanContext.Provider>
-        );
+    test('cancels deletion when cancel button is clicked', async () => {
+        await act(async () => {
+            render(
+                <KanbanContext.Provider value={mockContextValue}>
+                    <Task task={mockTask} columnId="col1" />
+                </KanbanContext.Provider>
+            );
+        });
         
         // Find and click the delete button
         const deleteButton = screen.getByTitle('Usuń zadanie');
-        fireEvent.click(deleteButton);
+        await act(async () => {
+            fireEvent.click(deleteButton);
+        });
         
         // Find and click the cancel button
         const cancelButton = screen.getByText('Nie');
-        fireEvent.click(cancelButton);
+        await act(async () => {
+            fireEvent.click(cancelButton);
+        });
         
         // Check that confirmation dialog is no longer displayed
         expect(screen.queryByText('Czy na pewno chcesz usunąć to zadanie?')).not.toBeInTheDocument();
@@ -107,12 +125,14 @@ describe('Task Component', () => {
         expect(mockContextValue.deleteTask).not.toHaveBeenCalled();
     });
 
-    test('renders labels correctly', () => {
-        render(
-            <KanbanContext.Provider value={mockContextValue}>
-                <Task task={mockTask} columnId="col1" />
-            </KanbanContext.Provider>
-        );
+    test('renders labels correctly', async () => {
+        await act(async () => {
+            render(
+                <KanbanContext.Provider value={mockContextValue}>
+                    <Task task={mockTask} columnId="col1" />
+                </KanbanContext.Provider>
+            );
+        });
         
         // Task should have a label pill with title "High Priority"
         const labelPill = screen.getByTitle('High Priority');
@@ -120,24 +140,28 @@ describe('Task Component', () => {
         expect(labelPill).toHaveClass('task-label-pill');
     });
 
-    test('handles drag start event correctly', () => {
+    test('handles drag start event correctly', async () => {
         // Mock dataTransfer
         const dataTransfer = {
             setData: jest.fn(),
             effectAllowed: null
         };
         
-        render(
-            <KanbanContext.Provider value={mockContextValue}>
-                <Task task={mockTask} columnId="col1" />
-            </KanbanContext.Provider>
-        );
+        await act(async () => {
+            render(
+                <KanbanContext.Provider value={mockContextValue}>
+                    <Task task={mockTask} columnId="col1" />
+                </KanbanContext.Provider>
+            );
+        });
         
         // Find the task element
         const taskElement = screen.getByText('Test Task').closest('.task');
         
         // Simulate drag start
-        fireEvent.dragStart(taskElement, { dataTransfer });
+        await act(async () => {
+            fireEvent.dragStart(taskElement, { dataTransfer });
+        });
         
         // Check that dataTransfer.setData was called correctly
         expect(dataTransfer.setData).toHaveBeenCalledWith('application/task', expect.any(String));
@@ -155,32 +179,46 @@ describe('Task Component', () => {
             userIds: ['123']
         };
         
-        render(
-            <KanbanContext.Provider value={mockContextValue}>
-                <Task task={taskWithUser} columnId="col1" />
-            </KanbanContext.Provider>
-        );
+        await act(async () => {
+            render(
+                <KanbanContext.Provider value={mockContextValue}>
+                    <Task task={taskWithUser} columnId="col1" />
+                </KanbanContext.Provider>
+            );
+            
+            // Wait for the avatar fetch to complete
+            await new Promise(resolve => setTimeout(resolve, 0));
+        });
         
         // Check that getUserAvatar was called with the correct user id
         expect(getUserAvatar).toHaveBeenCalledWith('123');
         
-        // Wait for the avatar to be displayed
-        await waitFor(() => {
-            const avatar = screen.getByAltText('User avatar');
-            expect(avatar).toBeInTheDocument();
-            expect(avatar).toHaveClass('avatar-preview');
-        });
+        // The avatar should already be rendered after our act() completes
+        const avatar = screen.getByAltText('User avatar');
+        expect(avatar).toBeInTheDocument();
+        expect(avatar).toHaveClass('avatar-preview');
     });
 
+    // Test that checks for unfinished subtasks on mount
     test('checks for unfinished subtasks on mount', async () => {
+        // Mock the API response before rendering
+        fetchSubTasksByTaskId.mockResolvedValue([
+            { id: 1, completed: false, title: 'Subtask 1' }
+        ]);
+    
+        // Wrap the entire render and wait process in an async act
         await act(async () => {
             render(
                 <KanbanContext.Provider value={mockContextValue}>
                     <Task task={mockTask} columnId="col1" />
                 </KanbanContext.Provider>
             );
+        
+            // This await is important - it waits for all promises to resolve
+            await new Promise(resolve => setTimeout(resolve, 0));
         });
-    
+
+        // Now you can make assertions after the component has fully updated
         expect(fetchSubTasksByTaskId).toHaveBeenCalledWith('1');
     });
 
@@ -194,41 +232,61 @@ describe('Task Component', () => {
             }))
         };
         
-        render(
-            <KanbanContext.Provider value={mockContextValue}>
-                <Task task={mockTask} columnId="col1" />
-            </KanbanContext.Provider>
-        );
+        await act(async () => {
+            render(
+                <KanbanContext.Provider value={mockContextValue}>
+                    <Task task={mockTask} columnId="col1" />
+                </KanbanContext.Provider>
+            );
+        });
         
         // Find the task element
         const taskElement = screen.getByText('Test Task').closest('.task');
         
-        // Simulate drop
-        await fireEvent.drop(taskElement, { dataTransfer });
+        // Simulate drop with act
+        await act(async () => {
+            fireEvent.drop(taskElement, { dataTransfer });
+            // Wait for any promises to resolve
+            await new Promise(resolve => setTimeout(resolve, 0));
+        });
+        
+        // We can verify assignUserToTask was called correctly
+        expect(assignUserToTask).toHaveBeenCalledWith('1', 123);
     });
 
-  test('renders task with correct title', () => {
-    render(
-      <KanbanContext.Provider value={mockContextValue}>
-        <Task task={mockTask} columnId="col1" />
-      </KanbanContext.Provider>
-    );
-    
-    expect(screen.getByText('Test Task')).toBeInTheDocument();
-  });
+    test('renders task with correct title', async () => {
+        await act(async () => {
+          render(
+            <KanbanContext.Provider value={mockContextValue}>
+              <Task task={mockTask} columnId="col1" />
+            </KanbanContext.Provider>
+          );
+          // Wait for any promises to resolve
+          await new Promise(resolve => setTimeout(resolve, 0));
+        });
+        
+        expect(screen.getByText('Test Task')).toBeInTheDocument();
+    });
 
-  test('shows delete confirmation when delete button is clicked', () => {
-    render(
-      <KanbanContext.Provider value={mockContextValue}>
-        <Task task={mockTask} columnId="col1" />
-      </KanbanContext.Provider>
-    );
+  test('shows delete confirmation when delete button is clicked', async () => {
+    await act(async () => {
+      render(
+        <KanbanContext.Provider value={mockContextValue}>
+          <Task task={mockTask} columnId="col1" />
+        </KanbanContext.Provider>
+      );
+      // Wait for any promises to resolve
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
     
     // Find and click the delete button
     const deleteButton = screen.getByTitle('Usuń zadanie');
-    fireEvent.click(deleteButton);
+    await act(async () => {
+      fireEvent.click(deleteButton);
+    });
     
     // Check if confirmation dialog appears
     expect(screen.getByText('Czy na pewno chcesz usunąć to zadanie?')).toBeInTheDocument();
   });
+  
 });
