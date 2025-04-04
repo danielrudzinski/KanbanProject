@@ -80,8 +80,8 @@ jobs:
 
   generate-badges:
     needs: [backend, frontend]
-      runs-on: ubuntu-latest
-      steps:
+    runs-on: ubuntu-latest
+    steps:
         - uses: actions/checkout@v4
             
         - name: Download backend coverage
