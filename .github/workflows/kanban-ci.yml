@@ -101,17 +101,38 @@ jobs:
             npm install -g lcov-badge-generator
             BACKEND_COVERAGE=$(grep -oP 'Total.*?([0-9]{1,3})%' coverage-reports/backend/index.html | grep -oP '[0-9]{1,3}')
             echo "Backend coverage: $BACKEND_COVERAGE%"
-            FRONTEND_COVERAGE=$(node -e "const coverage = require('./coverage-reports/frontend/coverage-summary.json'); console.log(coverage.total.statements.pct)")
+              
+            FRONTEND_COVERAGE=$(grep -oP 'Statements.*?([0-9]{1,3}\.[0-9]{1,2})%' coverage-reports/frontend/lcov-report/index.html | grep -oP '[0-9]{1,3}\.[0-9]{1,2}' | head -1)
             echo "Frontend coverage: $FRONTEND_COVERAGE%"
+              
+            mkdir -p badges
             lcov-badge-generator -o badges/backend-coverage.svg -v $BACKEND_COVERAGE
             lcov-badge-generator -o badges/frontend-coverage.svg -v $FRONTEND_COVERAGE
-                
+                  
         - name: Commit and push badges
           run: |
-              git config --local user.name "GitHub Actions - Badge Updater"
-              mkdir -p badges
-              # Update README with badges
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Actions - Badge Updater"
+                
+            # Check if badges directory exists, if not create it
+            mkdir -p badges
+                
+            # Check if README.md already has the badges
+            if ! grep -q "backend-coverage.svg" README.md; then
+              # Badges don't exist yet - add them
               sed -i '/<img src="https:\/\/img.shields.io\/badge\/java-23-orange"/a \  <img src="https:\/\/github.com\/danielrudzinski\/KanbanProject\/raw\/main\/badges\/backend-coverage.svg" alt="Backend Coverage"\/>\n  <img src="https:\/\/github.com\/danielrudzinski\/KanbanProject\/raw\/main\/badges\/frontend-coverage.svg" alt="Frontend Coverage"\/>' README.md
-              git add badges/*.svg README.md
-              git commit -m "Update coverage badges" || echo "No changes to commit"
+            fi
+                
+            # Always add the badges - they will be updated if they've changed
+            git add badges/*.svg README.md
+                
+            # Check if there are changes to commit
+            if git diff --staged --quiet; then
+              echo "No changes to commit"
+            else
+              # Commit and push changes
+              git commit -m "Update coverage badges [skip ci]"
+                  
+              # Configure git to use token for push
               git push
+            fi
