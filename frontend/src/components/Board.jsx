@@ -1,5 +1,5 @@
 import { useKanban } from '../context/KanbanContext';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Task from './Task';
 import EditableText from './EditableText';
 import '../styles/components/Board.css';
