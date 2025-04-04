@@ -77,3 +77,41 @@ jobs:
       with:
         name: frontend-test-coverage
         path: frontend/coverage
+
+  generate-badges:
+    needs: [backend, frontend]
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+            
+        - name: Download backend coverage
+          uses: actions/download-artifact@v4
+          with:
+            name: test-coverage
+            path: coverage-reports/backend
+                
+        - name: Download frontend coverage
+          uses: actions/download-artifact@v4
+          with:
+            name: frontend-test-coverage
+            path: coverage-reports/frontend
+                
+        - name: Generate coverage badges
+          run: |
+            npm install -g lcov-badge-generator
+            BACKEND_COVERAGE=$(grep -oP 'Total.*?([0-9]{1,3})%' coverage-reports/backend/index.html | grep -oP '[0-9]{1,3}')
+            echo "Backend coverage: $BACKEND_COVERAGE%"
+            FRONTEND_COVERAGE=$(node -e "const coverage = require('./coverage-reports/frontend/coverage-summary.json'); console.log(coverage.total.statements.pct)")
+            echo "Frontend coverage: $FRONTEND_COVERAGE%"
+            lcov-badge-generator -o badges/backend-coverage.svg -v $BACKEND_COVERAGE
+            lcov-badge-generator -o badges/frontend-coverage.svg -v $FRONTEND_COVERAGE
+                
+        - name: Commit and push badges
+          run: |
+              git config --local user.name "GitHub Actions - Badge Updater"
+              mkdir -p badges
+              # Update README with badges
+              sed -i '/<img src="https:\/\/img.shields.io\/badge\/java-23-orange"/a \  <img src="https:\/\/github.com\/danielrudzinski\/KanbanProject\/raw\/main\/badges\/backend-coverage.svg" alt="Backend Coverage"\/>\n  <img src="https:\/\/github.com\/danielrudzinski\/KanbanProject\/raw\/main\/badges\/frontend-coverage.svg" alt="Frontend Coverage"\/>' README.md
+              git add badges/*.svg README.md
+              git commit -m "Update coverage badges" || echo "No changes to commit"
+              git push
