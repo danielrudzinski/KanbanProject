@@ -3,7 +3,9 @@ package pl.myproject.kanbanproject2.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.mapper.TaskMapper;
 import pl.myproject.kanbanproject2.model.Task;
@@ -58,133 +60,169 @@ public class TaskService {
     }
 
     public void deleteTask(Integer id) {
-        if (!taskRepository.existsById(id)) {
-            throw new EntityNotFoundException("Nie ma zadania o takim id");
+        try {
+            if (!taskRepository.existsById(id)) {
+                throw new EntityNotFoundException("Nie ma zadania o takim id");
+            }
+            taskRepository.deleteById(id);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
-        taskRepository.deleteById(id);
     }
 
     public TaskDTO getTaskById(Integer id) {
-        return taskRepository.findById(id)
-                .map(taskMapper::apply)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+        try {
+            return taskRepository.findById(id)
+                    .map(taskMapper::apply)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
 
     public TaskDTO patchTask(Integer id, Task task) {
-        Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+        try {
+            Task existingTask = taskRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
-        if (task.getTitle() != null) {
-            existingTask.setTitle(task.getTitle());
-        }
-        if (task.getColumn() != null) {
-            existingTask.setColumn(task.getColumn());
-        }
-        if (task.getUsers() != null) {
-            existingTask.setUsers(task.getUsers());
-        }
-        if (task.getPosition() != null) {
-            existingTask.setPosition(task.getPosition());
-        }
-        if (task.getRow() != null) {
-            existingTask.setRow(task.getRow());
-        }
-        if (task.getLabels() != null) {
-            existingTask.setLabels(task.getLabels());
-        }
-        if (task.getDescription() != null) {
-            existingTask.setDescription(task.getDescription());
-        }
-        if (task.getPosition() != null) {
-            existingTask.setPosition(task.getPosition());
-        }
+            if (task.getTitle() != null) {
+                existingTask.setTitle(task.getTitle());
+            }
+            if (task.getColumn() != null) {
+                existingTask.setColumn(task.getColumn());
+            }
+            if (task.getUsers() != null) {
+                existingTask.setUsers(task.getUsers());
+            }
+            if (task.getPosition() != null) {
+                existingTask.setPosition(task.getPosition());
+            }
+            if (task.getRow() != null) {
+                existingTask.setRow(task.getRow());
+            }
+            if (task.getLabels() != null) {
+                existingTask.setLabels(task.getLabels());
+            }
+            if (task.getDescription() != null) {
+                existingTask.setDescription(task.getDescription());
+            }
+            if (task.getPosition() != null) {
+                existingTask.setPosition(task.getPosition());
+            }
 
-
-        Task savedTask = taskRepository.save(existingTask);
-        return taskMapper.apply(savedTask);
+            Task savedTask = taskRepository.save(existingTask);
+            return taskMapper.apply(savedTask);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
 
     public TaskDTO assignUserToTask(Integer taskId, Integer userId) {
-        boolean isWithinLimit = userService.checkWipStatus(userId);
+        try {
+            boolean isWithinLimit = userService.checkWipStatus(userId);
 
-        if (!isWithinLimit) {
-            throw new RuntimeException("Nie można przypisać użytkownika.");
+            if (!isWithinLimit) {
+                throw new RuntimeException("Nie można przypisać użytkownika.");
+            }
+
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+
+            task.getUsers().add(user);
+            user.getTasks().add(task);
+
+            userRepository.save(user);
+            Task updatedTask = taskRepository.save(task);
+
+            return taskMapper.apply(updatedTask);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
-
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
-
-        task.getUsers().add(user);
-        user.getTasks().add(task);
-
-        userRepository.save(user);
-        Task updatedTask = taskRepository.save(task);
-
-        return taskMapper.apply(updatedTask);
     }
 
     public TaskDTO removeUserFromTask(Integer taskId, Integer userId) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+        try {
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-        task.getUsers().remove(user);
-        user.getTasks().remove(task);
+            task.getUsers().remove(user);
+            user.getTasks().remove(task);
 
-        userRepository.save(user);
-        Task updatedTask = taskRepository.save(task);
+            userRepository.save(user);
+            Task updatedTask = taskRepository.save(task);
 
-        return taskMapper.apply(updatedTask);
+            return taskMapper.apply(updatedTask);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
 
     public TaskDTO updateTaskPosition(Integer id, Integer position) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
-        task.setPosition(position);
-        Task updatedTask = taskRepository.save(task);
-        return taskMapper.apply(updatedTask);
+        try {
+            Task task = taskRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+            task.setPosition(position);
+            Task updatedTask = taskRepository.save(task);
+            return taskMapper.apply(updatedTask);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
 
     public TaskDTO addLabelToTask(Integer taskId, String label) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+        try {
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
-        if (task.getLabels() == null) {
-            task.setLabels(new HashSet<>());
+            if (task.getLabels() == null) {
+                task.setLabels(new HashSet<>());
+            }
+
+            task.getLabels().add(label);
+            Task updatedTask = taskRepository.save(task);
+            return taskMapper.apply(updatedTask);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
-
-        task.getLabels().add(label);
-        Task updatedTask = taskRepository.save(task);
-        return taskMapper.apply(updatedTask);
     }
 
     public TaskDTO removeLabelFromTask(Integer taskId, String label) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+        try {
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
-        if (task.getLabels() != null) {
-            task.getLabels().remove(label);
-            Task updatedTask = taskRepository.save(task);
-            return taskMapper.apply(updatedTask);
+            if (task.getLabels() != null) {
+                task.getLabels().remove(label);
+                Task updatedTask = taskRepository.save(task);
+                return taskMapper.apply(updatedTask);
+            }
+
+            return taskMapper.apply(task);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
-
-        return taskMapper.apply(task);
     }
 
     public TaskDTO updateTaskLabels(Integer taskId, Set<String> labels) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+        try {
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
-        task.setLabels(labels);
-        Task updatedTask = taskRepository.save(task);
-        return taskMapper.apply(updatedTask);
+            task.setLabels(labels);
+            Task updatedTask = taskRepository.save(task);
+            return taskMapper.apply(updatedTask);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
-
 
     public Set<String> getAllLabels() {
         try {
@@ -194,9 +232,7 @@ public class TaskService {
                     .flatMap(task -> task.getLabels().stream())
                     .collect(Collectors.toSet());
         } catch (Exception e) {
-
-            return new HashSet<>();
-
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error retrieving labels", e);
         }
     }
 }

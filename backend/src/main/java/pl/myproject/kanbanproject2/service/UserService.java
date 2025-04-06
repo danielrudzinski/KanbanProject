@@ -3,8 +3,10 @@ package pl.myproject.kanbanproject2.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import pl.myproject.kanbanproject2.dto.UserDTO;
 import pl.myproject.kanbanproject2.mapper.UserMapper;
 import pl.myproject.kanbanproject2.model.File;
@@ -31,7 +33,6 @@ public class UserService {
     }
 
     public List<UserDTO> getAllUsers() {
-
         List<UserDTO> userDTOS = userRepository.findAll().stream()
                 .map(userMapper::apply)
                 .collect(Collectors.toList());
@@ -39,61 +40,76 @@ public class UserService {
     }
 
     public UserDTO getUserById(Integer id) {
-        return userRepository.findById(id)
-                .map(userMapper::apply)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+        try {
+            return userRepository.findById(id)
+                    .map(userMapper::apply)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
 
     public User addUser(User user) {
         return userRepository.save(user);
     }
 
-
     public void deleteUser(Integer id) {
-        if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException("Nie ma użytkownika o takim id");
+        try {
+            if (!userRepository.existsById(id)) {
+                throw new EntityNotFoundException("Nie ma użytkownika o takim id");
+            }
+            userRepository.deleteById(id);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
-        userRepository.deleteById(id);
     }
 
     public User updateUser(Integer id, User user) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+        try {
+            User existingUser = userRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-        if (user.getEmail() != null) {
-            existingUser.setEmail(user.getEmail());
+            if (user.getEmail() != null) {
+                existingUser.setEmail(user.getEmail());
+            }
+            if (user.getName() != null) {
+                existingUser.setName(user.getName());
+            }
+            if (user.getWipLimit() != null) {
+                existingUser.setWipLimit(user.getWipLimit());
+            }
+            return userRepository.save(existingUser);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
-        if (user.getName() != null) {
-            existingUser.setName(user.getName());
-        }
-        if (user.getWipLimit() != null) {
-            existingUser.setWipLimit(user.getWipLimit());
-        }
-        return userRepository.save(existingUser);
     }
 
     public UserDTO patchUser(UserDTO userDTO, Integer id) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+        try {
+            User existingUser = userRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-        if (userDTO.email() != null) {
-            existingUser.setEmail(userDTO.email());
+            if (userDTO.email() != null) {
+                existingUser.setEmail(userDTO.email());
+            }
+            if (userDTO.name() != null) {
+                existingUser.setName(userDTO.name());
+            }
+            if (userDTO.wipLimit() != null) {
+                existingUser.setWipLimit(userDTO.wipLimit());
+            }
+            User updatedUser = userRepository.save(existingUser);
+            return userMapper.apply(updatedUser);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
-        if (userDTO.name() != null) {
-            existingUser.setName(userDTO.name());
-        }
-        if (userDTO.wipLimit() != null) {
-            existingUser.setWipLimit(userDTO.wipLimit());
-        }
-        User updatedUser = userRepository.save(existingUser);
-        return userMapper.apply(updatedUser);
     }
 
     public void uploadAvatar(Integer id, MultipartFile file) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
-
         try {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+
             File avatar = new File();
             avatar.setName(file.getOriginalFilename());
             avatar.setType(file.getContentType());
@@ -102,55 +118,73 @@ public class UserService {
             fileRepository.save(avatar);
             user.setAvatar(avatar);
             userRepository.save(user);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (IOException e) {
-            throw new RuntimeException("Błąd podczas wczytywania avatara", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Błąd podczas wczytywania avatara", e);
         }
     }
 
     public byte[] getAvatar(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-        if (user.getAvatar() == null) {
-            throw new EntityNotFoundException("Użytkownik nie posiada avatara");
+            if (user.getAvatar() == null) {
+                throw new EntityNotFoundException("Użytkownik nie posiada avatara");
+            }
+
+            return user.getAvatar().getData();
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
-
-        return user.getAvatar().getData();
     }
 
     public String getAvatarContentType(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-        if (user.getAvatar() == null) {
-            throw new EntityNotFoundException("Użytkownik nie posiada avatara");
+            if (user.getAvatar() == null) {
+                throw new EntityNotFoundException("Użytkownik nie posiada avatara");
+            }
+
+            return user.getAvatar().getType();
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
-
-        return user.getAvatar().getType();
     }
 
     public void deleteAvatar(Integer id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+        try {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-        if (user.getAvatar() == null) {
-            throw new EntityNotFoundException("Użytkownik nie posiada avatara");
+            if (user.getAvatar() == null) {
+                throw new EntityNotFoundException("Użytkownik nie posiada avatara");
+            }
+
+            File avatar = user.getAvatar();
+            user.setAvatar(null);
+            userRepository.save(user);
+            fileRepository.delete(avatar);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
-
-        File avatar = user.getAvatar();
-        user.setAvatar(null);
-        userRepository.save(user);
-        fileRepository.delete(avatar);
     }
 
     public UserDTO updateWipLimit(Integer userId, Integer wipLimit) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-        user.setWipLimit(wipLimit);
-        User updatedUser = userRepository.save(user);
+            user.setWipLimit(wipLimit);
+            User updatedUser = userRepository.save(user);
 
-        return userMapper.apply(updatedUser);
+            return userMapper.apply(updatedUser);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
     }
 
     public boolean checkWipStatus(Integer userId) {
@@ -166,10 +200,7 @@ public class UserService {
             int activeTaskCount = user.getTasks().size();
             return activeTaskCount < wipLimit;
         } catch (EntityNotFoundException e) {
-
-            return true;
-
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
-
 }

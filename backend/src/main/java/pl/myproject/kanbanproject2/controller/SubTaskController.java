@@ -1,6 +1,5 @@
 package pl.myproject.kanbanproject2.controller;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,30 +27,18 @@ public class SubTaskController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSubTask(@PathVariable Integer id) {
-        try {
-            subTaskService.deleteSubTask(id);
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        subTaskService.deleteSubTask(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SubTaskDTO> getSubTaskById(@PathVariable Integer id) {
-        try {
-            return ResponseEntity.ok(subTaskService.getSubTaskById(id));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(subTaskService.getSubTaskById(id));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<SubTaskDTO> patchSubTask(@PathVariable Integer id, @RequestBody SubTask subTask) {
-        try {
-            return ResponseEntity.ok(subTaskService.patchSubTask(id, subTask));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(subTaskService.patchSubTask(id, subTask));
     }
 
     @PostMapping
@@ -61,36 +48,21 @@ public class SubTaskController {
 
     @PutMapping("/{subTaskId}/task/{taskId}")
     public ResponseEntity<SubTaskDTO> assignTaskToSubTask(@PathVariable Integer subTaskId, @PathVariable Integer taskId) {
-        try {
-            return ResponseEntity.ok(subTaskService.assignTaskToSubTask(subTaskId, taskId));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(subTaskService.assignTaskToSubTask(subTaskId, taskId));
     }
 
     @GetMapping("/task/{taskId}")
     public ResponseEntity<List<SubTaskDTO>> getSubTasksByTaskId(@PathVariable Integer taskId) {
-        try {
-            return ResponseEntity.ok(subTaskService.getSubTasksByTaskId(taskId));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(subTaskService.getSubTasksByTaskId(taskId));
     }
 
     @PatchMapping("/{id}/change")
     public ResponseEntity<SubTaskDTO> toggleSubTaskCompletion(@PathVariable Integer id) {
-        try {
-            return ResponseEntity.ok(subTaskService.toggleSubTaskCompletion(id));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(subTaskService.toggleSubTaskCompletion(id));
     }
+
     @PatchMapping("/{id}/position/{position}")
     public ResponseEntity<SubTaskDTO> updateSubTaskPosition(@PathVariable Integer id, @PathVariable Integer position) {
-        try {
-            return ResponseEntity.ok(subTaskService.updateSubTaskPosition(id, position));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(subTaskService.updateSubTaskPosition(id, position));
     }
 }

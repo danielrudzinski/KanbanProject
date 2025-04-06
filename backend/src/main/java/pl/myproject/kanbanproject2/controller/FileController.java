@@ -8,8 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.myproject.kanbanproject2.model.File;
 import pl.myproject.kanbanproject2.service.FileService;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/files")
 public class FileController {
@@ -21,12 +19,8 @@ public class FileController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            File savedFile = fileService.saveFile(file);
-            return ResponseEntity.ok("Plik załadowany z sukcesem! ID: " + savedFile.getId());
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("Nie udało się wysłać pliku.");
-        }
+        File savedFile = fileService.saveFile(file);
+        return ResponseEntity.ok("Plik załadowany z sukcesem! ID: " + savedFile.getId());
     }
 
     @GetMapping("/{id}")
@@ -37,14 +31,10 @@ public class FileController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileEntity.getName() + "\"")
                 .body(fileEntity.getData());
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteFile(@PathVariable Long id) {
-        try {
-            fileService.deleteFile(id);
-            return ResponseEntity.ok("Plik usunięty pomyślnie!");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body("Plik nie znaleziony");
-        }
+        fileService.deleteFile(id);
+        return ResponseEntity.ok("Plik usunięty pomyślnie!");
     }
-
 }
