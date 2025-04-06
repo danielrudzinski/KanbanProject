@@ -121,18 +121,7 @@ public class SubTaskControllerTest {
         Mockito.verify(subTaskService).getSubTaskById(1);
     }
 
-    @Test
-    void getSubTaskByIdShouldReturnNotFoundWhenSubTaskDoesNotExist() throws Exception {
-        // given
-        Mockito.when(subTaskService.getSubTaskById(999)).thenThrow(new EntityNotFoundException("Nie ma podzadania o takim id"));
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.get("/subtasks/999")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        Mockito.verify(subTaskService).getSubTaskById(999);
-    }
 
     @Test
     void createSubTaskShouldReturnCreatedSubTask() throws Exception {

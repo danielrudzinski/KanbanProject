@@ -10,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.mapper.TaskMapper;
 import pl.myproject.kanbanproject2.model.Column;
@@ -155,7 +157,9 @@ public class TaskServiceTest {
         Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
 
         // when & then
-        Assertions.assertThrows(EntityNotFoundException.class, () -> taskService.getTaskById(taskId));
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> taskService.getTaskById(taskId));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         Mockito.verify(taskRepository).findById(taskId);
     }
 
@@ -224,7 +228,9 @@ public class TaskServiceTest {
         Mockito.when(taskRepository.existsById(taskId)).thenReturn(false);
 
         // when & then
-        Assertions.assertThrows(EntityNotFoundException.class, () -> taskService.deleteTask(taskId));
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> taskService.deleteTask(taskId));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         Mockito.verify(taskRepository).existsById(taskId);
         Mockito.verify(taskRepository, Mockito.never()).deleteById(taskId);
     }
@@ -262,6 +268,23 @@ public class TaskServiceTest {
         Mockito.verify(taskRepository).findById(testTask.getId());
         Mockito.verify(taskRepository).save(testTask);
         Mockito.verify(taskMapper).apply(testTask);
+    }
+
+    @Test
+    void patchTaskShouldThrowExceptionWhenTaskNotFound() {
+        // given
+        int taskId = 99;
+        Task patchTask = new Task();
+        patchTask.setTitle("Updated Title");
+
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> taskService.patchTask(taskId, patchTask));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        Mockito.verify(taskRepository).findById(taskId);
+        Mockito.verify(taskRepository, Mockito.never()).save(Mockito.any(Task.class));
     }
 
     @Test
@@ -308,10 +331,30 @@ public class TaskServiceTest {
         Mockito.when(userService.checkWipStatus(userId)).thenReturn(false);
 
         // when & then
-        Assertions.assertThrows(RuntimeException.class, () -> taskService.assignUserToTask(taskId, userId));
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> taskService.assignUserToTask(taskId, userId));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         Mockito.verify(userService).checkWipStatus(userId);
         Mockito.verify(taskRepository, Mockito.never()).findById(taskId);
         Mockito.verify(userRepository, Mockito.never()).findById(userId);
+    }
+
+    @Test
+    void assignUserToTaskShouldThrowExceptionWhenTaskNotFound() {
+        // given
+        int taskId = 99;
+        int userId = testUser.getId();
+
+        Mockito.when(userService.checkWipStatus(userId)).thenReturn(true);
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> taskService.assignUserToTask(taskId, userId));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        Mockito.verify(userService).checkWipStatus(userId);
+        Mockito.verify(taskRepository).findById(taskId);
+        Mockito.verify(userRepository, Mockito.never()).findById(Mockito.anyInt());
     }
 
     @Test
@@ -350,6 +393,22 @@ public class TaskServiceTest {
     }
 
     @Test
+    void removeUserFromTaskShouldThrowExceptionWhenTaskNotFound() {
+        // given
+        int taskId = 99;
+        int userId = testUser.getId();
+
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> taskService.removeUserFromTask(taskId, userId));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        Mockito.verify(taskRepository).findById(taskId);
+        Mockito.verify(userRepository, Mockito.never()).findById(Mockito.anyInt());
+    }
+
+    @Test
     void updateTaskPositionShouldUpdatePosition() {
         // given
         int taskId = testTask.getId();
@@ -380,6 +439,22 @@ public class TaskServiceTest {
         Mockito.verify(taskRepository).findById(taskId);
         Mockito.verify(taskRepository).save(testTask);
         Mockito.verify(taskMapper).apply(testTask);
+    }
+
+    @Test
+    void updateTaskPositionShouldThrowExceptionWhenTaskNotFound() {
+        // given
+        int taskId = 99;
+        int newPosition = 5;
+
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> taskService.updateTaskPosition(taskId, newPosition));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        Mockito.verify(taskRepository).findById(taskId);
+        Mockito.verify(taskRepository, Mockito.never()).save(Mockito.any(Task.class));
     }
 
     @Test
@@ -424,6 +499,22 @@ public class TaskServiceTest {
     }
 
     @Test
+    void addLabelToTaskShouldThrowExceptionWhenTaskNotFound() {
+        // given
+        int taskId = 99;
+        String newLabel = "newLabel";
+
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> taskService.addLabelToTask(taskId, newLabel));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        Mockito.verify(taskRepository).findById(taskId);
+        Mockito.verify(taskRepository, Mockito.never()).save(Mockito.any(Task.class));
+    }
+
+    @Test
     void removeLabelFromTaskShouldRemoveLabel() {
         // given
         int taskId = testTask.getId();
@@ -465,6 +556,22 @@ public class TaskServiceTest {
     }
 
     @Test
+    void removeLabelFromTaskShouldThrowExceptionWhenTaskNotFound() {
+        // given
+        int taskId = 99;
+        String labelToRemove = "important";
+
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> taskService.removeLabelFromTask(taskId, labelToRemove));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        Mockito.verify(taskRepository).findById(taskId);
+        Mockito.verify(taskRepository, Mockito.never()).save(Mockito.any(Task.class));
+    }
+
+    @Test
     void updateTaskLabelsShouldUpdateLabels() {
         // given
         int taskId = testTask.getId();
@@ -503,6 +610,22 @@ public class TaskServiceTest {
     }
 
     @Test
+    void updateTaskLabelsShouldThrowExceptionWhenTaskNotFound() {
+        // given
+        int taskId = 99;
+        Set<String> newLabels = Set.of("newLabel1", "newLabel2");
+
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> taskService.updateTaskLabels(taskId, newLabels));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        Mockito.verify(taskRepository).findById(taskId);
+        Mockito.verify(taskRepository, Mockito.never()).save(Mockito.any(Task.class));
+    }
+
+    @Test
     void getAllLabelsShouldReturnAllLabels() {
         // given
         List<Task> tasks = List.of(testTask);
@@ -521,11 +644,10 @@ public class TaskServiceTest {
         // given
         Mockito.when(taskRepository.findAll()).thenThrow(new RuntimeException("Test exception"));
 
-        // when
-        Set<String> result = taskService.getAllLabels();
-
-        // then
-        Assertions.assertTrue(result.isEmpty());
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> taskService.getAllLabels());
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
         Mockito.verify(taskRepository).findAll();
     }
 }

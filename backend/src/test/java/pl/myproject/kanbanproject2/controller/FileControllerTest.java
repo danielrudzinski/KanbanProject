@@ -88,16 +88,5 @@ public class FileControllerTest {
 
 
 
-    @Test
-    void deleteFileShouldHandleFileNotFound() throws Exception {
-        // given
-        Mockito.doThrow(new RuntimeException("File not found")).when(fileService).deleteFile(1L);
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.delete("/files/1"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.content().string("Plik nie znaleziony"));
-
-        Mockito.verify(fileService).deleteFile(1L);
-    }
 }

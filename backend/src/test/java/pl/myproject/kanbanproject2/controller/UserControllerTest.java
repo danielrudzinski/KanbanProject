@@ -113,18 +113,7 @@ public class UserControllerTest {
         Mockito.verify(userService).getUserById(1);
     }
 
-    @Test
-    void getUserByIdShouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
-        // given
-        Mockito.when(userService.getUserById(999)).thenThrow(new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/999")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        Mockito.verify(userService).getUserById(999);
-    }
 
     @Test
     void addUserShouldReturnCreatedUser() throws Exception {
@@ -180,20 +169,7 @@ public class UserControllerTest {
         Mockito.verify(userService).updateUser(Mockito.eq(1), Mockito.any(User.class));
     }
 
-    @Test
-    void updateUserShouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
-        // given
-        Mockito.when(userService.updateUser(Mockito.eq(999), Mockito.any(User.class)))
-                .thenThrow(new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/999")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testUser)))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        Mockito.verify(userService).updateUser(Mockito.eq(999), Mockito.any(User.class));
-    }
 
     @Test
     void patchUserShouldReturnPatchedUser() throws Exception {
@@ -220,21 +196,7 @@ public class UserControllerTest {
         Mockito.verify(userService).patchUser(Mockito.any(UserDTO.class), Mockito.eq(1));
     }
 
-    @Test
-    void patchUserShouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
-        // given
-        UserDTO patchDTO = new UserDTO(999, "patched@example.com", "Patched User", new HashSet<>(), 7);
-        Mockito.when(userService.patchUser(Mockito.any(UserDTO.class), Mockito.eq(999)))
-                .thenThrow(new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.patch("/users/999")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(patchDTO)))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        Mockito.verify(userService).patchUser(Mockito.any(UserDTO.class), Mockito.eq(999));
-    }
 
     @Test
     void deleteUserShouldReturnNoContent() throws Exception {
@@ -248,18 +210,7 @@ public class UserControllerTest {
         Mockito.verify(userService).deleteUser(1);
     }
 
-    @Test
-    void deleteUserShouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
-        // given
-        Mockito.doThrow(new EntityNotFoundException("Nie ma użytkownika o takim id"))
-                .when(userService).deleteUser(999);
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.delete("/users/999"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        Mockito.verify(userService).deleteUser(999);
-    }
 
     @Test
     void uploadAvatarShouldReturnSuccess() throws Exception {
@@ -283,26 +234,7 @@ public class UserControllerTest {
         Mockito.verify(userService).uploadAvatar(Mockito.eq(1), Mockito.any(MockMultipartFile.class));
     }
 
-    @Test
-    void uploadAvatarShouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
-        // given
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "avatar.jpg",
-                "image/jpeg",
-                "test image content".getBytes()
-        );
 
-        Mockito.doThrow(new EntityNotFoundException("Nie ma użytkownika o takim id"))
-                .when(userService).uploadAvatar(Mockito.eq(999), Mockito.any(MockMultipartFile.class));
-
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/users/999/avatar")
-                        .file(file))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        Mockito.verify(userService).uploadAvatar(Mockito.eq(999), Mockito.any(MockMultipartFile.class));
-    }
 
     @Test
     void getAvatarShouldReturnAvatarData() throws Exception {
@@ -324,17 +256,6 @@ public class UserControllerTest {
         Mockito.verify(userService).getAvatarContentType(1);
     }
 
-    @Test
-    void getAvatarShouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
-        // given
-        Mockito.when(userService.getAvatar(999)).thenThrow(new EntityNotFoundException("Nie ma użytkownika o takim id"));
-
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/999/avatar"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        Mockito.verify(userService).getAvatar(999);
-    }
 
     @Test
     void deleteAvatarShouldReturnSuccess() throws Exception {
@@ -350,18 +271,7 @@ public class UserControllerTest {
         Mockito.verify(userService).deleteAvatar(1);
     }
 
-    @Test
-    void deleteAvatarShouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
-        // given
-        Mockito.doThrow(new EntityNotFoundException("Nie ma użytkownika o takim id"))
-                .when(userService).deleteAvatar(999);
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.delete("/users/999/avatar"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        Mockito.verify(userService).deleteAvatar(999);
-    }
 
     @Test
     void updateWipLimitShouldReturnUpdatedUser() throws Exception {

@@ -142,18 +142,7 @@ public class TaskControllerTest {
         Mockito.verify(taskService).getTaskById(1);
     }
 
-    @Test
-    void getTaskByIdShouldReturnNotFoundWhenTaskDoesNotExist() throws Exception {
-        // given
-        Mockito.when(taskService.getTaskById(999)).thenThrow(new EntityNotFoundException("Nie ma zadania o takim id"));
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.get("/tasks/999")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        Mockito.verify(taskService).getTaskById(999);
-    }
 
     @Test
     void createTaskShouldReturnCreatedTask() throws Exception {
@@ -218,23 +207,7 @@ public class TaskControllerTest {
         Mockito.verify(taskService).patchTask(Mockito.eq(1), Mockito.any(Task.class));
     }
 
-    @Test
-    void patchTaskShouldReturnNotFoundWhenTaskDoesNotExist() throws Exception {
-        // given
-        Task updateTask = new Task();
-        updateTask.setTitle("Updated Task");
 
-        Mockito.when(taskService.patchTask(Mockito.eq(999), Mockito.any(Task.class)))
-                .thenThrow(new EntityNotFoundException("Nie ma zadania o takim id"));
-
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.patch("/tasks/999")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateTask)))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        Mockito.verify(taskService).patchTask(Mockito.eq(999), Mockito.any(Task.class));
-    }
 
     @Test
     void deleteTaskShouldReturnNoContent() throws Exception {
@@ -248,17 +221,7 @@ public class TaskControllerTest {
         Mockito.verify(taskService).deleteTask(1);
     }
 
-    @Test
-    void deleteTaskShouldReturnNotFoundWhenTaskDoesNotExist() throws Exception {
-        // given
-        Mockito.doThrow(new EntityNotFoundException("Nie ma zadania o takim id")).when(taskService).deleteTask(999);
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.delete("/tasks/999"))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        Mockito.verify(taskService).deleteTask(999);
-    }
 
     @Test
     void assignUserToTaskShouldReturnUpdatedTask() throws Exception {

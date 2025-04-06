@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 import pl.myproject.kanbanproject2.dto.SubTaskDTO;
 import pl.myproject.kanbanproject2.mapper.SubTaskMapper;
 import pl.myproject.kanbanproject2.model.SubTask;
@@ -176,8 +177,10 @@ public class SubTaskServiceTest {
         Mockito.when(subTaskRepository.findById(subTaskId)).thenReturn(Optional.empty());
 
         // when & then
-        Assertions.assertThrows(EntityNotFoundException.class,
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
                 () -> subTaskService.getSubTaskById(subTaskId));
+
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma podzadania o takim id\"", exception.getMessage());
 
         Mockito.verify(subTaskRepository).findById(subTaskId);
         Mockito.verify(subTaskMapper, Mockito.never()).toDto(Mockito.any(SubTask.class));
@@ -204,8 +207,10 @@ public class SubTaskServiceTest {
         Mockito.when(subTaskRepository.existsById(subTaskId)).thenReturn(false);
 
         // when & then
-        Assertions.assertThrows(EntityNotFoundException.class,
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
                 () -> subTaskService.deleteSubTask(subTaskId));
+
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma podzadania o takim id\"", exception.getMessage());
 
         Mockito.verify(subTaskRepository).existsById(subTaskId);
         Mockito.verify(subTaskRepository, Mockito.never()).deleteById(subTaskId);
@@ -276,8 +281,10 @@ public class SubTaskServiceTest {
         Mockito.when(subTaskRepository.findById(subTaskId)).thenReturn(Optional.empty());
 
         // when & then
-        Assertions.assertThrows(EntityNotFoundException.class,
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
                 () -> subTaskService.patchSubTask(subTaskId, patchSubTask));
+
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma podzadania o takim id\"", exception.getMessage());
 
         Mockito.verify(subTaskRepository).findById(subTaskId);
         Mockito.verify(subTaskRepository, Mockito.never()).save(Mockito.any(SubTask.class));
@@ -334,6 +341,43 @@ public class SubTaskServiceTest {
     }
 
     @Test
+    void assignTaskToSubTaskShouldThrowExceptionWhenSubTaskNotFound() {
+        // given
+        Integer subTaskId = 99;
+        Integer taskId = 1;
+
+        Mockito.when(subTaskRepository.findById(subTaskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> subTaskService.assignTaskToSubTask(subTaskId, taskId));
+
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma podzadania o takim id\"", exception.getMessage());
+
+        Mockito.verify(subTaskRepository).findById(subTaskId);
+        Mockito.verify(taskRepository, Mockito.never()).findById(Mockito.anyInt());
+    }
+
+    @Test
+    void assignTaskToSubTaskShouldThrowExceptionWhenTaskNotFound() {
+        // given
+        Integer subTaskId = 1;
+        Integer taskId = 99;
+
+        Mockito.when(subTaskRepository.findById(subTaskId)).thenReturn(Optional.of(testSubTask));
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> subTaskService.assignTaskToSubTask(subTaskId, taskId));
+
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma zadania o takim id\"", exception.getMessage());
+
+        Mockito.verify(subTaskRepository).findById(subTaskId);
+        Mockito.verify(taskRepository).findById(taskId);
+    }
+
+    @Test
     void getSubTasksByTaskIdShouldReturnSubTasks() {
         // given
         Integer taskId = testTask.getId();
@@ -352,6 +396,22 @@ public class SubTaskServiceTest {
 
         Mockito.verify(taskRepository).findById(taskId);
         Mockito.verify(subTaskMapper).toDto(testSubTask);
+    }
+
+    @Test
+    void getSubTasksByTaskIdShouldThrowExceptionWhenTaskNotFound() {
+        // given
+        Integer taskId = 99;
+
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> subTaskService.getSubTasksByTaskId(taskId));
+
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma zadania o takim id\"", exception.getMessage());
+
+        Mockito.verify(taskRepository).findById(taskId);
     }
 
     @Test
@@ -397,6 +457,23 @@ public class SubTaskServiceTest {
     }
 
     @Test
+    void toggleSubTaskCompletionShouldThrowExceptionWhenSubTaskNotFound() {
+        // given
+        Integer subTaskId = 99;
+
+        Mockito.when(subTaskRepository.findById(subTaskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> subTaskService.toggleSubTaskCompletion(subTaskId));
+
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma podzadania o takim id\"", exception.getMessage());
+
+        Mockito.verify(subTaskRepository).findById(subTaskId);
+        Mockito.verify(subTaskRepository, Mockito.never()).save(Mockito.any(SubTask.class));
+    }
+
+    @Test
     void updateSubTaskPositionShouldUpdatePosition() {
         // given
         Integer subTaskId = testSubTask.getId();
@@ -437,5 +514,23 @@ public class SubTaskServiceTest {
         Mockito.verify(subTaskRepository).findById(subTaskId);
         Mockito.verify(subTaskRepository).save(Mockito.any(SubTask.class));
         Mockito.verify(subTaskMapper).toDto(updatedSubTask);
+    }
+
+    @Test
+    void updateSubTaskPositionShouldThrowExceptionWhenSubTaskNotFound() {
+        // given
+        Integer subTaskId = 99;
+        Integer newPosition = 3;
+
+        Mockito.when(subTaskRepository.findById(subTaskId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> subTaskService.updateSubTaskPosition(subTaskId, newPosition));
+
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma podzadania o takim id\"", exception.getMessage());
+
+        Mockito.verify(subTaskRepository).findById(subTaskId);
+        Mockito.verify(subTaskRepository, Mockito.never()).save(Mockito.any(SubTask.class));
     }
 }

@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import pl.myproject.kanbanproject2.dto.UserDTO;
 import pl.myproject.kanbanproject2.mapper.UserMapper;
 import pl.myproject.kanbanproject2.model.File;
@@ -115,13 +116,15 @@ public class UserServiceTest {
     }
 
     @Test
-    void getNonExistingUserShouldNotGiveException() {
+    void getNonExistingUserShouldThrowResponseStatusException() {
         //given
         int userId = 10;
         Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         //when & then
-        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> userService.getUserById(userId));
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma użytkownika o takim id\"", exception.getMessage());
         Mockito.verify(userRepository).findById(userId);
         Mockito.verify(userMapper, Mockito.never()).apply(Mockito.any());
     }
@@ -138,16 +141,17 @@ public class UserServiceTest {
     }
 
     @Test
-    void deleteNonExistingUserShouldGiveException() {
+    void deleteNonExistingUserShouldThrowResponseStatusException() {
         // given
         int userId = 10;
         Mockito.when(userRepository.existsById(userId)).thenReturn(false);
+
         // when & then
-        Assertions.assertThrows(EntityNotFoundException.class,
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
                 () -> userService.deleteUser(userId));
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma użytkownika o takim id\"", exception.getMessage());
         Mockito.verify(userRepository).existsById(userId);
         Mockito.verify(userRepository, Mockito.never()).deleteById(userId);
-
     }
 
     @Test
@@ -188,6 +192,24 @@ public class UserServiceTest {
         Assertions.assertEquals(updatedUser.getWipLimit(), result.getWipLimit());
         Mockito.verify(userRepository).save(Mockito.any(User.class));
     }
+
+    @Test
+    void updateNonExistingUserShouldThrowResponseStatusException() {
+        // given
+        int userId = 10;
+        User updatedUser = new User();
+        updatedUser.setName("Updated Name");
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> userService.updateUser(userId, updatedUser));
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma użytkownika o takim id\"", exception.getMessage());
+        Mockito.verify(userRepository).findById(userId);
+        Mockito.verify(userRepository, Mockito.never()).save(Mockito.any(User.class));
+    }
+
     @Test
     void patchUserShouldUpdateOnlyNonNullFields() {
         // given
@@ -215,6 +237,23 @@ public class UserServiceTest {
 
         Mockito.verify(userRepository).save(Mockito.any(User.class));
     }
+
+    @Test
+    void patchNonExistingUserShouldThrowResponseStatusException() {
+        // given
+        int userId = 10;
+        UserDTO patchUserDTO = new UserDTO(null, "patched@example.com", null, null, 7);
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> userService.patchUser(patchUserDTO, userId));
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma użytkownika o takim id\"", exception.getMessage());
+        Mockito.verify(userRepository).findById(userId);
+        Mockito.verify(userRepository, Mockito.never()).save(Mockito.any(User.class));
+    }
+
     @Test
     void getAvatarShouldReturnAvatarData() {
         // given
@@ -243,7 +282,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void getNonExistingAvatarShouldThrowException() {
+    void getNonExistingAvatarShouldThrowResponseStatusException() {
         // given
         User userWithoutAvatar = new User();
         userWithoutAvatar.setId(2);
@@ -252,9 +291,23 @@ public class UserServiceTest {
         Mockito.when(userRepository.findById(userWithoutAvatar.getId())).thenReturn(Optional.of(userWithoutAvatar));
 
         // when & then
-        Assertions.assertThrows(EntityNotFoundException.class,
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
                 () -> userService.getAvatar(userWithoutAvatar.getId()));
+        Assertions.assertEquals("404 NOT_FOUND \"Użytkownik nie posiada avatara\"", exception.getMessage());
         Mockito.verify(userRepository).findById(userWithoutAvatar.getId());
+    }
+
+    @Test
+    void getAvatarForNonExistingUserShouldThrowResponseStatusException() {
+        // given
+        int userId = 10;
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> userService.getAvatar(userId));
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma użytkownika o takim id\"", exception.getMessage());
+        Mockito.verify(userRepository).findById(userId);
     }
 
     @Test
@@ -273,7 +326,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void deleteNonExistingAvatarShouldThrowException() {
+    void deleteNonExistingAvatarShouldThrowResponseStatusException() {
         // given
         User userWithoutAvatar = new User();
         userWithoutAvatar.setId(2);
@@ -282,9 +335,25 @@ public class UserServiceTest {
         Mockito.when(userRepository.findById(userWithoutAvatar.getId())).thenReturn(Optional.of(userWithoutAvatar));
 
         // when & then
-        Assertions.assertThrows(EntityNotFoundException.class,
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
                 () -> userService.deleteAvatar(userWithoutAvatar.getId()));
+        Assertions.assertEquals("404 NOT_FOUND \"Użytkownik nie posiada avatara\"", exception.getMessage());
         Mockito.verify(userRepository).findById(userWithoutAvatar.getId());
+        Mockito.verify(userRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(fileRepository, Mockito.never()).delete(Mockito.any());
+    }
+
+    @Test
+    void deleteAvatarForNonExistingUserShouldThrowResponseStatusException() {
+        // given
+        int userId = 10;
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> userService.deleteAvatar(userId));
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma użytkownika o takim id\"", exception.getMessage());
+        Mockito.verify(userRepository).findById(userId);
         Mockito.verify(userRepository, Mockito.never()).save(Mockito.any());
         Mockito.verify(fileRepository, Mockito.never()).delete(Mockito.any());
     }
@@ -308,6 +377,21 @@ public class UserServiceTest {
         Mockito.verify(userRepository).findById(testUser.getId());
         Mockito.verify(userRepository).save(testUser);
         Mockito.verify(userMapper).apply(testUser);
+    }
+
+    @Test
+    void updateWipLimitForNonExistingUserShouldThrowResponseStatusException() {
+        // given
+        int userId = 10;
+        Integer newWipLimit = 10;
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> userService.updateWipLimit(userId, newWipLimit));
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma użytkownika o takim id\"", exception.getMessage());
+        Mockito.verify(userRepository).findById(userId);
+        Mockito.verify(userRepository, Mockito.never()).save(Mockito.any());
     }
 
     @Test
@@ -357,17 +441,16 @@ public class UserServiceTest {
     }
 
     @Test
-    void checkWipStatusShouldReturnTrueWhenUserNotFound() {
+    void checkWipStatusForNonExistingUserShouldThrowResponseStatusException() {
         // given
         int nonExistingUserId = 999;
         Mockito.when(userRepository.findById(nonExistingUserId))
-                .thenThrow(new EntityNotFoundException("User not found"));
+                .thenReturn(Optional.empty());
 
-        // when
-        boolean result = userService.checkWipStatus(nonExistingUserId);
-
-        // then
-        Assertions.assertTrue(result);
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> userService.checkWipStatus(nonExistingUserId));
+        Assertions.assertEquals("404 NOT_FOUND \"User not found\"", exception.getMessage());
         Mockito.verify(userRepository).findById(nonExistingUserId);
     }
 
@@ -385,24 +468,56 @@ public class UserServiceTest {
         savedFile.setType("image/jpeg");
         savedFile.setData(new byte[]{1, 2, 3});
 
-        try {
-            Mockito.when(mockFile.getOriginalFilename()).thenReturn("test.jpg");
-            Mockito.when(mockFile.getContentType()).thenReturn("image/jpeg");
-            Mockito.when(mockFile.getBytes()).thenReturn(new byte[]{1, 2, 3});
-            Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-            Mockito.when(fileRepository.save(Mockito.any(File.class))).thenReturn(savedFile);
+        Mockito.when(mockFile.getOriginalFilename()).thenReturn("test.jpg");
+        Mockito.when(mockFile.getContentType()).thenReturn("image/jpeg");
+        Mockito.when(mockFile.getBytes()).thenReturn(new byte[]{1, 2, 3});
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        Mockito.when(fileRepository.save(Mockito.any(File.class))).thenReturn(savedFile);
 
-            // when
-            userService.uploadAvatar(userId, mockFile);
+        // when
+        userService.uploadAvatar(userId, mockFile);
 
-            // then
-            Assertions.assertNotNull(user.getAvatar());
-            Mockito.verify(userRepository).findById(userId);
-            Mockito.verify(fileRepository).save(Mockito.any(File.class));
-            Mockito.verify(userRepository).save(user);
-        } catch (IOException e) {
-            Assertions.fail("Test nie powinien rzucać wyjątku IOException");
-        }
+        // then
+        Assertions.assertNotNull(user.getAvatar());
+        Mockito.verify(userRepository).findById(userId);
+        Mockito.verify(fileRepository).save(Mockito.any(File.class));
+        Mockito.verify(userRepository).save(user);
+    }
+
+    @Test
+    void uploadAvatarForNonExistingUserShouldThrowResponseStatusException() throws IOException {
+        // given
+        int userId = 10;
+        MultipartFile mockFile = Mockito.mock(MultipartFile.class);
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> userService.uploadAvatar(userId, mockFile));
+        Assertions.assertEquals("404 NOT_FOUND \"Nie ma użytkownika o takim id\"", exception.getMessage());
+        Mockito.verify(userRepository).findById(userId);
+        Mockito.verify(fileRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(userRepository, Mockito.never()).save(Mockito.any());
+    }
+
+    @Test
+    void uploadAvatarWithIOExceptionShouldThrowResponseStatusException() throws IOException {
+        // given
+        int userId = 1;
+        MultipartFile mockFile = Mockito.mock(MultipartFile.class);
+        User user = new User();
+        user.setId(userId);
+
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        Mockito.when(mockFile.getBytes()).thenThrow(new IOException("Test IO Exception"));
+
+        // when & then
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> userService.uploadAvatar(userId, mockFile));
+        Assertions.assertEquals("500 INTERNAL_SERVER_ERROR \"Błąd podczas wczytywania avatara\"", exception.getMessage());
+        Mockito.verify(userRepository).findById(userId);
+        Mockito.verify(fileRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(userRepository, Mockito.never()).save(Mockito.any());
     }
 }
-

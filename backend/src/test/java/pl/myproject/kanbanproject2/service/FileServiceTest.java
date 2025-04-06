@@ -9,8 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import pl.myproject.kanbanproject2.model.File;
 import pl.myproject.kanbanproject2.repository.FileRepository;
 
@@ -94,11 +96,12 @@ public class FileServiceTest {
         Mockito.when(fileRepository.findById(fileId)).thenReturn(Optional.empty());
 
         // when & then
-        RuntimeException exception = Assertions.assertThrows(
-                RuntimeException.class,
+        ResponseStatusException exception = Assertions.assertThrows(
+                ResponseStatusException.class,
                 () -> fileService.getFile(fileId)
         );
-        Assertions.assertEquals("File not found", exception.getMessage());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        Assertions.assertEquals("File not found", exception.getReason());
 
         Mockito.verify(fileRepository).findById(fileId);
     }
@@ -124,11 +127,12 @@ public class FileServiceTest {
         Mockito.when(fileRepository.existsById(fileId)).thenReturn(false);
 
         // when & then
-        RuntimeException exception = Assertions.assertThrows(
-                RuntimeException.class,
+        ResponseStatusException exception = Assertions.assertThrows(
+                ResponseStatusException.class,
                 () -> fileService.deleteFile(fileId)
         );
-        Assertions.assertEquals("File not found", exception.getMessage());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        Assertions.assertEquals("File not found", exception.getReason());
 
         Mockito.verify(fileRepository).existsById(fileId);
         Mockito.verify(fileRepository, Mockito.never()).deleteById(fileId);
