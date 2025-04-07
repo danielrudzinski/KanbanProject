@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import '../styles/components/Forms.css'; 
 
