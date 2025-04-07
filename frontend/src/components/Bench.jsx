@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { fetchUsers, getUserAvatar, updateUserWipLimit } from '../services/api';
 import '../styles/components/Bench.css';
