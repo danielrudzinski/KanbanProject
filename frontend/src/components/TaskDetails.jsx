@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { createPortal } from 'react-dom';
 import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask } from '../services/api';
@@ -31,6 +31,23 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const panelRef = useRef(null);
   const descriptionInputRef = useRef(null);
   const taskDescriptionInputRef = useRef(null);
+
+  useEffect(() => {
+    const handleEscapeKeyForPanel = (event) => {
+      if (event.key === 'Escape' && 
+          !showAssignForm && 
+          !showDeleteConfirmation && 
+          !showUserDeleteConfirmation) {
+        onClose();
+      }
+    };
+  
+    document.addEventListener('keydown', handleEscapeKeyForPanel);
+  
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKeyForPanel);
+    };
+  }, [onClose, showAssignForm, showDeleteConfirmation, showUserDeleteConfirmation]);
   
   // Update loadTaskData to include subtasks loading
   const loadTaskData = async () => {
@@ -396,6 +413,24 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     setUserToDelete(null);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setShowAssignForm(false);
+        setShowDeleteConfirmation(false);
+        setShowUserDeleteConfirmation(false);
+      }
+    };
+
+    if (showAssignForm || showDeleteConfirmation || showUserDeleteConfirmation) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showAssignForm, showDeleteConfirmation, showUserDeleteConfirmation]);
+
   const handleAssignUser = async () => {
     if (!selectedUserId) return;
     
@@ -476,7 +511,15 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   
   return createPortal(
     <>
-      <div className="task-details-overlay" onClick={onClose} />
+      <div
+        className="task-details-overlay"
+        onClick={(event) => {
+          event.stopPropagation();
+          setShowDeleteConfirmation(false);
+          setSubtaskToDelete(null);
+          onClose();
+        }}
+      />
       <div className="task-details-panel" ref={panelRef}>
       {/* Header */}
       <div className="panel-header">
@@ -491,7 +534,15 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
           </button>
-          <button className="close-panel-btn" onClick={onClose}>×</button>
+          <button
+            className="close-panel-btn"
+            onClick={(event) => {
+              event.stopPropagation();
+              onClose();
+            }}
+          >
+            ×
+          </button>
         </div>
       </div>
           
@@ -727,7 +778,10 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   
         {/* Delete subtask confirmation dialog */}
         {showDeleteConfirmation && subtaskToDelete && (
-          <div className="delete-confirmation-overlay">
+          <div 
+          className="delete-confirmation-overlay"
+          onClick={canceldeleteSubTask}
+          >
             <div className="delete-confirmation-dialog">
               <h4>Potwierdź usunięcie</h4>
               <p>Czy na pewno chcesz usunąć podzadanie: <strong>{subtaskToDelete.title}</strong>?</p>
@@ -751,7 +805,10 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         
         {/* Delete user confirmation dialog */}
         {showUserDeleteConfirmation && userToDelete && (
-          <div className="delete-confirmation-overlay">
+          <div
+           className="delete-confirmation-overlay"
+           onClick={canceldeleteSubTask}
+           >
             <div className="delete-confirmation-dialog">
               <h4>Potwierdź usunięcie</h4>
               <p>Czy na pewno chcesz usunąć użytkownika: <strong>{userToDelete.name}</strong> z tego zadania?</p>
