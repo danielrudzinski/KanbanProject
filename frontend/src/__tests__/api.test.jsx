@@ -1,4 +1,4 @@
-import * as api from '../../services/api';
+import * as api from '../services/api';
 
 // Mock the global fetch function
 global.fetch = jest.fn();
