@@ -45,15 +45,11 @@ describe('AddTaskForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        // Submit form without entering a title
         await act(async () => {
             fireEvent.click(screen.getByText('Dodaj zadanie'));
         });
-        
-        // Should show validation error
+
         expect(screen.getByText('Tytuł zadania jest wymagany!')).toBeInTheDocument();
-        
-        // addTask should not have been called
         expect(mockAddTask).not.toHaveBeenCalled();
     });
 
@@ -69,23 +65,16 @@ describe('AddTaskForm Component', () => {
             target: { value: 'New Task' }
         });
         
-        // Submit form
         await act(async () => {
             fireEvent.click(screen.getByText('Dodaj zadanie'));
         });
         
-        // Check addTask was called with correct arguments
         expect(mockAddTask).toHaveBeenCalledWith('New Task');
-        
-        // Check refreshTasks was called
         expect(mockRefreshTasks).toHaveBeenCalled();
-        
-        // Check onClose was called
         expect(mockOnClose).toHaveBeenCalled();
     });
 
     test('handles API errors correctly', async () => {
-        // Create a context with a failing addTask function
         const errorContext = {
             ...mockContextValue,
             addTask: jest.fn().mockRejectedValue(new Error('API Error'))
@@ -102,15 +91,11 @@ describe('AddTaskForm Component', () => {
             target: { value: 'Error Task' }
         });
         
-        // Submit form
         await act(async () => {
             fireEvent.click(screen.getByText('Dodaj zadanie'));
         });
         
-        // Check error message is displayed
         expect(screen.getByText('API Error')).toBeInTheDocument();
-        
-        // Check onClose was not called
         expect(mockOnClose).not.toHaveBeenCalled();
     });
 
@@ -127,17 +112,14 @@ describe('AddTaskForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        // Fill in the form
         fireEvent.change(screen.getByLabelText(/Tytuł zadania:/i), {
             target: { value: 'Error Task' }
         });
-        
-        // Submit form
+
         await act(async () => {
             fireEvent.click(screen.getByText('Dodaj zadanie'));
         });
         
-        // Check default error message is displayed
         expect(screen.getByText('Wystąpił błąd podczas dodawania zadania')).toBeInTheDocument();
     });
 
@@ -154,20 +136,16 @@ describe('AddTaskForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        // Fill in the form
         fireEvent.change(screen.getByLabelText(/Tytuł zadania:/i), {
             target: { value: 'Test Task' }
         });
         
-        // Submit form but don't wait for resolution
         act(() => {
             fireEvent.click(screen.getByText('Dodaj zadanie'));
         });
         
-        // Check button text changes to loading state
         expect(screen.getByText('Dodawanie...')).toBeInTheDocument();
         
-        // Check form controls are disabled
         expect(screen.getByLabelText(/Tytuł zadania:/i)).toBeDisabled();
         expect(screen.getByText('Dodawanie...')).toBeDisabled();
         expect(screen.getByText('Anuluj')).toBeDisabled();

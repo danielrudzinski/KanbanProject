@@ -53,21 +53,15 @@ describe('EditableText Component', () => {
             />
         );
         
-        // Enter edit mode
-        fireEvent.doubleClick(screen.getByText('Original Text'));
-        
-        // Change text and blur
+        fireEvent.doubleClick(screen.getByText('Original Text')); 
         const inputElement = screen.getByDisplayValue('Original Text');
         fireEvent.change(inputElement, { target: { value: 'Updated Text' } });
         await act(async () => {
             fireEvent.blur(inputElement);
         });
         
-        // Check that onUpdate was called with correct args
         expect(mockOnUpdate).toHaveBeenCalledWith('test-1', 'Updated Text', 'default');
         
-        // Component should go back to display mode with original text
-        // (since the parent didn't update the prop)
         expect(screen.getByText('Original Text')).toBeInTheDocument();
     });
     
@@ -80,20 +74,16 @@ describe('EditableText Component', () => {
             />
         );
         
-        // Enter edit mode
         fireEvent.doubleClick(screen.getByText('Original Text'));
         
-        // Change text to empty and blur
         const inputElement = screen.getByDisplayValue('Original Text');
         fireEvent.change(inputElement, { target: { value: '   ' } });
         await act(async () => {
             fireEvent.blur(inputElement);
         });
         
-        // Check that onUpdate was not called
         expect(mockOnUpdate).not.toHaveBeenCalled();
         
-        // Component should stay in display mode with original text
         expect(screen.getByText('Original Text')).toBeInTheDocument();
     });
     
@@ -106,18 +96,13 @@ describe('EditableText Component', () => {
             />
         );
         
-        // Enter edit mode
         fireEvent.doubleClick(screen.getByText('Original Text'));
-        
-        // Change text and press Escape
         const inputElement = screen.getByDisplayValue('Original Text');
         fireEvent.change(inputElement, { target: { value: 'Changed Text' } });
         fireEvent.keyDown(inputElement, { key: 'Escape' });
         
-        // onUpdate should not be called
         expect(mockOnUpdate).not.toHaveBeenCalled();
         
-        // Component should go back to display mode with original text
         expect(screen.getByText('Original Text')).toBeInTheDocument();
     });
     
@@ -130,10 +115,7 @@ describe('EditableText Component', () => {
             />
         );
         
-        // Enter edit mode
         fireEvent.doubleClick(screen.getByText('Original Text'));
-        
-        // Change text and press Enter
         const inputElement = screen.getByDisplayValue('Original Text');
         fireEvent.change(inputElement, { target: { value: 'Updated Text' } });
         
@@ -141,15 +123,11 @@ describe('EditableText Component', () => {
             fireEvent.keyDown(inputElement, { key: 'Enter' });
         });
         
-        // onUpdate should be called
         expect(mockOnUpdate).toHaveBeenCalledWith('test-1', 'Updated Text', 'default');
-        
-        // Component goes back to display mode with original text
         expect(screen.getByText('Original Text')).toBeInTheDocument();
     });
     
     test('simulates updating text from parent when onUpdate succeeds', async () => {
-        // Initial render with original text
         const { rerender } = render(
             <EditableText
                 id="test-1"
@@ -158,10 +136,7 @@ describe('EditableText Component', () => {
             />
         );
         
-        // Enter edit mode
         fireEvent.doubleClick(screen.getByText('Original Text'));
-        
-        // Change text and blur
         const inputElement = screen.getByDisplayValue('Original Text');
         fireEvent.change(inputElement, { target: { value: 'Updated Text' } });
         
@@ -169,7 +144,6 @@ describe('EditableText Component', () => {
             fireEvent.blur(inputElement);
         });
         
-        // Simulate parent component updating the text prop
         rerender(
             <EditableText
                 id="test-1"
@@ -178,7 +152,6 @@ describe('EditableText Component', () => {
             />
         );
         
-        // Now we should see the updated text
         expect(screen.getByText('Updated Text')).toBeInTheDocument();
     });
     
@@ -193,15 +166,10 @@ describe('EditableText Component', () => {
             />
         );
         
-        // Check display mode classes
         const textElement = screen.getByText('Test Text');
         expect(textElement).toHaveClass('editable-text');
         expect(textElement).toHaveClass('custom-class');
-        
-        // Enter edit mode
         fireEvent.doubleClick(textElement);
-        
-        // Check input mode classes
         const inputElement = screen.getByDisplayValue('Test Text');
         expect(inputElement).toHaveClass('editable-text-input');
         expect(inputElement).toHaveClass('custom-input-class');

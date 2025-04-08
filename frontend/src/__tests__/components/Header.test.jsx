@@ -56,7 +56,6 @@ describe('Header Component', () => {
     expect(screen.getByText('Tablica Kanban')).toBeInTheDocument();
     
     // Check navigation links
-    // Remove the line looking for 'Tablica' as it doesn't exist
     expect(screen.getByText('Dodaj zadanie')).toBeInTheDocument();
     expect(screen.getByText('Limit WIP')).toBeInTheDocument();
     expect(screen.getByText('Dodaj wiersz/kolumnę')).toBeInTheDocument();
@@ -66,31 +65,20 @@ describe('Header Component', () => {
   test('opens AddTaskForm when "Dodaj zadanie" is clicked', () => {
     renderHeader();
     
-    // Click on "Dodaj zadanie" button
+
     fireEvent.click(screen.getByText('Dodaj zadanie'));
-    
-    // Check that form is displayed
     expect(screen.getByTestId('mock-add-task-form')).toBeInTheDocument();
-    
-    // Close the form
     fireEvent.click(screen.getByText('Close'));    
-    // Form should be closed
+
     expect(screen.queryByTestId('mock-add-task-form')).not.toBeInTheDocument();
   });
 
   test('opens WipLimitControl when "Limit WIP" is clicked', () => {
     renderHeader();
     
-    // Click on "Limit WIP" button 
     fireEvent.click(screen.getByText('Limit WIP'));
-    
-    // Check that form is displayed
     expect(screen.getByTestId('mock-wip-limit-control')).toBeInTheDocument();
-    
-    // Close the form 
     fireEvent.click(screen.getByText('Close'));
-    
-    // Form should be closed
     expect(screen.queryByTestId('mock-wip-limit-control')).not.toBeInTheDocument();
   });
 
@@ -135,35 +123,19 @@ describe('Header Component', () => {
   test('can only have one form open at a time', () => {
     renderHeader();
     
-    // Open AddTaskForm first
     fireEvent.click(screen.getByText('Dodaj zadanie'));
-    
-    // Check that the form is displayed
     expect(screen.getByTestId('mock-add-task-form')).toBeInTheDocument();
-    
-    // Now click the WIP Limit button
     fireEvent.click(screen.getByText('Limit WIP'));
-    
-    // Check that AddTaskForm is closed
     expect(screen.queryByTestId('mock-add-task-form')).not.toBeInTheDocument();
-    
-    // And WIP Limit form is displayed
     expect(screen.getByTestId('mock-wip-limit-control')).toBeInTheDocument();
 });
 
   test('cleans up scroll event listener on unmount', async () => {
-    // Mock window.removeEventListener
     const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
     
     const { unmount } = renderHeader();
-    
-    // Unmount the component
     unmount();
-    
-    // Check if removeEventListener was called with 'scroll'
     expect(removeEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
-    
-    // Clean up the spy
     removeEventListenerSpy.mockRestore();
   });
 
@@ -174,18 +146,13 @@ describe('Header Component', () => {
       </BrowserRouter>
     );
     
-    // Find the "Add row/column" button and click it
     const addRowColumnButton = screen.getByText(/Dodaj wiersz\/kolumnę/i);
     fireEvent.click(addRowColumnButton);
-    
-    // Verify the form is displayed
     expect(screen.getByTestId('mock-add-board-item-form')).toBeInTheDocument();
     
-    // Find and click the close button
     const closeButton = screen.getByText(/Close/i);
     fireEvent.click(closeButton);
     
-    // Verify the form is no longer displayed
     expect(screen.queryByTestId('mock-add-board-item-form')).not.toBeInTheDocument();
   });
   

@@ -113,13 +113,8 @@ describe('Bench Component', () => {
       effectAllowed: null
     };
     
-    // Find first user card
     const userCard = screen.getByText('John Doe').closest('.user-card');
-    
-    // Simulate drag start
     fireEvent.dragStart(userCard, { dataTransfer });
-    
-    // Check that dataTransfer.setData was called correctly
     expect(dataTransfer.setData).toHaveBeenCalledWith(
       'application/user', 
       expect.stringContaining('userId')
@@ -155,36 +150,25 @@ describe('Bench Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Find and click WIP limit display to edit
     const wipLimitDisplay = screen.getAllByText(/WIP Limit/)[0].closest('.wip-limit-display');
     fireEvent.click(wipLimitDisplay);
     
-    // Check if input appears
     const input = screen.getByPlaceholderText('Unlimited');
     expect(input).toBeInTheDocument();
-    expect(input.value).toBe('5'); // Initial value should be set
+    expect(input.value).toBe('5'); 
     
-    // Change value
     fireEvent.change(input, { target: { value: '7' } });
-    
-    // Mock the implementation of updateUserWipLimit to immediately call refreshTasks
     updateUserWipLimit.mockImplementationOnce(() => {
       mockRefreshTasks();
       return Promise.resolve({ success: true });
     });
     
-    // Save changes with proper async handling
     const saveButton = screen.getByTitle('Zapisz limit WIP');
-    
-    // Use act with await to ensure all state updates and effects complete
     await act(async () => {
       fireEvent.click(saveButton);
     });
     
-    // Verify the API was called with the right parameters
     expect(updateUserWipLimit).toHaveBeenCalledWith(1, 7);
-    
-    // Verify refreshTasks was called
     expect(mockRefreshTasks).toHaveBeenCalled();
   });
   
@@ -199,27 +183,20 @@ describe('Bench Component', () => {
     const wipLimitDisplay = screen.getAllByText(/WIP Limit/)[0].closest('.wip-limit-display');
     fireEvent.click(wipLimitDisplay);
     
-    // Change value
     const input = screen.getByPlaceholderText('Unlimited');
     fireEvent.change(input, { target: { value: '7' } });
-    
-    // Cancel changes
+
     const cancelButton = screen.getByTitle('Anuluj');
     fireEvent.click(cancelButton);
     
-    // Check if input disappeared and original value is shown
     expect(screen.queryByPlaceholderText('Unlimited')).not.toBeInTheDocument();
     expect(screen.getByText('WIP Limit: 5')).toBeInTheDocument();
     
-    // Check that API was not called
     expect(updateUserWipLimit).not.toHaveBeenCalled();
   });
   
   test('handles errors when updating WIP limit', async () => {
-    // Mock console.error
     console.error = jest.fn();
-    
-    // Mock API to reject
     updateUserWipLimit.mockRejectedValueOnce(new Error('Failed to update WIP limit'));
     
     renderBench();
@@ -227,8 +204,7 @@ describe('Bench Component', () => {
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
-    
-    // Find and click WIP limit display to edit
+
     const wipLimitDisplay = screen.getAllByText(/WIP Limit/)[0].closest('.wip-limit-display');
     fireEvent.click(wipLimitDisplay);
     
@@ -255,8 +231,6 @@ describe('Bench Component', () => {
       }
       return Promise.resolve('mock-avatar-url');
     });
-    
-    // Mock console.error
     console.error = jest.fn();
     
     renderBench();
@@ -264,14 +238,11 @@ describe('Bench Component', () => {
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
-    
-    // Check if error was logged but component still rendered
     expect(console.error).toHaveBeenCalledWith(
       'Error loading avatar for user 1:',
       expect.any(Error)
     );
     
-    // All users should still be displayed
     expect(screen.getByText('John Doe')).toBeInTheDocument();
   });
   
@@ -284,8 +255,6 @@ describe('Bench Component', () => {
     
     // Find all avatar images
     const avatarImages = document.querySelectorAll('.avatar');
-    
-    // Simulate error on first image
     fireEvent.error(avatarImages[0]);
     
     // Image should still be displayed (using fallback)
@@ -313,7 +282,6 @@ describe('Bench Component', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
     
-    // Unmount component
     unmount();
     
     // URL.revokeObjectURL should be called for each avatar
@@ -327,15 +295,12 @@ describe('Bench Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Find and click WIP limit display to edit
+
     const wipLimitDisplay = screen.getAllByText(/WIP Limit/)[0].closest('.wip-limit-display');
     fireEvent.click(wipLimitDisplay);
-    
-    // Change value to empty (which means unlimited)
     const input = screen.getByPlaceholderText('Unlimited');
     fireEvent.change(input, { target: { value: '' } });
     
-    // Save changes
     const saveButton = screen.getByTitle('Zapisz limit WIP');
     await act(async () => {
       fireEvent.click(saveButton);

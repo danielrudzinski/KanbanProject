@@ -4,14 +4,12 @@ import TaskLabels from '../../components/TaskLabels';
 import { addLabelToTask, removeLabelFromTask, getAllLabels } from '../../services/api';
 import KanbanContext from '../../context/KanbanContext';
 
-// Mock the API functions
 jest.mock('../../services/api', () => ({
   addLabelToTask: jest.fn(),
   removeLabelFromTask: jest.fn(),
   getAllLabels: jest.fn()
 }));
 
-// Mock createPortal to make testing components with portals possible
 jest.mock('react-dom', () => {
   const original = jest.requireActual('react-dom');
   return {
@@ -32,7 +30,6 @@ describe('TaskLabels Component', () => {
   const allLabels = ['Bug', 'Feature', 'Documentation', 'High Priority', 'Medium Priority'];
   
   beforeEach(() => {
-    // Reset mocks
     jest.clearAllMocks();
     
     // Mock localStorage
@@ -61,12 +58,10 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Wait for component to fetch existing labels
     await waitFor(() => {
       expect(getAllLabels).toHaveBeenCalled();
     });
     
-    // Check that each initial label is rendered
     initialLabels.forEach(label => {
       expect(screen.getByText(label)).toBeInTheDocument();
     });

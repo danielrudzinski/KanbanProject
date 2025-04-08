@@ -199,53 +199,43 @@ describe('TaskDetails Component', () => {
   });
     
   test('allows adding a new subtask', async () => {
-        renderTaskDetails();
+    renderTaskDetails();
         
-        await waitFor(() => {
-            expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
-        });
+    await waitFor(() => {
+      expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
+    });
         
-        const input = await screen.findByPlaceholderText('Nazwa podzadania');
-        fireEvent.change(input, { target: { value: 'New Subtask' } });
+    const input = await screen.findByPlaceholderText('Nazwa podzadania');
+    fireEvent.change(input, { target: { value: 'New Subtask' } });
         
-        // Find and click the Add button by text
-        const addButton = screen.getByText('Dodaj');
+    const addButton = screen.getByText('Dodaj');
+    api.addSubTask.mockResolvedValue({ id: 3, title: 'New Subtask', completed: false });
         
-        // Mock implementation to resolve immediately
-        api.addSubTask.mockResolvedValue({ id: 3, title: 'New Subtask', completed: false });
+    await act(async () => {
+      fireEvent.click(addButton);
+    });
         
-        // Need to await this operation since it triggers async functions
-        await act(async () => {
-            fireEvent.click(addButton);
-        });
-        
-        // Wait for all async operations to complete
-        await waitFor(() => {
-            expect(api.addSubTask).toHaveBeenCalledWith(mockTask.id, 'New Subtask');
-        });
-        
-        // Now check if update was called
-        expect(onSubtaskUpdateMock).toHaveBeenCalled();
-        
-        // Check for success message
-        expect(screen.getByText('Operacja zakończona pomyślnie!')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(api.addSubTask).toHaveBeenCalledWith(mockTask.id, 'New Subtask');
+    });
+    expect(onSubtaskUpdateMock).toHaveBeenCalled();
+    expect(screen.getByText('Operacja zakończona pomyślnie!')).toBeInTheDocument();
   });
 
   test('prevents adding empty subtasks', async () => {
-        renderTaskDetails();
+    renderTaskDetails();
         
-        await waitFor(() => {
-            expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
-        });
+    await waitFor(() => {
+      expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
+    });
         
-        // Try to add empty subtask
-        const input = await screen.findByPlaceholderText('Nazwa podzadania');
-        fireEvent.change(input, { target: { value: '   ' } });
+    // Try to add empty subtask
+    const input = await screen.findByPlaceholderText('Nazwa podzadania');
+    fireEvent.change(input, { target: { value: '   ' } });
         
-        const addButton = screen.getByText('Dodaj');
-        fireEvent.click(addButton);
-        
-        expect(api.addSubTask).not.toHaveBeenCalled();
+    const addButton = screen.getByText('Dodaj');
+    fireEvent.click(addButton);
+    expect(api.addSubTask).not.toHaveBeenCalled();
   });
 
   test('allows toggling subtask completion', async () => {
@@ -257,12 +247,9 @@ describe('TaskDetails Component', () => {
   
     renderTaskDetails();
     
-    // Wait for initial loading to complete
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
-    
-    // Find the checkbox by label
     const checkbox = await screen.findByLabelText('Subtask 1');
     
     // Click the checkbox and wait for state updates
@@ -367,11 +354,9 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Click delete button
     const deleteButtons = await screen.findAllByTitle('Usuń podzadanie');
-    fireEvent.click(deleteButtons[0]); // First delete button
+    fireEvent.click(deleteButtons[0]); 
     
-    // Cancel deletion
     await waitFor(() => {
       expect(screen.getByText(/Czy na pewno chcesz usunąć podzadanie:/)).toBeInTheDocument();
     });
@@ -390,21 +375,17 @@ describe('TaskDetails Component', () => {
     
     renderTaskDetails();
     
-    // Wait for initial loading to complete
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Open assign form
     const assignButton = await screen.findByTitle('Przypisz użytkownika');
     fireEvent.click(assignButton);
     
-    // Wait for the form to appear
     await waitFor(() => {
       expect(screen.getByText('Wybierz użytkownika')).toBeInTheDocument();
     });
     
-    // Select user
     const select = screen.getByRole('combobox');
     fireEvent.change(select, { target: { value: '2' } });
     
@@ -447,11 +428,9 @@ describe('TaskDetails Component', () => {
       expect(screen.getByText('Przypisani:')).toBeInTheDocument();
     });
     
-    // Click remove user button
     const removeButtons = await screen.findAllByTitle('Usuń użytkownika');
     fireEvent.click(removeButtons[0]); // First remove button
     
-    // Cancel removal
     await waitFor(() => {
       expect(screen.getByText(/Czy na pewno chcesz usunąć użytkownika:/)).toBeInTheDocument();
     });
@@ -468,16 +447,11 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Create a spy to track updateTask calls
     const updateTaskSpy = jest.spyOn(api, 'updateTask');
-    
-    // Find and manually invoke the handler for the TaskLabels component
     const newLabels = ['Bug', 'Frontend', 'High Priority'];
     
-    // Find the TaskLabels component wrapper
     const labelsSection = await screen.findByText('Etykiety');
     
-    // Simulate updating labels through the context directly
     await act(async () => {
       mockContextValue.refreshTasks(newLabels);
       await api.updateTask(mockTask.id, { labels: newLabels });
@@ -677,15 +651,12 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Find and click the assign user button
     const assignButton = screen.getByTitle('Przypisz użytkownika');
     fireEvent.click(assignButton);
     
-    // Select a user from the dropdown
     const userSelect = screen.getByRole('combobox');
-    fireEvent.change(userSelect, { target: { value: '2' } });  // Select user with ID 2
+    fireEvent.change(userSelect, { target: { value: '2' } });
     
-    // Click the confirm button
     const confirmButton = screen.getByText('Przypisz');
     fireEvent.click(confirmButton);
     
@@ -716,17 +687,14 @@ describe('TaskDetails Component', () => {
   
     renderTaskDetails();
     
-    // Wait for initial loading to complete
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Wait for the assigned users section to appear
     await waitFor(() => {
       expect(screen.getByText('Przypisani:')).toBeInTheDocument();
     });
     
-    // Find and click the remove user button
     const removeButtons = await screen.findAllByTitle('Usuń użytkownika');
     expect(removeButtons.length).toBeGreaterThan(0);
     
@@ -734,12 +702,10 @@ describe('TaskDetails Component', () => {
       fireEvent.click(removeButtons[0]);
     });
     
-    // Wait for and verify the confirmation dialog appears
     await waitFor(() => {
       expect(screen.getByText(/Czy na pewno chcesz usunąć użytkownika:/)).toBeInTheDocument();
     });
     
-    // Click confirm button inside an act to handle async state updates
     await act(async () => {
       fireEvent.click(screen.getByText('Tak'));
     });
@@ -796,11 +762,9 @@ describe('TaskDetails Component', () => {
       expect(screen.getByText(/Czy na pewno chcesz usunąć podzadanie:/)).toBeInTheDocument();
     });
     
-    // Click on the delete confirmation overlay rather than trying to query by class
     const overlay = screen.getByText(/Czy na pewno chcesz usunąć podzadanie:/).closest('.delete-confirmation-overlay');
     fireEvent.click(overlay);
     
-    // The confirmation dialog should be closed now
     await waitFor(() => {
       expect(screen.queryByText(/Czy na pewno chcesz usunąć podzadanie:/)).not.toBeInTheDocument();
     });
@@ -816,14 +780,12 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Find and click the delete button for the first subtask
     const deleteButtons = await screen.findAllByTitle('Usuń podzadanie');
     fireEvent.click(deleteButtons[0]);
     
     const cancelButton = screen.getByText('Nie');
     fireEvent.click(cancelButton);
     
-    // The confirmation dialog should be closed
     expect(screen.queryByText('Usuń podzadanie')).not.toBeInTheDocument();
     
     // The delete API should not have been called
@@ -840,7 +802,6 @@ describe('TaskDetails Component', () => {
     const assignButton = screen.getByTitle('Przypisz użytkownika');
     fireEvent.click(assignButton);
     
-    // Modal should be open now - check for the dropdown header or the select element
     expect(screen.getByText('Przypisz użytkownika')).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toBeInTheDocument();
     
@@ -933,9 +894,7 @@ describe('TaskDetails Component', () => {
     
     // Cancel editing
     fireEvent.click(screen.getByText('Anuluj'));
-    
-    // The component should focus back on the original element
-    // This test will help cover the useEffect cleanup function
+  
   });
   
   test('handles editing task description with empty value', async () => {

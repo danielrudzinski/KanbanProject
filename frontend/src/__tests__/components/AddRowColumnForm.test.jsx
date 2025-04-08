@@ -55,19 +55,14 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        // Initially, column tab should be active
         const columnTab = screen.getByText('Kolumny');
         const rowTab = screen.getByText('Wiersze');
         expect(columnTab).toHaveClass('active');
         
-        // Click on the row tab
         fireEvent.click(rowTab);
-        
-        // Now row tab should be active
         expect(rowTab).toHaveClass('active');
         expect(columnTab).not.toHaveClass('active');
         
-        // Label should change to reflect row selection
         expect(screen.getByLabelText(/Nazwa wiersza:/i)).toBeInTheDocument();
         expect(screen.getByText('Dodaj wiersz')).toBeInTheDocument();
     });
@@ -83,11 +78,7 @@ describe('AddRowColumnForm Component', () => {
         await act(async () => {
             fireEvent.click(screen.getByText('Dodaj kolumnę'));
         });
-        
-        // Should show validation error
         expect(screen.getByText('Nazwa kolumny jest wymagana!')).toBeInTheDocument();
-        
-        // addColumn should not have been called
         expect(mockAddColumn).not.toHaveBeenCalled();
     });
 
@@ -102,15 +93,10 @@ describe('AddRowColumnForm Component', () => {
         fireEvent.change(screen.getByLabelText(/Nazwa kolumny:/i), { target: { value: 'New Column' } });
         fireEvent.change(screen.getByLabelText(/Limit WIP/i), { target: { value: '5' } });
         
-        // Submit form
         await act(async () => {
             fireEvent.click(screen.getByText('Dodaj kolumnę'));
         });
-        
-        // Check addColumn was called with correct arguments
         expect(mockAddColumn).toHaveBeenCalledWith('New Column', '5');
-        
-        // Check onClose was called
         expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -121,22 +107,16 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        // Switch to row tab
         fireEvent.click(screen.getByText('Wiersze'));
         
-        // Fill in the form
         fireEvent.change(screen.getByLabelText(/Nazwa wiersza:/i), { target: { value: 'New Row' } });
         fireEvent.change(screen.getByLabelText(/Limit WIP/i), { target: { value: '3' } });
-        
-        // Submit form
+
         await act(async () => {
             fireEvent.click(screen.getByText('Dodaj wiersz'));
         });
         
-        // Check addRow was called with correct arguments
         expect(mockAddRow).toHaveBeenCalledWith('New Row', 3);
-        
-        // Check onClose was called
         expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -147,10 +127,7 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        // Click the cancel button
         fireEvent.click(screen.getByText('Anuluj'));
-        
-        // Check onClose was called
         expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -170,15 +147,11 @@ describe('AddRowColumnForm Component', () => {
         // Fill in the form
         fireEvent.change(screen.getByLabelText(/Nazwa kolumny:/i), { target: { value: 'Error Column' } });
         
-        // Submit form
         await act(async () => {
             fireEvent.click(screen.getByText('Dodaj kolumnę'));
         });
-        
-        // Check error message is displayed
+
         expect(screen.getByText('API Error')).toBeInTheDocument();
-        
-        // Check onClose was not called
         expect(mockOnClose).not.toHaveBeenCalled();
     });
 
@@ -197,13 +170,10 @@ describe('AddRowColumnForm Component', () => {
         
         // Fill in the form
         fireEvent.change(screen.getByLabelText(/Nazwa kolumny:/i), { target: { value: 'Error Column' } });
-        
-        // Submit form
+
         await act(async () => {
             fireEvent.click(screen.getByText('Dodaj kolumnę'));
         });
-        
-        // Check default error message is displayed
         expect(screen.getByText('Wystąpił błąd podczas dodawania kolumny')).toBeInTheDocument();
     });
 
@@ -245,14 +215,11 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        // Fill in the form for column
         fireEvent.change(screen.getByLabelText(/Nazwa kolumny:/i), { target: { value: 'Test Column' } });
         fireEvent.change(screen.getByLabelText(/Limit WIP/i), { target: { value: '5' } });
         
-        // Switch to row tab
         fireEvent.click(screen.getByText('Wiersze'));
         
-        // Check form fields are reset
         expect(screen.getByLabelText(/Nazwa wiersza:/i).value).toBe('');
         expect(screen.getByLabelText(/Limit WIP/i).value).toBe('0');
     });
