@@ -70,7 +70,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       setUsers(usersData || []);
       const subtasksData = await fetchSubTasksByTaskId(task.id);
       setSubtasks(subtasksData || []);
-      const labelsData = taskData.labels || [];
       const description = taskData.description || '';
       setTaskDescription(description);
       setOriginalTaskDescription(description);

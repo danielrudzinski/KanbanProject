@@ -587,7 +587,7 @@ export function KanbanProvider({ children }) {
             handleMoveTask(taskId, targetColumnId, targetRowId);
           }
         } catch (fallbackErr) {
-          console.error('Fallback error:', fallbackErr);
+          console.error('Fallback error:', fallbackErr, err);
         }
       }
     }
