@@ -1,20 +1,33 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import React, { useEffect,useState } from 'react';
 import AddTaskForm from './AddTaskForm';
 import AddBoardItemForm from './AddRowColumnForm';
 import WipLimitControl from './WipLimitControl';
-import logo from '/kanban-logo.png';
+import logo from '../../public/kanban-logo.png';
 
 function Header() {
   const [activeForm, setActiveForm] = useState(null); // 'task', 'boardItem', or 'wip'
+  const [isSticky, setIsSticky] = useState(false);
 
   const handleFormToggle = (formType) => {
     setActiveForm(activeForm === formType ? null : formType);
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 0);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
     <>
-      <header className="app-header">
+      <header className={`app-header ${isSticky ? 'sticky' : ''}`}>
         <Link to="/">
           <img src={logo} alt="Kanban Logo" className="app-logo" />
           <h1 className="app-title">Tablica Kanban</h1>
