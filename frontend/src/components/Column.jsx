@@ -26,12 +26,8 @@ function Column({ column, tasks}) {
   };
 
   const onDragOver = (e) => {
-    e.preventDefault(); // This is critical to allow drops
-    
-    // Set visual feedback
+    e.preventDefault();
     setIsDragOver(true);
-    
-    // Call the context's drag over handler
     handleDragOver(e);
   };
   
@@ -41,21 +37,14 @@ function Column({ column, tasks}) {
   
   const onDrop = (e) => {
     console.log('Column drop event on column:', column.id);
-    
-    // Reset visual feedback
     setIsDragOver(false);
-    
-    // Call the context's drop handler
     handleDrop(e, column.id, null);
   };
   
   const onDragStart = (e) => {
     console.log('Column drag start:', column.id);
-    
-    // Set the data directly
     const data = { id: column.id, type: 'column' };
     const dataString = JSON.stringify(data);
-    
     e.dataTransfer.setData('application/column', dataString);
     e.dataTransfer.setData('text/plain', dataString);
     e.dataTransfer.effectAllowed = 'move';

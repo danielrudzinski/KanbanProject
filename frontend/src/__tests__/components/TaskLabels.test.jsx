@@ -32,7 +32,6 @@ describe('TaskLabels Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Mock localStorage
     Object.defineProperty(window, 'localStorage', {
       value: {
         getItem: jest.fn(() => null),
@@ -41,7 +40,6 @@ describe('TaskLabels Component', () => {
       writable: true
     });
     
-    // Mock getAllLabels response
     getAllLabels.mockResolvedValue(allLabels);
   });
   
@@ -66,7 +64,6 @@ describe('TaskLabels Component', () => {
       expect(screen.getByText(label)).toBeInTheDocument();
     });
     
-    // Check that the "Add Label" button is present
     expect(screen.getByText('+ Etykieta')).toBeInTheDocument();
   });
   
@@ -83,13 +80,11 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Click the add label button
     const addButton = screen.getByText('+ Etykieta');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
-    // Check that the picker is shown
     await waitFor(() => {
       expect(screen.getByText('Wybierz etykietę')).toBeInTheDocument();
       expect(screen.getByText('Predefiniowane etykiety')).toBeInTheDocument();
@@ -97,7 +92,6 @@ describe('TaskLabels Component', () => {
   });
   
   test('adds a predefined label when selected', async () => {
-    // Setup API mock for adding a label
     addLabelToTask.mockResolvedValue({ id: 1, labels: [...initialLabels, 'High Priority'] });
     
     await act(async () => {
@@ -112,18 +106,15 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Click the add label button
     const addButton = screen.getByText('+ Etykieta');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
-    // Wait for the picker to appear
     await waitFor(() => {
       expect(screen.getByText('Wybierz etykietę')).toBeInTheDocument();
     });
     
-    // Click on "High Priority" label
     const highPriorityOption = screen.getByText('High Priority');
     await act(async () => {
       fireEvent.click(highPriorityOption);
@@ -138,7 +129,6 @@ describe('TaskLabels Component', () => {
   });
   
   test('removes a label when remove button is clicked', async () => {
-    // Setup API mock for removing a label
     removeLabelFromTask.mockResolvedValue({ id: 1, labels: ['Feature'] });
     
     await act(async () => {
@@ -153,13 +143,11 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Find the Bug label and its remove button (×)
     const bugLabel = screen.getAllByText('×')[0];
     await act(async () => {
       fireEvent.click(bugLabel);
     });
     
-    // Check if API was called correctly
     await waitFor(() => {
       expect(removeLabelFromTask).toHaveBeenCalledWith(1, 'Bug');
       expect(mockLabelsChange).toHaveBeenCalledWith(['Feature']);
@@ -179,24 +167,20 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Click the add label button
     const addButton = screen.getByText('+ Etykieta');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
-    // Wait for the picker to appear
     await waitFor(() => {
       expect(screen.getByText('Wybierz etykietę')).toBeInTheDocument();
     });
     
-    // Click on "Dodaj własną etykietę" option
     const customLabelOption = screen.getByText('Dodaj własną etykietę');
     await act(async () => {
       fireEvent.click(customLabelOption);
     });
     
-    // Check if custom form appears
     await waitFor(() => {
       expect(screen.getByPlaceholderText('Wpisz nazwę etykiety')).toBeInTheDocument();
       expect(screen.getByText('Kolor etykiety:')).toBeInTheDocument();
@@ -204,7 +188,6 @@ describe('TaskLabels Component', () => {
   });
   
   test('adds a custom label when submitted', async () => {
-    // Setup API mock for adding a label
     addLabelToTask.mockResolvedValue({ id: 1, labels: [...initialLabels, 'Custom Label'] });
     
     await act(async () => {
@@ -219,22 +202,18 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Open label picker
     const addButton = screen.getByText('+ Etykieta');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
-    // Open custom label form
     await waitFor(() => {
       const customLabelOption = screen.getByText('Dodaj własną etykietę');
       fireEvent.click(customLabelOption);
     });
     
-    // Fill in the form
     await waitFor(() => {
       const nameInput = screen.getByPlaceholderText('Wpisz nazwę etykiety');
-      // Fix: query the color input directly by its type
       const colorInput = screen.getByDisplayValue('#888888');
       
       fireEvent.change(nameInput, { target: { value: 'Custom Label' } });
@@ -251,7 +230,6 @@ describe('TaskLabels Component', () => {
       expect(mockRefreshTasks).toHaveBeenCalled();
     });
     
-    // Check if custom color was stored in localStorage
     expect(window.localStorage.setItem).toHaveBeenCalled();
   });
   
@@ -268,26 +246,22 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Open label picker
     const addButton = screen.getByText('+ Etykieta');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
-    // Open custom label form
     await waitFor(() => {
       const customLabelOption = screen.getByText('Dodaj własną etykietę');
       fireEvent.click(customLabelOption);
     });
     
-    // Verify form is open and click cancel
     await waitFor(() => {
       expect(screen.getByText('Dodaj własną etykietę')).toBeInTheDocument();
       const cancelButton = screen.getByText('Anuluj');
       fireEvent.click(cancelButton);
     });
     
-    // Verify form is closed
     await waitFor(() => {
       expect(screen.queryByText('Dodaj własną etykietę')).not.toBeInTheDocument();
     });
@@ -306,30 +280,25 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Open label picker
     const addButton = screen.getByText('+ Etykieta');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
-    // Verify picker is open
     await waitFor(() => {
       expect(screen.getByText('Wybierz etykietę')).toBeInTheDocument();
     });
     
-    // Simulate click outside
     await act(async () => {
       fireEvent.mouseDown(document.body);
     });
     
-    // Verify picker is closed
     await waitFor(() => {
       expect(screen.queryByText('Wybierz etykietę')).not.toBeInTheDocument();
     });
   });
   
   test('loads label colors from localStorage', async () => {
-    // Setup localStorage mock to return stored colors
     const storedColors = JSON.stringify({ 
       'Bug': '#FF0000', 
       'Feature': '#2196F3',
@@ -349,7 +318,6 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Verify localStorage was checked
     expect(window.localStorage.getItem).toHaveBeenCalledWith('labelColors');
   });
   
@@ -368,19 +336,16 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Open label picker
     const addButton = screen.getByText('+ Etykieta');
     await act(async () => {
       fireEvent.click(addButton);
     });
-    
-    // Click on "Bug" label (which is already in initialLabels)
+
     await waitFor(() => {
-      const bugOption = screen.getAllByText('Bug')[1]; // Second "Bug" is in the picker
+      const bugOption = screen.getAllByText('Bug')[1];
       fireEvent.click(bugOption);
     });
     
-    // Check that alert was shown and API was not called
     await waitFor(() => {
       expect(global.alert).toHaveBeenCalledWith('Ta etykieta została już dodana do zadania');
       expect(addLabelToTask).not.toHaveBeenCalled();
@@ -405,19 +370,16 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Open label picker
     const addButton = screen.getByText('+ Etykieta');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
-    // Click on "High Priority" label
     await waitFor(() => {
       const highPriorityOption = screen.getByText('High Priority');
       fireEvent.click(highPriorityOption);
     });
-    
-    // Check that error was handled
+
     await waitFor(() => {
       expect(addLabelToTask).toHaveBeenCalledWith(1, 'High Priority');
       expect(console.error).toHaveBeenCalled();
@@ -426,7 +388,6 @@ describe('TaskLabels Component', () => {
   });
   
   test('handles API errors gracefully when removing labels', async () => {
-    // Setup API mock to throw an error
     removeLabelFromTask.mockRejectedValue(new Error('API error'));
     global.alert = jest.fn();
     global.console.error = jest.fn();
@@ -443,13 +404,11 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    // Find the Bug label and its remove button (×)
     const bugLabel = screen.getAllByText('×')[0];
     await act(async () => {
       fireEvent.click(bugLabel);
     });
     
-    // Check that error was handled
     await waitFor(() => {
       expect(removeLabelFromTask).toHaveBeenCalledWith(1, 'Bug');
       expect(console.error).toHaveBeenCalled();

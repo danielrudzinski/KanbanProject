@@ -28,11 +28,9 @@ function AddRowColumnForm({ onClose }) {
         await addRow(name, parseInt(wipLimit) || 0);
       }
       
-      // Reset form
       setName('');
       setWipLimit('0');
-      
-      // Close form after successful submission
+
       if (onClose) onClose();
     } catch (err) {
       setError(err.message || `Wystąpił błąd podczas dodawania ${activeTab === 'column' ? 'kolumny' : 'wiersza'}`);
@@ -41,7 +39,6 @@ function AddRowColumnForm({ onClose }) {
     }
   };
 
-  // Switch between column and row tabs
   const switchTab = (tab) => {
     setActiveTab(tab);
     setName('');

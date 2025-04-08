@@ -29,18 +29,14 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
   const { refreshTasks } = useKanban();
   const buttonRef = useRef(null);
 
-  // Fetch all existing labels when component mounts
   useEffect(() => {
     const fetchExistingLabels = async () => {
       try {
         const labelsData = await getAllLabels();
         setExistingLabels(labelsData);
-        
-        // Initialize label colors from predefined labels and store in local storage
         const storedLabelColors = localStorage.getItem('labelColors');
         const initialLabelColors = storedLabelColors ? JSON.parse(storedLabelColors) : {};
         
-        // Merge stored colors with predefined colors
         const mergedColors = { ...initialLabelColors };
         PREDEFINED_LABELS.forEach(label => {
           mergedColors[label.name] = label.color;
@@ -55,17 +51,14 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
     fetchExistingLabels();
   }, []);
 
-  // Save label colors to localStorage whenever they change
   useEffect(() => {
     if (Object.keys(labelColors).length > 0) {
       localStorage.setItem('labelColors', JSON.stringify(labelColors));
     }
   }, [labelColors]);
 
-  // Toggle label picker with position calculation
   const toggleLabelPicker = () => {
     if (!showLabelPicker) {
-      // Calculate position first and then show after a small delay
       setIsPickerReady(false);
       if (buttonRef.current) {
         const rect = buttonRef.current.getBoundingClientRect();
@@ -74,7 +67,6 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
           left: rect.left + window.scrollX
         });
         
-        // Show picker after a small delay to ensure position is set
         setTimeout(() => {
           setIsPickerReady(true);
         }, 50);
@@ -83,12 +75,10 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
     setShowLabelPicker(!showLabelPicker);
   };
 
-  // Show custom form with position calculation
   const showCustomLabelForm = () => {
     setIsFormReady(false);
     setShowLabelPicker(false);
     
-    // Calculate position
     const viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
     const viewportHeight = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
     
@@ -96,8 +86,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
       top: viewportHeight / 2 - 150,
       left: viewportWidth / 2 - 150
     });
-    
-    // Show form after a small delay
+
     setTimeout(() => {
       setShowCustomForm(true);
       setIsFormReady(true);
@@ -119,7 +108,6 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
       const updatedLabels = [...labels, labelName];
       setLabels(updatedLabels);
       
-      // Add to existing labels if not already there
       if (!existingLabels.includes(labelName)) {
         setExistingLabels([...existingLabels, labelName]);
       }
@@ -136,7 +124,6 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
     if (!customLabelName.trim()) return;
     
     try {
-      // Save the custom color for this label
       const newLabelColors = { ...labelColors };
       newLabelColors[customLabelName] = customLabelColor;
       setLabelColors(newLabelColors);
@@ -161,7 +148,6 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
     }
   };
 
-  // Helper to get color for a label (either predefined, custom or default)
   const getLabelColor = (labelName) => {
     if (labelColors[labelName]) {
       return labelColors[labelName];
@@ -171,7 +157,6 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
     return predefined?.color || '#888888';
   };
 
-  // Close picker when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showLabelPicker && !event.target.closest('.label-picker') && 
@@ -186,7 +171,6 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
     };
   }, [showLabelPicker]);
 
-  // Close custom form when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showCustomForm && !event.target.closest('.custom-label-form-portal')) {
@@ -200,12 +184,10 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
     };
   }, [showCustomForm]);
 
-  // Handle picker click to prevent closing task details
   const handlePickerClick = (e) => {
     e.stopPropagation();
   };
 
-  // Handle form click to prevent closing task details
   const handleFormClick = (e) => {
     e.stopPropagation();
   };

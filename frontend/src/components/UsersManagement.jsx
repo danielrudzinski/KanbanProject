@@ -9,7 +9,6 @@ function UsersManagement() {
   const [avatarPreviews, setAvatarPreviews] = useState({});
   const avatarPreviewsRef = useRef({});
 
-  // Update ref when state changes
   useEffect(() => {
     avatarPreviewsRef.current = avatarPreviews;
   }, [avatarPreviews]);
@@ -35,7 +34,6 @@ function UsersManagement() {
     }
   }, []);
 
-  // Function to load users from backend
   const loadUsers = useCallback(async () => {
     try {
       const response = await fetch('/users');
@@ -46,7 +44,6 @@ function UsersManagement() {
       const data = await response.json();
       setUsers(data);
   
-      // Load avatars for all users
       const avatarPromises = data.map(async (user) => {
         const avatarUrl = await fetchUserAvatar(user.id);
         if (avatarUrl) {
@@ -68,7 +65,6 @@ function UsersManagement() {
     loadUsers();
     
     return () => {
-      // Use ref for cleanup to avoid dependency cycle
       Object.values(avatarPreviewsRef.current).forEach(url => {
         URL.revokeObjectURL(url);
       });
@@ -108,7 +104,6 @@ function UsersManagement() {
         throw new Error(responseData || 'Failed to upload avatar');
       }
   
-      // Update avatar preview with retry mechanism
       let retries = 3;
       while (retries > 0) {
         try {
@@ -121,7 +116,6 @@ function UsersManagement() {
           
           if (avatarResponse.ok) {
             const blob = await avatarResponse.blob();
-            // Revoke old URL to prevent memory leaks
             if (avatarPreviews[userId]) {
               URL.revokeObjectURL(avatarPreviews[userId]);
             }
@@ -148,7 +142,6 @@ function UsersManagement() {
     }
   };
   
-  // Update the renderUserAvatar function
   const renderUserAvatar = (user) => {
     const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"%3E%3C/path%3E%3C/svg%3E';
     
@@ -184,28 +177,23 @@ function UsersManagement() {
     );
   };
 
-  // Function to add a new user
   const addUser = () => {
-    // Validate input
     if (name.trim() === '' || email.trim() === '' || password.trim() === '') {
       alert('Proszę wypełnić wszystkie pola!');
       return;
     }
 
-    // Validate email
     if (!isValidEmail(email)) {
       alert('Proszę podać poprawny adres email!');
       return;
     }
 
-    // Prepare user data
     const userData = {
       name: name,
       email: email,
       password: password
     };
 
-    // Send request to backend
     fetch('/users', {
       method: 'POST',
       headers: {
@@ -220,10 +208,7 @@ function UsersManagement() {
         return response.json();
       })
       .then(newUser => {
-        // Add new user to the list
         setUsers([...users, newUser]);
-
-        // Clear form fields
         setName('');
         setEmail('');
         setPassword('');
@@ -234,7 +219,6 @@ function UsersManagement() {
       });
   };
 
-  // Function to delete user
   const deleteUser = (userId) => {
     if (window.confirm('Czy na pewno chcesz usunąć tego użytkownika?')) {
       // Send delete request to backend
@@ -256,7 +240,6 @@ function UsersManagement() {
     }
   };
 
-  // Function to handle Enter key
   const handleKeyPress = (e, nextField) => {
     if (e.key === 'Enter') {
       if (nextField === 'email') {
@@ -269,7 +252,6 @@ function UsersManagement() {
     }
   };
 
-  // Email validation function
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);

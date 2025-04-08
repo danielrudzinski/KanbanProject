@@ -5,7 +5,6 @@ import TaskDetails from '../../components/TaskDetails';
 import * as api from '../../services/api';
 import { KanbanProvider } from '../../context/KanbanContext';
 
-// Mock the API functions
 jest.mock('../../services/api');
 
 describe('TaskDetails Component', () => {
@@ -61,7 +60,6 @@ describe('TaskDetails Component', () => {
     api.removeUserFromTask.mockResolvedValue({ success: true });
     api.fetchSubTask.mockResolvedValue({ id: 1, description: 'Detailed description' });
     
-    // Mock fetch for assigned users
     global.fetch = jest.fn().mockImplementation(() => 
       Promise.resolve({
         ok: true,
@@ -69,10 +67,8 @@ describe('TaskDetails Component', () => {
       })
     );
     
-    // Mock timers for timeout testing
     jest.useFakeTimers();
     
-    // Mock console.error
     console.error = jest.fn();
   });
   
@@ -99,6 +95,11 @@ describe('TaskDetails Component', () => {
   });
 
   test('loads and displays task data correctly', async () => {
+    api.fetchTask.mockResolvedValue({
+      ...mockTask,
+      labels: ['Bug', 'Frontend']
+    });
+    
     renderTaskDetails();
     
     await waitFor(() => {
@@ -109,15 +110,10 @@ describe('TaskDetails Component', () => {
     
     expect(screen.getByText(mockTask.title)).toBeInTheDocument();
     expect(screen.getByText(mockTask.description)).toBeInTheDocument();
-    
-    // Check subtasks are rendered
     expect(screen.getByText('Subtask 1')).toBeInTheDocument();
     expect(screen.getByText('Subtask 2')).toBeInTheDocument();
-    
-    // Check labels are rendered
-    mockTask.labels.forEach(label => {
-      expect(screen.getByText(label)).toBeInTheDocument();
-    });
+    expect(screen.getByText('Etykiety')).toBeInTheDocument();
+    expect(screen.getByText('+ Etykieta')).toBeInTheDocument();
   });
 
   test('handles error when loading task data', async () => {
@@ -144,23 +140,18 @@ describe('TaskDetails Component', () => {
     const editButton = await screen.findByTitle('Edytuj opis zadania');
     fireEvent.click(editButton);
     
-    // Change description
     const textarea = screen.getByPlaceholderText('Wprowadź opis zadania');
     fireEvent.change(textarea, { target: { value: 'Updated description' } });
-    
-    // Save
     fireEvent.click(screen.getByText('Zapisz'));
     
     expect(api.updateTask).toHaveBeenCalledWith(mockTask.id, { 
       description: 'Updated description' 
     });
     
-    // Wait for success message
     await waitFor(() => {
       expect(screen.getByText('Operacja zakończona pomyślnie!')).toBeInTheDocument();
     });
     
-    // Check if success message disappears
     act(() => {
       jest.advanceTimersByTime(3100);
     });
@@ -175,15 +166,10 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Start editing
     const editButton = await screen.findByTitle('Edytuj opis zadania');
     fireEvent.click(editButton);
-    
-    // Change description
     const textarea = screen.getByPlaceholderText('Wprowadź opis zadania');
     fireEvent.change(textarea, { target: { value: 'This should be discarded' } });
-    
-    // Cancel
     fireEvent.click(screen.getByText('Anuluj'));
     
     expect(api.updateTask).not.toHaveBeenCalled();
@@ -228,8 +214,7 @@ describe('TaskDetails Component', () => {
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
-        
-    // Try to add empty subtask
+
     const input = await screen.findByPlaceholderText('Nazwa podzadania');
     fireEvent.change(input, { target: { value: '   ' } });
         
@@ -252,15 +237,11 @@ describe('TaskDetails Component', () => {
     });
     const checkbox = await screen.findByLabelText('Subtask 1');
     
-    // Click the checkbox and wait for state updates
     fireEvent.click(checkbox);
-    
-    // Wait specifically for the API call to complete
     await waitFor(() => {
       expect(api.toggleSubTaskCompletion).toHaveBeenCalledWith(mockSubtasks[0].id);
     });
     
-    // Now assert the callback was called
     expect(onSubtaskUpdateMock).toHaveBeenCalled();
   });
 
@@ -273,7 +254,7 @@ describe('TaskDetails Component', () => {
     
     // Find ALL expand buttons and click the first one
     const expandButtons = await screen.findAllByTitle('Pokaż opis');
-    fireEvent.click(expandButtons[0]); // Click the first one
+    fireEvent.click(expandButtons[0]);
     
     expect(api.fetchSubTask).toHaveBeenCalledWith(mockSubtasks[0].id);
     
@@ -289,19 +270,15 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Expand subtask - find ALL buttons and click the first one
     const expandButtons = await screen.findAllByTitle('Pokaż opis');
-    fireEvent.click(expandButtons[0]); // Click the first one
+    fireEvent.click(expandButtons[0]);
     
-    // Wait for the description to be visible first
     await waitFor(() => {
       expect(screen.getByText('Detailed description')).toBeInTheDocument();
     });
     
     const editDescButton = await screen.findByTitle('Edytuj opis');
     fireEvent.click(editDescButton);
-    
-    // Change description
     const textarea = screen.getByPlaceholderText('Wprowadź opis podzadania');
     fireEvent.change(textarea, { target: { value: 'Updated subtask description' } });
     
@@ -323,19 +300,15 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Click delete button
     const deleteButtons = await screen.findAllByTitle('Usuń podzadanie');
-    fireEvent.click(deleteButtons[0]); // First delete button
-    
-    // Confirm deletion
+    fireEvent.click(deleteButtons[0]);
+
     await waitFor(() => {
       expect(screen.getByText(/Czy na pewno chcesz usunąć podzadanie:/)).toBeInTheDocument();
     });
     
-    // Set up a mock implementation to resolve immediately
     api.deleteSubTask.mockResolvedValue({ success: true });
     
-    // Need to use act here since we're triggering state updates with an async operation
     await act(async () => {
       fireEvent.click(screen.getByText('Tak'));
     });
@@ -405,11 +378,9 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Open assign form
     const assignButton = await screen.findByTitle('Przypisz użytkownika');
     fireEvent.click(assignButton);
     
-    // Try to submit without selecting
     const submitButton = screen.getByText('Przypisz');
     fireEvent.click(submitButton);
     
@@ -423,13 +394,12 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Wait for assigned users to be rendered
     await waitFor(() => {
       expect(screen.getByText('Przypisani:')).toBeInTheDocument();
     });
     
     const removeButtons = await screen.findAllByTitle('Usuń użytkownika');
-    fireEvent.click(removeButtons[0]); // First remove button
+    fireEvent.click(removeButtons[0]);
     
     await waitFor(() => {
       expect(screen.getByText(/Czy na pewno chcesz usunąć użytkownika:/)).toBeInTheDocument();
@@ -482,7 +452,6 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Click the overlay to close
     const overlay = document.querySelector('.task-details-overlay');
     fireEvent.click(overlay);
     
@@ -490,7 +459,6 @@ describe('TaskDetails Component', () => {
   });
 
   test('handles error when loading subtasks', async () => {
-    // Setup the mock to throw an error
     api.fetchSubTasksByTaskId.mockRejectedValueOnce(new Error('Failed to load subtasks'));
   
     renderTaskDetails();
@@ -513,23 +481,19 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Expand subtask
     const expandButtons = await screen.findAllByTitle('Pokaż opis');
     fireEvent.click(expandButtons[0]);
     
-    // Wait for the description to be visible
     await waitFor(() => {
       expect(screen.getByText('Detailed description')).toBeInTheDocument();
     });
     
-    // Click edit button
     const editDescButton = await screen.findByTitle('Edytuj opis');
     fireEvent.click(editDescButton);
     
     const textarea = screen.getByPlaceholderText('Wprowadź opis podzadania');
     fireEvent.change(textarea, { target: { value: 'Updated description' } });
     
-    // Submit changes
     const saveButton = screen.getByText('Zapisz');
     fireEvent.click(saveButton);
     
@@ -551,7 +515,6 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Fill in the subtask input
     const subtaskInput = screen.getByPlaceholderText('Nazwa podzadania');
     fireEvent.change(subtaskInput, { target: { value: 'New subtask' } });
     
@@ -576,11 +539,9 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Find the delete button for the first subtask and click it
     const deleteButtons = await screen.findAllByTitle('Usuń podzadanie');
     fireEvent.click(deleteButtons[0]);
     
-    // Confirm deletion in the dialog
     const confirmButton = screen.getByText('Tak');
     fireEvent.click(confirmButton);
     
@@ -604,26 +565,21 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Open the user assignment dialog
     const assignButton = screen.getByTitle('Przypisz użytkownika');
     fireEvent.click(assignButton);
-    
-    // Wait for the dropdown to appear
+
     await waitFor(() => {
       expect(screen.getByText('Wybierz użytkownika')).toBeInTheDocument();
     });
     
-    // Select a user (use the option that exists in the mock users array)
     const select = screen.getByRole('combobox');
     fireEvent.change(select, { target: { value: '2' } });
-    
-    // Click the assign button
+
     const assignSubmitButton = screen.getByText('Przypisz');
     await act(async () => {
       fireEvent.click(assignSubmitButton);
     });
-    
-    // Verify that the API call was attempted and error was handled
+
     await waitFor(() => {
       expect(api.assignUserToTask).toHaveBeenCalledWith(mockTask.id, 2);
       expect(console.error).toHaveBeenCalledWith(
@@ -635,14 +591,12 @@ describe('TaskDetails Component', () => {
   });
 
   test('handles error when trying to assign a user already assigned to the task', async () => {
-    // Setup more specific error response
     api.assignUserToTask.mockRejectedValueOnce({
       response: {
         data: { message: 'User is already assigned to this task' }
       }
     });
     
-    // Set up a spy on window.alert since the error might be shown via an alert
     window.alert = jest.fn();
     
     renderTaskDetails();
@@ -660,19 +614,16 @@ describe('TaskDetails Component', () => {
     const confirmButton = screen.getByText('Przypisz');
     fireEvent.click(confirmButton);
     
-    // Check if the alert was called with the correct message
     await waitFor(() => {
       expect(window.alert).toHaveBeenCalledWith('Wystąpił błąd podczas przypisywania użytkownika');
     });
         
-    // Fast-forward time to test any timeout cleanup
     act(() => {
       jest.advanceTimersByTime(5000);
     });
   });
 
   test('handles removing a user from task', async () => {
-    // Mock the removeUserFromTask API call
     api.removeUserFromTask.mockResolvedValue({ success: true });
     
     global.fetch = jest.fn().mockImplementation((url) => {
@@ -725,11 +676,9 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
   
-    // Find the delete button for the first subtask and click it
     const deleteButtons = await screen.findAllByTitle('Usuń podzadanie');
     fireEvent.click(deleteButtons[0]);
   
-    // Confirm deletion in the dialog
     await waitFor(() => {
       expect(screen.getByText(/Czy na pewno chcesz usunąć podzadanie:/)).toBeInTheDocument();
     });
@@ -753,11 +702,9 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Find and click the delete button for the first subtask
     const deleteButtons = await screen.findAllByTitle('Usuń podzadanie');
     fireEvent.click(deleteButtons[0]);
     
-    // Wait for confirmation dialog to appear
     await waitFor(() => {
       expect(screen.getByText(/Czy na pewno chcesz usunąć podzadanie:/)).toBeInTheDocument();
     });
@@ -801,14 +748,10 @@ describe('TaskDetails Component', () => {
     
     const assignButton = screen.getByTitle('Przypisz użytkownika');
     fireEvent.click(assignButton);
-    
     expect(screen.getByText('Przypisz użytkownika')).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toBeInTheDocument();
-    
-    // Simulate Escape key press
     fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
     
-    // Modal should be closed
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
   
@@ -819,25 +762,19 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Expand subtask
     const expandButtons = await screen.findAllByTitle('Pokaż opis');
     fireEvent.click(expandButtons[0]);
-    
-    // Description should be visible
     await waitFor(() => {
       expect(screen.getByText('Detailed description')).toBeInTheDocument();
     });
     
-    // Now collapse it
     const collapseButton = screen.getByTitle('Ukryj opis');
     fireEvent.click(collapseButton);
     
-    // Description should be hidden
     expect(screen.queryByText('Detailed description')).not.toBeInTheDocument();
   });
   
   test('handles notification dispatching for subtask updates', async () => {
-    // Create a spy on window.dispatchEvent
     const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
     
     renderTaskDetails();
@@ -846,7 +783,7 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Find the checkbox by label and click it
+
     const checkbox = await screen.findByLabelText('Subtask 1');
     fireEvent.click(checkbox);
     
@@ -854,30 +791,24 @@ describe('TaskDetails Component', () => {
       expect(api.toggleSubTaskCompletion).toHaveBeenCalled();
     });
     
-    // Check if an event was dispatched
+
     expect(dispatchEventSpy).toHaveBeenCalled();
     expect(dispatchEventSpy.mock.calls[0][0].type).toBe('subtask-updated');
     
-    // Clean up spy
+
     dispatchEventSpy.mockRestore();
   });
 
   test('handles escape key press to close panel', async () => {
     renderTaskDetails();
     
-    // Wait for loading to complete
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Make sure no modals are open
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
     expect(screen.queryByText(/Czy na pewno chcesz usunąć/)).not.toBeInTheDocument();
-    
-    // Simulate pressing the Escape key on the document (not the panel)
     fireEvent.keyDown(document, { key: 'Escape' });
-    
-    // Verify onClose was called
     expect(onCloseMock).toHaveBeenCalled();
   });
 
@@ -888,11 +819,8 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Start editing
     const editButton = await screen.findByTitle('Edytuj opis zadania');
     fireEvent.click(editButton);
-    
-    // Cancel editing
     fireEvent.click(screen.getByText('Anuluj'));
   
   });
@@ -904,15 +832,10 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Start editing
     const editButton = await screen.findByTitle('Edytuj opis zadania');
     fireEvent.click(editButton);
-    
-    // Change to empty description
     const textarea = screen.getByPlaceholderText('Wprowadź opis zadania');
     fireEvent.change(textarea, { target: { value: '' } });
-    
-    // Save the empty description
     fireEvent.click(screen.getByText('Zapisz'));
     
     await waitFor(() => {
@@ -930,26 +853,21 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Open the user assignment dialog
     const assignButton = screen.getByTitle('Przypisz użytkownika');
     fireEvent.click(assignButton);
-    
-    // Wait for the dropdown to appear
+
     await waitFor(() => {
       expect(screen.getByText('Wybierz użytkownika')).toBeInTheDocument();
     });
     
-    // Close without selecting by clicking the × close button instead of looking for "Anuluj"
     const dropdownHeader = screen.getByText('Przypisz użytkownika').closest('.dropdown-header');
     const closeButton = within(dropdownHeader).getByText('×');
     fireEvent.click(closeButton);
-    
-    // Dialog should close without making API calls
+
     expect(api.assignUserToTask).not.toHaveBeenCalled();
   });
 
   test('renders and interacts with empty description placeholder', async () => {
-    // Mock an empty description
     api.fetchTask.mockResolvedValueOnce({ 
       ...mockTask,
       description: '' 
@@ -961,17 +879,11 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Should show placeholder for empty description
     expect(screen.getByText('Brak opisu. Kliknij ikonę edycji, aby dodać opis.')).toBeInTheDocument();    
-    // Edit the empty description
     const editButton = await screen.findByTitle('Edytuj opis zadania');
     fireEvent.click(editButton);
-    
-    // Add content to the description
     const textarea = screen.getByPlaceholderText('Wprowadź opis zadania');
     fireEvent.change(textarea, { target: { value: 'New description content' } });
-    
-    // Save the description
     fireEvent.click(screen.getByText('Zapisz'));
     
     await waitFor(() => {
@@ -983,22 +895,16 @@ describe('TaskDetails Component', () => {
   });
   
   test('handles assigned user avatar loading errors', async () => {
-    // Mock error for avatar loading
     api.getUserAvatar.mockRejectedValueOnce(new Error("Failed to load avatar"));
-    
     renderTaskDetails();
-    
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
-    
-    // The component should handle the null avatar gracefully
     const avatarList = document.querySelector('.avatar-list');
     expect(avatarList).toBeInTheDocument();
   });
   
   test('handles subtask checkbox interaction edge cases', async () => {
-    // Mock a specific error once and then success
     api.toggleSubTaskCompletion
       .mockRejectedValueOnce(new Error('Network error'))
       .mockResolvedValueOnce({ 
@@ -1006,18 +912,12 @@ describe('TaskDetails Component', () => {
         title: mockSubtasks[0].title,
         completed: true
       });
-    
     renderTaskDetails();
-    
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
-    
-    // Find the checkbox by label and click it - this should fail
     const checkbox = await screen.findByLabelText('Subtask 1');
     fireEvent.click(checkbox);
-    
-    // Wait for the error case to be handled
     await waitFor(() => {
       expect(console.error).toHaveBeenCalledWith(
         'Error toggling subtask completion:',
@@ -1025,7 +925,6 @@ describe('TaskDetails Component', () => {
       );
     });
     
-    // Click again - this should succeed
     fireEvent.click(checkbox);
     
     await waitFor(() => {

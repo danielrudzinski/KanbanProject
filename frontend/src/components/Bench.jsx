@@ -18,14 +18,12 @@ function Bench() {
       const allUsers = await fetchUsers();
       setUsers(allUsers);
       
-      // Initialize WIP limits from data, default to Unlimited (null)
       const initialWipLimits = {};
       allUsers.forEach(user => {
         initialWipLimits[user.id] = user.wipLimit || null; 
       });
       setWipLimits(initialWipLimits);
       
-      // Load avatars for all users
       const avatarPromises = allUsers.map(async (user) => {
         try {
           const avatarUrl = await getUserAvatar(user.id);
@@ -75,7 +73,6 @@ function Bench() {
     e.dataTransfer.effectAllowed = 'copy';
   };
 
-  // Start editing WIP limit
   const startEditWipLimit = (userId) => {
     setEditingWipLimit({
       ...editingWipLimit,
@@ -83,50 +80,41 @@ function Bench() {
     });
   };
 
-  // Handle WIP limit change
   const handleWipLimitChange = (userId, value) => {
-    // Allow setting to null (Unlimited) or a positive number
     setWipLimits({
       ...wipLimits,
       [userId]: value === '' ? null : parseInt(value)
     });
   };
 
-  // Save WIP limit to backend
   const saveWipLimit = async (userId) => {
     try {
       const newLimit = wipLimits[userId];
       await updateUserWipLimit(userId, newLimit);
       
-      // Update local user data
       setUsers(prevUsers => 
         prevUsers.map(user => 
           user.id === userId ? { ...user, wipLimit: newLimit } : user
         )
       );
       
-      // Exit edit mode
       setEditingWipLimit({
         ...editingWipLimit,
         [userId]: false
       });
       
-      // Refresh tasks to update UI
       refreshTasks();
     } catch (error) {
       console.error('Error updating WIP limit:', error);
     }
   };
 
-  // Cancel editing
   const cancelEditWipLimit = (userId) => {
-    // Reset to original value
     setWipLimits({
       ...wipLimits,
       [userId]: users.find(u => u.id === userId).wipLimit || null
     });
     
-    // Exit edit mode
     setEditingWipLimit({
       ...editingWipLimit,
       [userId]: false

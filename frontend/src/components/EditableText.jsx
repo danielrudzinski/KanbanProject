@@ -20,7 +20,6 @@ function EditableText({
     }
   }, [isEditing]);
 
-  // Update local state when prop changes (useful for external updates)
   useEffect(() => {
     setValue(text);
   }, [text]);
@@ -33,10 +32,10 @@ function EditableText({
     if (value.trim() !== text && value.trim() !== '') {
       const success = await onUpdate(id, value.trim(), type);
       if (!success) {
-        setValue(text); // Reset to original if update failed
+        setValue(text); 
       }
     } else if (value.trim() === '') {
-      setValue(text); // Don't allow empty names
+      setValue(text); 
     }
     setIsEditing(false);
   };

@@ -21,13 +21,11 @@ function Board() {
   const { handleDragOver } = dragAndDrop;
 
   useEffect(() => {
-    // Set CSS variable for column count
     if (columns.length > 0) {
       document.documentElement.style.setProperty('--column-count', columns.length);
     }
     
     return () => {
-      // Reset when component unmounts
       document.documentElement.style.setProperty('--column-count', 3);
     };
   }, [columns.length, rows.length]);
@@ -40,14 +38,12 @@ function Board() {
     return <div className="board-error">Error: {error}</div>;
   }
 
-  // Filter tasks by column and row
   const getTasksByColumnAndRow = (columnId, rowId = null) => {
     return tasks.filter(task => 
       task.columnId === columnId && task.rowId === rowId
     );
   };
 
-  // Calculate task counts for each row
   const calculateTaskCounts = () => {
     const counts = {};
     rows.forEach(row => {
@@ -58,7 +54,6 @@ function Board() {
 
   const taskCounts = calculateTaskCounts();
 
-  // Calculate task counts for each column
   const calculateColumnTaskCounts = () => {
     const counts = {};
     columns.forEach(column => {
@@ -69,7 +64,6 @@ function Board() {
 
   const columnTaskCounts = calculateColumnTaskCounts();
 
-  // Check if any row is over its WIP limit
   const checkRowWipLimits = () => {
     const rowStatus = {};
     rows.forEach(row => {
@@ -81,7 +75,6 @@ function Board() {
     return rowStatus;
   };
 
-  // Check if any column is over its WIP limit
   const checkColumnWipLimits = () => {
     const columnStatus = {};
     columns.forEach(column => {
@@ -96,31 +89,26 @@ function Board() {
   const rowWipStatus = checkRowWipLimits();
   const columnWipStatus = checkColumnWipLimits();
 
-  // Enhance row objects with additional properties
   const enhancedRows = rows.map(row => ({
     ...row,
     taskCount: taskCounts[row.id] || 0,
     isOverLimit: rowWipStatus[row.id] || false
   }));
 
-  // Enhance column objects with additional properties
   const enhancedColumns = columns.map(column => ({
     ...column,
     taskCount: columnTaskCounts[column.id] || 0,
     isOverLimit: columnWipStatus[column.id] || false
   }));
 
-  // Handle column drag over for the board itself
   const onBoardDragOver = (e) => {
     handleDragOver(e);
     
-    // For column reordering
     if (e.dataTransfer.types.includes('application/column')) {
       e.preventDefault();
     }
   };
 
-  // Safe deleteRow function that prevents deleting the last row
   const safeDeleteRow = (rowId) => {
     if (rows.length > 1) {
       if (window.confirm('Czy na pewno chcesz usunąć ten wiersz?')) {
@@ -131,7 +119,6 @@ function Board() {
     }
   };
 
-  // Render the row header with drag and drop handlers
   const renderRowHeader = (row) => {
     const onDragStart = (e) => {
       dragAndDrop.handleDragStart(e, row.id, 'row');
@@ -184,7 +171,6 @@ function Board() {
     );
   };
 
-  // Render column header with drag and drop handlers
   const renderColumnHeader = (column) => {
     const columnTaskCount = columnTaskCounts[column.id] || 0;
     const isOverLimit = column.wipLimit > 0 && columnTaskCount > column.wipLimit;
@@ -245,12 +231,10 @@ function Board() {
     );
   };
 
-  // Render table cells with proper drag and drop handlers
   const renderCell = (column, row) => {
     const cellTasks = getTasksByColumnAndRow(column.id, row.id);
     const hasTasksInCell = cellTasks.length > 0;
     
-    // Determine if this cell should be highlighted for WIP limit
     const columnExceedsWip = column.wipLimit > 0 && columnTaskCounts[column.id] > column.wipLimit;
     const rowExceedsWip = row.wipLimit > 0 && taskCounts[row.id] > row.wipLimit;
     const shouldHighlight = hasTasksInCell && (columnExceedsWip || rowExceedsWip);
@@ -286,7 +270,6 @@ function Board() {
     );
   };
 
-  // Always render the grid-based board with rows and columns
   return (
     <div className="board-grid" onDragOver={onBoardDragOver}>
       <table className="kanban-table">

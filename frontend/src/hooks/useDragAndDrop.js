@@ -3,7 +3,6 @@ import { useState, useCallback } from 'react';
 const useDragAndDrop = () => {
   const [draggedItem, setDraggedItem] = useState(null);
   
-  // Handle drag start
   const handleDragStart = useCallback((e, data) => {
     // For tasks, data should be an object with taskId and sourceColumnId
     // For columns, data should be the columnId
@@ -17,7 +16,6 @@ const useDragAndDrop = () => {
     
     setDraggedItem(data);
     
-    // Set a clear indicator of what type of item is being dragged
     if (data.taskId) {
       e.dataTransfer.setData('application/task', payload);
     } else if (data.type === 'column') {
@@ -27,17 +25,15 @@ const useDragAndDrop = () => {
     }
   }, []);
   
-  // Handle drag over
   const handleDragOver = useCallback((e) => {
     if (e.preventDefault) {
-      e.preventDefault(); // Necessary to allow dropping
+      e.preventDefault(); 
     }
     
     e.dataTransfer.dropEffect = 'move';
     return false;
   }, []);
   
-  // Handle drag end
   const handleDragEnd = useCallback(() => {
     setDraggedItem(null);
   }, []);

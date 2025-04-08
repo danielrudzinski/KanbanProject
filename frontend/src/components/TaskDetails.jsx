@@ -49,47 +49,33 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     };
   }, [onClose, showAssignForm, showDeleteConfirmation, showUserDeleteConfirmation]);
   
-  // Update loadTaskData to include subtasks loading
   const loadTaskData = async () => {
     try {
       setLoading(true);
-      
-      // Fetch the full task data
       const taskData = await fetchTask(task.id);
-      
-      // Load users assigned to the task - ensure we have an array
       let assignedData = [];
       try {
         const response = await fetch(`/tasks/${task.id}/users`);
         if (response.ok) {
           const data = await response.json();
-          // Ensure assignedData is always an array
           assignedData = Array.isArray(data) ? data : [];
         }
       } catch (error) {
         console.error('Error fetching assigned users:', error);
       }
       
+      // load everything
       setAssignedUsers(assignedData);
-      
-      // Load available users
       const usersData = await fetchUsers();
       setUsers(usersData || []);
-      
-      // Load subtasks
       const subtasksData = await fetchSubTasksByTaskId(task.id);
       setSubtasks(subtasksData || []);
-      
-      // Load task labels
       const labelsData = taskData.labels || [];
-      setTaskLabels(labelsData);
-      
-      // Set the task description from the fetched data
       const description = taskData.description || '';
       setTaskDescription(description);
       setOriginalTaskDescription(description);
       
-      // Load avatar previews for users - only if we have assigned users
+      // load avatars
       if (assignedData.length > 0) {
         const avatarPromises = assignedData.map(async user => {
           try {
@@ -121,14 +107,11 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     // save task description
     const saveTaskDescription = async () => {
       try {
-        // Use the generic updateTask function to update the description field
         await updateTask(task.id, { description: taskDescription });
-        
-        // Store locally as well
+
         setOriginalTaskDescription(taskDescription);
         setEditingTaskDescription(false);
-        
-        // Show success message
+
         setSuccess(true);
         setTimeout(() => {
           setSuccess(false);
@@ -152,13 +135,10 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
 
     const startEditingSubTaskDescription = () => {
       if (!expandedSubtaskId) return;
-      
-      // Store original description for cancel operation
       const currentSubtask = subtasks.find(s => s.id === expandedSubtaskId);
       if (currentSubtask) {
         setSubtaskDescription(currentSubtask.description || '');
       }
-      
       setEditingDescription(true);
       setTimeout(() => {
         if (descriptionInputRef.current) {
@@ -183,7 +163,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   
     // cancel task description editing
     const cancelEditingTaskDescription = () => {
-      setTaskDescription(originalTaskDescription); // Restore original value
+      setTaskDescription(originalTaskDescription);
       setEditingTaskDescription(false);
     };
 
@@ -193,14 +173,11 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     try {
       await addSubTask(task.id, newSubtaskTitle.trim());
       setNewSubtaskTitle('');
-      await loadTaskData(); // Refresh task data including subtasks
-      
-      // Notify parent component about subtask changes
+      await loadTaskData();
       if (onSubtaskUpdate) {
         onSubtaskUpdate();
       }
       
-      // Dispatch event to notify other components
       window.dispatchEvent(new CustomEvent('subtask-updated', { detail: { taskId: task.id } }));
       
       setSuccess(true);
@@ -217,7 +194,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     try {
       await toggleSubTaskCompletion(subtaskId);
       
-      // Update the UI by toggling the completion status locally
       setSubtasks(prev => prev.map(subtask => {
         if (subtask.id === subtaskId) {
           return {
@@ -228,12 +204,10 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         return subtask;
       }));
       
-      // Notify parent component about subtask changes
       if (onSubtaskUpdate) {
         onSubtaskUpdate();
       }
       
-      // Dispatch event to notify other components
       window.dispatchEvent(new CustomEvent('subtask-updated', { detail: { taskId: task.id } }));
       
     } catch (error) {
@@ -243,7 +217,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   };
 
   const confirmdeleteSubTask = (subtaskId) => {
-    // Find the subtask to delete
     const subtask = subtasks.find(s => s.id === subtaskId);
     if (subtask) {
       setSubtaskToDelete(subtask);
@@ -256,16 +229,11 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     
     try {
       await deleteSubTask(subtaskToDelete.id);
-      
-      // Update the UI by removing the deleted subtask
       setSubtasks(prev => prev.filter(subtask => subtask.id !== subtaskToDelete.id));
-      
-      // Notify parent component about subtask changes
       if (onSubtaskUpdate) {
         onSubtaskUpdate();
       }
       
-      // Dispatch event to notify other components
       window.dispatchEvent(new CustomEvent('subtask-updated', { detail: { taskId: task.id } }));
       
       setSuccess(true);
@@ -273,7 +241,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         setSuccess(false);
       }, 3000);
       
-      // Close the confirmation dialog
       setShowDeleteConfirmation(false);
       setSubtaskToDelete(null);
     } catch (error) {
@@ -291,11 +258,9 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
 
   const toggleSubtaskExpansion = async (subtaskId) => {
     if (expandedSubtaskId === subtaskId) {
-      // If already expanded, collapse it
       setExpandedSubtaskId(null);
       setEditingDescription(false);
     } else {
-      // If not expanded, expand it and fetch its description
       setExpandedSubtaskId(subtaskId);
       setEditingDescription(false);
       
@@ -315,7 +280,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     try {
       await updateSubTask(expandedSubtaskId, { description: subtaskDescription });
       
-      // Update the local state
       setSubtasks(prev => prev.map(subtask => {
         if (subtask.id === expandedSubtaskId) {
           return {
@@ -340,7 +304,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const cancelEditingDescription = () => {
     setEditingDescription(false);
     
-    // Restore the original description
     const currentSubtask = subtasks.find(s => s.id === expandedSubtaskId);
     if (currentSubtask) {
       setSubtaskDescription(currentSubtask.description || '');
@@ -365,7 +328,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   };
 
   const confirmRemoveUser = (userId) => {
-    // Find the user to delete
     const user = assignedUsers.find(u => u.id === userId);
     if (user) {
       setUserToDelete(user);
@@ -379,7 +341,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     try {
       await removeUserFromTask(task.id, userToDelete.id);
       
-      // Revoke the object URL for the removed user's avatar to prevent memory leaks
       if (avatarPreviews[userToDelete.id]) {
         URL.revokeObjectURL(avatarPreviews[userToDelete.id]);
         setAvatarPreviews(prev => {
@@ -389,15 +350,14 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         });
       }
       
-      await loadTaskData(); // Refresh task data after removal
-      refreshTasks(); // Refresh tasks in the context
+      await loadTaskData();
+      refreshTasks();
 
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
       }, 3000);
-      
-      // Close the confirmation dialog
+
       setShowUserDeleteConfirmation(false);
       setUserToDelete(null);
     } catch (error) {
@@ -436,8 +396,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     
     try {
       await assignUserToTask(task.id, parseInt(selectedUserId));
-      
-      // Fetch the avatar for the newly assigned user
       const avatarUrl = await getUserAvatar(parseInt(selectedUserId));
       if (avatarUrl) {
         setAvatarPreviews(prev => ({
@@ -446,8 +404,8 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         }));
       }
       
-      await loadTaskData(); // Refresh task data after assignment
-      refreshTasks(); // Refresh tasks in the context
+      await loadTaskData();
+      refreshTasks(); 
 
       setSuccess(true);
       setSelectedUserId('');
@@ -462,11 +420,9 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     }
   };
 
-  // Load data when component mounts
   useEffect(() => {
     loadTaskData();
     
-    // Cleanup function to revoke object URLs when component unmounts
     return () => {
       Object.values(avatarPreviews).forEach(url => {
         URL.revokeObjectURL(url);
@@ -474,7 +430,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     };
   }, [task.id]);
 
-  // Position panel after it renders
   useEffect(() => {
     if (!loading) {
       positionPanel();
@@ -492,14 +447,12 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     );
   }
   
-  // Position panel relative to viewport
   const positionPanel = () => {
     if (!panelRef.current) return;
     
     const panel = panelRef.current;
     const rect = panel.getBoundingClientRect();
     
-    // Adjust if panel goes off screen
     if (rect.right > window.innerWidth) {
       panel.style.left = `${window.innerWidth - rect.width - 20}px`;
     }

@@ -5,14 +5,12 @@ import Bench from '../../components/Bench';
 import { fetchUsers, getUserAvatar, updateUserWipLimit } from '../../services/api';
 import { KanbanProvider } from '../../context/KanbanContext';
 
-// Mock the API functions
 jest.mock('../../services/api', () => ({
   fetchUsers: jest.fn(),
   getUserAvatar: jest.fn(),
   updateUserWipLimit: jest.fn()
 }));
 
-// Mock URL.revokeObjectURL
 URL.revokeObjectURL = jest.fn();
 
 describe('Bench Component', () => {
@@ -30,7 +28,6 @@ describe('Bench Component', () => {
   
   beforeEach(() => {
     jest.clearAllMocks();
-    // Default mock implementations
     fetchUsers.mockResolvedValue(mockUsers);
     getUserAvatar.mockResolvedValue('mock-avatar-url');
     updateUserWipLimit.mockResolvedValue({ success: true });
@@ -57,15 +54,10 @@ describe('Bench Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Check if user names are displayed
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     expect(screen.getByText('Bob Johnson')).toBeInTheDocument();
-    
-    // Check if role is displayed
     expect(screen.getByText('Developer')).toBeInTheDocument();
-    
-    // Check if avatars were requested
     expect(getUserAvatar).toHaveBeenCalledTimes(3);
   });
   
@@ -95,7 +87,6 @@ describe('Bench Component', () => {
     expect(benchContainer).toHaveClass('open');
     expect(screen.getByText('◀')).toBeInTheDocument();
     
-    // Toggle again
     fireEvent.click(screen.getByText('◀'));
     expect(benchContainer).not.toHaveClass('open');
   });
@@ -107,7 +98,6 @@ describe('Bench Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Mock dataTransfer
     const dataTransfer = {
       setData: jest.fn(),
       effectAllowed: null
@@ -129,16 +119,13 @@ describe('Bench Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Check WIP limit display
     expect(screen.getByText('WIP Limit: 5')).toBeInTheDocument();
     expect(screen.getByText('WIP Limit: Unlimited')).toBeInTheDocument();
-    
-    // Check task count display
+  
     expect(screen.getByText('Zadania: 3/5')).toBeInTheDocument();
     expect(screen.getByText('Zadania: 2/Unlimited')).toBeInTheDocument();
     expect(screen.getByText('Zadania: 4/3')).toBeInTheDocument();
     
-    // Check that the user who exceeded WIP limit has the appropriate class
     const exceededTaskCount = screen.getByText('Zadania: 4/3');
     expect(exceededTaskCount).toHaveClass('limit-reached');
   });
@@ -179,7 +166,6 @@ describe('Bench Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Find and click WIP limit display to edit
     const wipLimitDisplay = screen.getAllByText(/WIP Limit/)[0].closest('.wip-limit-display');
     fireEvent.click(wipLimitDisplay);
     
@@ -208,13 +194,11 @@ describe('Bench Component', () => {
     const wipLimitDisplay = screen.getAllByText(/WIP Limit/)[0].closest('.wip-limit-display');
     fireEvent.click(wipLimitDisplay);
     
-    // Save changes
     const saveButton = screen.getByTitle('Zapisz limit WIP');
     await act(async () => {
       fireEvent.click(saveButton);
     });
     
-    // Check if error was logged
     await waitFor(() => {
       expect(console.error).toHaveBeenCalledWith(
         'Error updating WIP limit:', 
@@ -224,7 +208,6 @@ describe('Bench Component', () => {
   });
   
   test('handles avatar loading errors gracefully', async () => {
-    // Mock getUserAvatar to fail for one user
     getUserAvatar.mockImplementation((userId) => {
       if (userId === 1) {
         return Promise.reject(new Error('Avatar load failed'));
@@ -253,16 +236,13 @@ describe('Bench Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Find all avatar images
     const avatarImages = document.querySelectorAll('.avatar');
     fireEvent.error(avatarImages[0]);
     
-    // Image should still be displayed (using fallback)
     expect(avatarImages[0]).toBeInTheDocument();
   });
   
   test('cleans up avatar URLs on unmount', async () => {
-    // Mock avatar URLs to be blob URLs specifically
     getUserAvatar.mockResolvedValue('blob:http://localhost:3000/12345');
     
     const { unmount } = renderBench();
@@ -271,20 +251,14 @@ describe('Bench Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Wait for avatar loading to complete
     await waitFor(() => {
       expect(getUserAvatar).toHaveBeenCalled();
     });
     
-    // Ensure the avatarPreviews state is populated
     await act(async () => {
-      // Small delay to ensure state updates are processed
       await new Promise(resolve => setTimeout(resolve, 0));
     });
-    
     unmount();
-    
-    // URL.revokeObjectURL should be called for each avatar
     expect(URL.revokeObjectURL).toHaveBeenCalled();
   });
   
@@ -306,7 +280,6 @@ describe('Bench Component', () => {
       fireEvent.click(saveButton);
     });
     
-    // Check if API was called with null value
     expect(updateUserWipLimit).toHaveBeenCalledWith(1, null);
   });
 });

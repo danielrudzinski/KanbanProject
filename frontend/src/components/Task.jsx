@@ -18,7 +18,6 @@ function Task({ task, columnId }) {
   const taskRef = useRef(null);
   const warningTimeoutRef = useRef(null);
 
-  // Check if task has unfinished subtasks
   const checkUnfinishedSubtasks = useCallback(async () => {
     try {
       const subtasks = await fetchSubTasksByTaskId(task.id);
@@ -30,9 +29,7 @@ function Task({ task, columnId }) {
   }, [task.id]);
 
   useEffect(() => {
-    // If task has a user assigned, fetch their avatar
     if (task.userIds && task.userIds.length > 0) {
-      // Get the first assigned user's avatar for display in the task card
       getUserAvatar(task.userIds[0]).then(url => {
         if (url) {
           setAvatarUrl(url);
@@ -40,10 +37,8 @@ function Task({ task, columnId }) {
       });
     }
     
-    // Check for unfinished subtasks when component mounts
     checkUnfinishedSubtasks();
   
-    // Clean up object URL when component unmounts
     return () => {
       if (avatarUrl && avatarUrl.startsWith('blob:')) {
         URL.revokeObjectURL(avatarUrl);
@@ -59,7 +54,6 @@ function Task({ task, columnId }) {
       checkUnfinishedSubtasks();
     };
 
-    // Listen for a custom event that will be dispatched from TaskDetails
     window.addEventListener('subtask-updated', handleSubtaskUpdate);
 
     return () => {
@@ -67,7 +61,6 @@ function Task({ task, columnId }) {
     };
   }, [checkUnfinishedSubtasks]);
 
-  // Clear assignment error after 5 seconds
   useEffect(() => {
     if (assignmentError) {
       const timer = setTimeout(() => {
@@ -133,38 +126,28 @@ function Task({ task, columnId }) {
     );
   };
 
-  // Handle drag start event
   const onDragStartHandler = (e) => {
     console.log('Task drag start:', { taskId: task.id, columnId });
     
-    // Set the data directly in the format expected by handleDrop
     const data = {
       id: task.id,
       type: 'task',
       sourceColumnId: columnId,
       sourceRowId: task.rowId
     };
-    
-    // Set the data in standard format
     const dataString = JSON.stringify(data);
     e.dataTransfer.setData('application/task', dataString);
-    
-    // For backwards compatibility
     e.dataTransfer.setData('taskId', task.id);
     e.dataTransfer.setData('columnId', columnId);
-    
     e.dataTransfer.effectAllowed = 'move';
     
-    // Add a class to indicate dragging
     if (taskRef.current) {
       taskRef.current.classList.add('dragging');
     }
 
-    // Show warning only if task has unfinished subtasks and is being dragged
     if (hasUnfinishedSubtasks) {
       setShowWarning(true);
-      
-      // Auto-hide warning after 5 seconds
+    
       if (warningTimeoutRef.current) {
         clearTimeout(warningTimeoutRef.current);
       }
@@ -179,7 +162,6 @@ function Task({ task, columnId }) {
     e.preventDefault();
     e.stopPropagation();
     
-    // Check if we're dragging a task or a user
     if (e.dataTransfer.types.includes('application/task') || 
         e.dataTransfer.types.includes('application/user')) {
       setIsDragOver(true);
@@ -197,34 +179,26 @@ function Task({ task, columnId }) {
     e.stopPropagation();
     setIsDragOver(false);
     
-    // Hide warning when task is dropped
     setShowWarning(false);
     if (warningTimeoutRef.current) {
       clearTimeout(warningTimeoutRef.current);
     }
     
-    // Check if we're dropping a task
     if (e.dataTransfer.types.includes('application/task')) {
       try {
         const dataString = e.dataTransfer.getData('application/task');
         const taskData = JSON.parse(dataString);
-        
-        // Extract the dragged task ID
         const draggedTaskId = taskData.id;
-        
-        // Don't reorder if dropping on itself
         if (draggedTaskId === task.id) {
           return;
         }
         
-        // Call the context method to handle task reordering
         dragAndDrop.handleTaskReorder(draggedTaskId, task.id);
       } catch (err) {
         console.error('Error processing task drop for reordering:', err);
       }
     }
     
-    // Check if we're dropping a user
     if (e.dataTransfer.types.includes('application/user')) {
       try {
         const dataString = e.dataTransfer.getData('application/user');
@@ -236,20 +210,15 @@ function Task({ task, columnId }) {
           console.log(`Attempting to assign user ${userId} to task ${task.id}`);
           
           try {
-            // Call API to assign user - now with WIP check
             await assignUserToTask(task.id, parseInt(userId));
-            
-            // Update local state - assuming we want to append to existing users
             const updatedUserIds = task.userIds ? [...task.userIds] : [];
             if (!updatedUserIds.includes(userId)) {
               updatedUserIds.push(userId);
             }
             
-            // Refresh tasks to get updated data
             refreshTasks();
             setAssignmentError(null);
           } catch (error) {
-            // Display error message related to WIP limit
             setAssignmentError(error.message || 'Error assigning user to task');
             console.error('Error assigning user:', error.message);
           }
@@ -263,14 +232,10 @@ function Task({ task, columnId }) {
   
   const onDragEndHandler = () => {
     console.log('Task drag end');
-    
-    // Hide warning when drag ends
     setShowWarning(false);
     if (warningTimeoutRef.current) {
       clearTimeout(warningTimeoutRef.current);
     }
-    
-    // Remove the dragging class
     if (taskRef.current) {
       taskRef.current.classList.remove('dragging');
     }
@@ -286,8 +251,6 @@ function Task({ task, columnId }) {
 
   const renderTaskLabels = () => {
     if (!task.labels || task.labels.length === 0) return null;
-    
-    // We'll show up to 3 labels in the compact view
     const visibleLabels = task.labels.slice(0, 3);
     const remainingCount = task.labels.length - 3;
     
@@ -318,16 +281,14 @@ function Task({ task, columnId }) {
     );
   };
 
-  // Helper function to get label color (consistent with TaskLabels)
   const getLabelColor = (labelName) => {
-    // Try to get from localStorage first
     const storedColors = localStorage.getItem('labelColors');
+    
     if (storedColors) {
       const colorMap = JSON.parse(storedColors);
       if (colorMap[labelName]) return colorMap[labelName];
     }
-  
-    // Default colors based on predefined labels
+
     const colorMap = {
       'High Priority': '#FF4D4D',
       'Medium Priority': '#FFA500',

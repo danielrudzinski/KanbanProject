@@ -10,12 +10,10 @@ function WipLimitControl({ onClose }) {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('column'); // 'column' or 'row'
   
-  // Handle item selection (column or row)
   const handleItemChange = (e) => {
     const itemId = e.target.value;
     setSelectedItem(itemId);
     
-    // Pre-fill current WIP limit
     if (itemId) {
       if (activeTab === 'column') {
         const column = columns.find(col => col.id === itemId);
@@ -33,7 +31,6 @@ function WipLimitControl({ onClose }) {
     }
   };
   
-  // Switch between column and row tabs
   const switchTab = (tab) => {
     setActiveTab(tab);
     setSelectedItem('');
@@ -41,7 +38,6 @@ function WipLimitControl({ onClose }) {
     setError(null);
   };
   
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -68,7 +64,6 @@ function WipLimitControl({ onClose }) {
       setSelectedItem('');
       setWipLimit('');
       
-      // Close form after successful submission
       if (onClose) onClose();
     } catch (err) {
       setError(err.message || 'Wystąpił błąd podczas aktualizacji limitu WIP');
@@ -77,7 +72,6 @@ function WipLimitControl({ onClose }) {
     }
   };
   
-  // Don't render if no items available for the current tab
   const hasItems = activeTab === 'column' ? columns.length > 0 : rows.length > 0;
   if (!hasItems && (columns.length === 0 && rows.length === 0)) {
     return null;

@@ -1,9 +1,6 @@
-import * as api from '../services/api';
+import * as api from '../../services/api';
 
-// Mock the global fetch function
 global.fetch = jest.fn();
-
-// Mock URL.createObjectURL
 URL.createObjectURL = jest.fn().mockReturnValue('mock-blob-url');
 
 describe('API Services', () => {
@@ -15,28 +12,22 @@ describe('API Services', () => {
   // ====== COLUMN OPERATIONS TESTS ======
   describe('Column Operations', () => {
     test('fetchColumns should return columns when successful', async () => {
-      // Mock data
       const mockColumns = [
         { id: 'col1', name: 'To Do', position: 0 },
         { id: 'col2', name: 'In Progress', position: 1 }
       ];
 
-      // Mock the fetch response
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockColumns
       });
 
-      // Execute the function
       const result = await api.fetchColumns();
-
-      // Assertions
       expect(fetch).toHaveBeenCalledWith('/columns');
       expect(result).toEqual(mockColumns);
     });
 
     test('fetchColumns should retry on failure', async () => {
-      // First two calls fail, third succeeds
       const mockColumns = [{ id: 'col1', name: 'To Do' }];
       
       fetch.mockResolvedValueOnce({
@@ -54,30 +45,22 @@ describe('API Services', () => {
         json: async () => mockColumns
       });
 
-      // Execute with default 3 retries
       const result = await api.fetchColumns();
-
-      // Should have been called 3 times
       expect(fetch).toHaveBeenCalledTimes(3);
       expect(result).toEqual(mockColumns);
     });
 
     test('fetchColumns should throw after all retries fail', async () => {
-      // All fetch calls fail
       fetch.mockResolvedValue({
         ok: false,
         status: 500
       });
 
-      // Execute with 2 retries
       await expect(api.fetchColumns(2)).rejects.toThrow('Error fetching columns: 500');
-      
-      // Should have been called 2 times
       expect(fetch).toHaveBeenCalledTimes(2);
     });
 
     test('fetchColumns should throw error on fetch failure', async () => {
-      // Mock fetch to throw an error
       fetch.mockImplementationOnce(() => {
         throw new Error('Network error');
       });
@@ -166,9 +149,8 @@ describe('API Services', () => {
       const columnId = 'col1';
       const wipLimit = 5;
         
-      // Mock a successful response that doesn't return valid JSON
       fetch.mockResolvedValueOnce({
-        status: 204, // No content response
+        status: 204, 
         json: async () => { throw new Error('Invalid JSON'); }
       });
         
@@ -184,7 +166,6 @@ describe('API Services', () => {
         }),
       });
         
-      // Should create a synthetic response
       expect(result).toEqual({
         id: columnId,
         wipLimit: parseInt(wipLimit)
@@ -352,7 +333,6 @@ describe('API Services', () => {
     });
 
     test('assignUserToTask should throw error when WIP limit exceeded', async () => {
-      // Mock WIP status check to return exceeded limit
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ 
@@ -367,19 +347,17 @@ describe('API Services', () => {
       );
 
       expect(fetch).toHaveBeenCalledWith('/users/123/wip-status');
-      expect(fetch).toHaveBeenCalledTimes(1); // Only the WIP check, not the actual assignment
+      expect(fetch).toHaveBeenCalledTimes(1); 
     });
 
     test('assignUserToTask should assign user when WIP limit not exceeded', async () => {
       const mockTask = { id: '1', title: 'Task', userIds: ['123'] };
       
-      // Mock WIP status check
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ willExceedLimit: false })
       });
       
-      // Mock assignment call
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockTask
@@ -779,13 +757,11 @@ describe('API Services', () => {
     });
 
     test('assignUserToTask should handle general errors', async () => {
-      // First mock for WIP check
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ willExceedLimit: false })
       });
         
-      // Mock fetch to throw a generic error
       fetch.mockImplementationOnce(() => {
         throw new Error('Network error');
       });
@@ -796,7 +772,6 @@ describe('API Services', () => {
     });
 
     test('assignUserToTask should handle server error responses', async () => {
-      // Mock error response with custom message
       const errorResponse = { error: 'WIP limit exceeded for this user' };
         
       fetch.mockResolvedValueOnce({
@@ -949,28 +924,22 @@ describe('API Services', () => {
     });
 
     test('fetchRows should return rows when successful', async () => {
-        // Mock data
         const mockRows = [
           { id: 'row1', name: 'Team A', position: 0, wipLimit: 5 },
           { id: 'row2', name: 'Team B', position: 1, wipLimit: 3 }
         ];
       
-        // Mock the fetch response
         fetch.mockResolvedValueOnce({
           ok: true,
           json: async () => mockRows
         });
       
-        // Execute the function
         const result = await api.fetchRows();
-      
-        // Assertions
         expect(fetch).toHaveBeenCalledWith('/rows');
         expect(result).toEqual(mockRows);
     });
       
     test('fetchRows should retry on failure', async () => {
-        // First two calls fail, third succeeds
         const mockRows = [{ id: 'row1', name: 'Team A' }];
         
         fetch.mockResolvedValueOnce({
@@ -988,25 +957,18 @@ describe('API Services', () => {
           json: async () => mockRows
         });
       
-        // Execute with default 3 retries
         const result = await api.fetchRows();
-      
-        // Should have been called 3 times
         expect(fetch).toHaveBeenCalledTimes(3);
         expect(result).toEqual(mockRows);
     });
       
     test('fetchRows should throw after all retries fail', async () => {
-        // All fetch calls fail
         fetch.mockResolvedValue({
           ok: false,
           status: 500
         });
       
-        // Execute with 2 retries
         await expect(api.fetchRows(2)).rejects.toThrow('Error fetching rows: 500');
-        
-        // Should have been called 2 times
         expect(fetch).toHaveBeenCalledTimes(2);
     });
       
@@ -1071,9 +1033,8 @@ describe('API Services', () => {
         const rowId = 'row1';
         const wipLimit = 8;
         
-        // Mock a successful response that doesn't return valid JSON
         fetch.mockResolvedValueOnce({
-          status: 204, // No content response
+          status: 204,
           json: async () => { throw new Error('Invalid JSON'); }
         });
         
@@ -1089,7 +1050,6 @@ describe('API Services', () => {
           }),
         });
         
-        // Should create a synthetic response
         expect(result).toEqual({
           id: rowId,
           wipLimit: parseInt(wipLimit)
@@ -1216,7 +1176,6 @@ describe('API Services', () => {
     });
 
     test('fetchRows should throw error on fetch failure', async () => {
-      // Mock fetch to throw an error
       fetch.mockImplementationOnce(() => {
         throw new Error('Network error');
       });
@@ -1290,7 +1249,6 @@ describe('API Services', () => {
 
       const result = await api.uploadUserAvatar('123', mockFile);
 
-      // Check that FormData was used correctly
       expect(fetch).toHaveBeenCalledWith('/users/123/avatar', {
         method: 'POST',
         body: expect.any(FormData)
@@ -1538,7 +1496,7 @@ describe('API Services', () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(5), // Should convert to number
+        body: JSON.stringify(5),
       });
       expect(result).toEqual(mockUser);
     });
@@ -1586,7 +1544,6 @@ describe('API Services', () => {
     });
 
     test('getUserAvatar should handle connection errors gracefully', async () => {
-      // Mock fetch to throw a network error
       fetch.mockImplementationOnce(() => {
         throw new Error('Network error');
       });
@@ -1882,7 +1839,6 @@ describe('API Services', () => {
 
       const result = await api.uploadFile(mockFile);
 
-      // Check that FormData was used correctly
       expect(fetch).toHaveBeenCalledWith('/files/upload', {
         method: 'POST',
         body: expect.any(FormData)
@@ -1891,7 +1847,6 @@ describe('API Services', () => {
     });
 
     test('uploadFile should upload a file successfully', async () => {
-      // Create a mock file
       const file = new File(['test file content'], 'test.txt', { type: 'text/plain' });
       const mockResponse = 'file-123';
         
@@ -1907,7 +1862,6 @@ describe('API Services', () => {
         body: expect.any(FormData)
       });
         
-      // Check that the response is correctly returned
       expect(result).toBe(mockResponse);
     });
       
@@ -1916,7 +1870,7 @@ describe('API Services', () => {
         
       fetch.mockResolvedValueOnce({
         ok: false,
-        status: 413 // Payload too large
+        status: 413 
       });
       
       await expect(api.uploadFile(file)).rejects.toThrow('Error uploading file: 413');
@@ -1937,12 +1891,9 @@ describe('API Services', () => {
       };
         
       fetch.mockResolvedValueOnce(mockResponse);
-      
       const result = await api.getFile(fileId);
       
       expect(fetch).toHaveBeenCalledWith('/files/file-123');
-        
-      // The full response should be returned
       expect(result).toBe(mockResponse);
     });
       
@@ -1974,7 +1925,6 @@ describe('API Services', () => {
         method: 'DELETE'
       });
         
-      // Check that the response is correctly returned
       expect(result).toBe(mockResponse);
     });
       
@@ -1994,23 +1944,18 @@ describe('API Services', () => {
     });
       
     test('file upload should create and populate FormData correctly', async () => {
-      // Create a mock file with specific content and type
       const fileName = 'important-document.pdf';
       const fileContent = 'PDF document content';
       const fileType = 'application/pdf';
       const file = new File([fileContent], fileName, { type: fileType });
         
-      // Mock the fetch response
       fetch.mockImplementationOnce((url, options) => {
-        // Extract and verify the FormData sent
         const formData = options.body;
         const fileFromForm = formData.get('file');
           
-        // Verify that the file in the FormData matches what we sent
         expect(fileFromForm.name).toBe(fileName);
         expect(fileFromForm.type).toBe(fileType);
           
-        // Return a successful response
         return Promise.resolve({
           ok: true,
           text: async () => 'file-123'
@@ -2019,7 +1964,6 @@ describe('API Services', () => {
       
       await api.uploadFile(file);
         
-      // Verify that fetch was called
       expect(fetch).toHaveBeenCalledWith('/files/upload', {
         method: 'POST',
         body: expect.any(FormData)
@@ -2030,17 +1974,13 @@ describe('API Services', () => {
       const fileId = 'file-123';
       const mockBlob = new Blob(['file content'], { type: 'application/pdf' });
         
-      // Create mock response that supports blob() method
       const mockResponse = {
         ok: true,
         blob: jest.fn().mockResolvedValue(mockBlob)
       };
         
       fetch.mockResolvedValueOnce(mockResponse);
-      
       const response = await api.getFile(fileId);
-        
-      // Test that the consumer can use the response to get a blob
       const blob = await response.blob();
         
       expect(fetch).toHaveBeenCalledWith('/files/file-123');
@@ -2052,7 +1992,6 @@ describe('API Services', () => {
       const fileId = 'file-123';
       const mockBlob = new Blob(['file content'], { type: 'application/pdf' });
         
-      // Create mock response that supports blob() method
       const mockResponse = {
         ok: true,
         blob: jest.fn().mockResolvedValue(mockBlob)
@@ -2072,7 +2011,6 @@ describe('API Services', () => {
     test('uploadFile should use proper FormData with file contents', async () => {
         const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
         
-        // Check that FormData is properly constructed
         fetch.mockImplementationOnce((url, options) => {
           const formData = options.body;
           expect(formData instanceof FormData).toBe(true);
@@ -2093,7 +2031,6 @@ describe('API Services', () => {
     test('uploadUserAvatar should use proper FormData with file contents', async () => {
       const file = new File(['avatar content'], 'avatar.png', { type: 'image/png' });
         
-      // Check that FormData is properly constructed
       fetch.mockImplementationOnce((url, options) => {
         const formData = options.body;
         expect(formData instanceof FormData).toBe(true);
@@ -2116,7 +2053,6 @@ describe('API Services', () => {
   // Tests for multiple fetch handling
   describe('Multiple fetch scenarios', () => {
     test('fetch retries should work properly for maximum retries', async () => {
-      // Set up 3 consecutive failures
       fetch.mockResolvedValueOnce({
         ok: false,
         status: 500
@@ -2132,7 +2068,6 @@ describe('API Services', () => {
         status: 500
       });
       
-      // This should exhaust the 3 retries
       await expect(api.fetchColumns(3)).rejects.toThrow('Error fetching columns: 500');
       expect(fetch).toHaveBeenCalledTimes(3);
     });
@@ -2140,7 +2075,6 @@ describe('API Services', () => {
     test('makeRequest utility should properly handle non-JSON responses', async () => {
       const mockTask = { id: '1', title: 'Task 1', column: { id: 'col1' } };
       
-      // First call succeeds but returns non-JSON content
       fetch.mockResolvedValueOnce({
         ok: true,
         headers: {
@@ -2150,38 +2084,32 @@ describe('API Services', () => {
         json: async () => { throw new Error('Not JSON'); }
       });
       
-      // Second call with JSON
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockTask
       });
       
-      // Test both paths
       const result1 = await api.updateTaskName('1', 'Task 1');
       expect(result1).toEqual(mockTask);
     });
 
     test('makeRequest should handle JSON parse errors with error details', async () => {
-      // Set up the first fetch response to be a failed request with JSON error details
       fetch.mockResolvedValueOnce({
         ok: false,
         status: 400,
         json: async () => ({ message: 'Bad request details' })
       });
         
-      // Use any API method that would use this error path
       await expect(api.updateTaskLabels('1', [])).rejects.toThrow('Error updating task labels: 400');
     });
       
     test('makeRequest should handle JSON parse errors without error details', async () => {
-      // Set up the fetch response to be a failed request with a JSON error
       fetch.mockResolvedValueOnce({
         ok: false,
         status: 400,
         json: async () => { throw new Error('Invalid JSON'); }
       });
         
-      // Use any API method that would use this error path
       await expect(api.updateTaskLabels('1', [])).rejects.toThrow('Error updating task labels: 400');
     });
     

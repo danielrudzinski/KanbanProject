@@ -4,7 +4,6 @@ import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
 import Header from '../../components/Header';
 
-// Mock the components that are rendered by the Header
 jest.mock('../../components/AddTaskForm', () => {
   return function MockAddTaskForm({ onClose }) {
     return (
@@ -51,11 +50,7 @@ describe('Header Component', () => {
 
   test('renders header with logo and navigation links', () => {
     renderHeader();
-    
-    // Check for logo and title 
     expect(screen.getByText('Tablica Kanban')).toBeInTheDocument();
-    
-    // Check navigation links
     expect(screen.getByText('Dodaj zadanie')).toBeInTheDocument();
     expect(screen.getByText('Limit WIP')).toBeInTheDocument();
     expect(screen.getByText('Dodaj wiersz/kolumnę')).toBeInTheDocument();
@@ -64,18 +59,14 @@ describe('Header Component', () => {
 
   test('opens AddTaskForm when "Dodaj zadanie" is clicked', () => {
     renderHeader();
-    
-
     fireEvent.click(screen.getByText('Dodaj zadanie'));
     expect(screen.getByTestId('mock-add-task-form')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Close'));    
-
     expect(screen.queryByTestId('mock-add-task-form')).not.toBeInTheDocument();
   });
 
   test('opens WipLimitControl when "Limit WIP" is clicked', () => {
     renderHeader();
-    
     fireEvent.click(screen.getByText('Limit WIP'));
     expect(screen.getByTestId('mock-wip-limit-control')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Close'));
@@ -84,34 +75,23 @@ describe('Header Component', () => {
 
   test('makes header sticky on scroll', async () => {
     renderHeader();
-    
-    // Initially header should not have sticky class
     const header = screen.getByRole('banner');
     expect(header).not.toHaveClass('sticky');
-    
-    // Mock scroll event
     await act(async () => {
       global.window.scrollY = 100;
       global.window.dispatchEvent(new Event('scroll'));
     });
-    
-    // Header should have sticky class
     expect(header).toHaveClass('sticky');
-    
-    // Mock scroll back to top
     await act(async () => {
       global.window.scrollY = 0;
       global.window.dispatchEvent(new Event('scroll'));
     });
-    
-    // Header should not have sticky class anymore
     expect(header).not.toHaveClass('sticky');
   });
 
   test('has correct navigation links with proper attributes', () => {
     renderHeader();
     
-    // Check that links have correct href attributes
     const homeLink = screen.getByText('Tablica Kanban');
     expect(homeLink).toBeInTheDocument();
     expect(homeLink.closest('a')).toHaveAttribute('href', '/');
@@ -128,7 +108,7 @@ describe('Header Component', () => {
     fireEvent.click(screen.getByText('Limit WIP'));
     expect(screen.queryByTestId('mock-add-task-form')).not.toBeInTheDocument();
     expect(screen.getByTestId('mock-wip-limit-control')).toBeInTheDocument();
-});
+  });
 
   test('cleans up scroll event listener on unmount', async () => {
     const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');

@@ -23,10 +23,7 @@ function AddTaskForm({ onClose }) {
       await addTask(title);
       await refreshTasks();
       
-      // Reset form
       setTitle('');
-      
-      // Close form after successful submission
       if (onClose) onClose();
     } catch (err) {
       setError(err.message || 'Wystąpił błąd podczas dodawania zadania');
