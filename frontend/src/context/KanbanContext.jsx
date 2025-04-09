@@ -143,8 +143,11 @@ export function KanbanProvider({ children }) {
 
   const handleAddTask = async (title, rowId) => {
     try {
-      if (columns.length === 0) {
-        throw new Error('Nie ma żadnej kolumny. Dodaj najpierw kolumnę.');
+      if (!columns || columns.length === 0) {
+        const errorMessage = 'Nie ma żadnej kolumny. Dodaj najpierw kolumnę.';
+        setError(errorMessage);
+        await new Promise(resolve => setTimeout(resolve, 10));
+        throw new Error(errorMessage);
       }
       
       const firstColumn = columns[0];
@@ -318,7 +321,7 @@ export function KanbanProvider({ children }) {
     try {
       return await getUserWipLimit(userId);
     } catch (err) {
-      console.error('Error checking user WIP limit:', err);
+      console.error('Error checking user WIP limit:', new Error(err.message));
       setError(err.message);
       throw err;
     }
@@ -515,7 +518,7 @@ export function KanbanProvider({ children }) {
       const rowIndex = rows.findIndex(row => row.id === rowId);
       const targetIndex = rows.findIndex(row => row.id === targetRowId);
       
-      if (rowIndex === -1 || targetIndex === -1) return;
+      if (rowIndex === -1 || targetIndex === -1 || rowId === targetRowId) return;
       const newRows = [...rows];
       const [movedRow] = newRows.splice(rowIndex, 1);
       newRows.splice(targetIndex, 0, movedRow);
