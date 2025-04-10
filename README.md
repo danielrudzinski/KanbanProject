@@ -16,6 +16,10 @@
   A flexible Kanban board application designed to help teams visualize and manage their workflow efficiently. This project provides an interactive drag-and-drop interface for task management with support for multiple views, columns, rows, and WIP limits.
 </p>
 
+<p align="center">
+  <a href="https://docs.kanbanproject.pl/" target="_blank">📘 User Guide</a>
+</p>
+
 ## 📋 Table of Contents
 
 - [📋 Overview](#-overview)
