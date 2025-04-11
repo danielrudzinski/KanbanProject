@@ -27,10 +27,14 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const [originalTaskDescription, setOriginalTaskDescription] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const [editingTaskDescription, setEditingTaskDescription] = useState(false);
-  
+  const [editingTaskTitle, setEditingTaskTitle] = useState(false);
+  const [taskTitle, setTaskTitle] = useState('');
+  const [originalTaskTitle, setOriginalTaskTitle] = useState('');
+
   const panelRef = useRef(null);
   const descriptionInputRef = useRef(null);
   const taskDescriptionInputRef = useRef(null);
+  const taskTitleInputRef = useRef(null);
 
   useEffect(() => {
     const handleEscapeKeyForPanel = (event) => {
@@ -48,12 +52,52 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       document.removeEventListener('keydown', handleEscapeKeyForPanel);
     };
   }, [onClose, showAssignForm, showDeleteConfirmation, showUserDeleteConfirmation]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setShowAssignForm(false);
+        setShowDeleteConfirmation(false);
+        setShowUserDeleteConfirmation(false);
+      }
+    };
+
+    if (showAssignForm || showDeleteConfirmation || showUserDeleteConfirmation) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showAssignForm, showDeleteConfirmation, showUserDeleteConfirmation]);
+
+  useEffect(() => {
+    loadTaskData();
+    
+    return () => {
+      Object.values(avatarPreviews).forEach(url => {
+        URL.revokeObjectURL(url);
+      });
+    };
+  }, [task.id]);
+
+  useEffect(() => {
+    if (!loading) {
+      positionPanel();
+    }
+  }, [loading]);
   
   const loadTaskData = async () => {
     try {
       setLoading(true);
       const taskData = await fetchTask(task.id);
       let assignedData = [];
+    if (taskData.userIds && taskData.userIds.length > 0) {
+      const usersData = await fetchUsers();
+      assignedData = usersData.filter(user => 
+        taskData.userIds.includes(user.id)
+      );
+    } else {
       try {
         const response = await fetch(`/tasks/${task.id}/users`);
         if (response.ok) {
@@ -63,16 +107,18 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       } catch (error) {
         console.error('Error fetching assigned users:', error);
       }
-      
-      // load everything
-      setAssignedUsers(assignedData);
-      const usersData = await fetchUsers();
-      setUsers(usersData || []);
-      const subtasksData = await fetchSubTasksByTaskId(task.id);
-      setSubtasks(subtasksData || []);
-      const description = taskData.description || '';
-      setTaskDescription(description);
-      setOriginalTaskDescription(description);
+    }
+    
+    setAssignedUsers(assignedData);
+    const usersData = await fetchUsers();
+    setUsers(usersData || []);
+    const subtasksData = await fetchSubTasksByTaskId(task.id);
+    setSubtasks(subtasksData || []);
+    const description = taskData.description || '';
+    setTaskDescription(description);
+    setOriginalTaskDescription(description);
+    setTaskTitle(taskData.title);
+    setOriginalTaskTitle(taskData.title);
       
       // load avatars
       if (assignedData.length > 0) {
@@ -103,68 +149,100 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       setLoading(false);
     }
   };
-    // save task description
-    const saveTaskDescription = async () => {
-      try {
-        await updateTask(task.id, { description: taskDescription });
 
-        setOriginalTaskDescription(taskDescription);
-        setEditingTaskDescription(false);
-
-        setSuccess(true);
-        setTimeout(() => {
-          setSuccess(false);
-        }, 3000);
-      } catch (error) {
-        console.error('Error saving task description:', error);
-        alert('Wystąpił błąd podczas zapisywania opisu zadania');
+  const startEditingTaskTitle = () => {
+    setOriginalTaskTitle(taskTitle);
+    setEditingTaskTitle(true);
+    setTimeout(() => {
+      if (taskTitleInputRef.current) {
+        taskTitleInputRef.current.focus();
       }
-    };
+    }, 0);
+  };
   
-    // start editing task description
-    const startEditingTaskDescription = () => {
-      setOriginalTaskDescription(taskDescription); 
-      setEditingTaskDescription(true);
-      setTimeout(() => {
-        if (taskDescriptionInputRef.current) {
-          taskDescriptionInputRef.current.focus();
-        }
-      }, 0);
-    };
-
-    const startEditingSubTaskDescription = () => {
-      if (!expandedSubtaskId) return;
-      const currentSubtask = subtasks.find(s => s.id === expandedSubtaskId);
-      if (currentSubtask) {
-        setSubtaskDescription(currentSubtask.description || '');
-      }
-      setEditingDescription(true);
-      setTimeout(() => {
-        if (descriptionInputRef.current) {
-          descriptionInputRef.current.focus();
-        }
-      }, 0);
-    };
-
-    const handleLabelsChange = (updatedLabels) => {
-      const labelsArray = Array.isArray(updatedLabels) ? updatedLabels : [];
+  const saveTaskTitle = async () => {
+    try {
+      await updateTask(task.id, { title: taskTitle });
       
-      const uniqueLabels = [...new Set(labelsArray)];
+      setOriginalTaskTitle(taskTitle);
+      setEditingTaskTitle(false);
       
-      if (uniqueLabels.length === labelsArray.length) {
-        setTaskLabels(uniqueLabels);
-        updateTask(task.id, { labels: uniqueLabels }).catch(error => {
-          console.error('Error updating task labels:', error);
-          alert('Wystąpił błąd podczas aktualizacji etykiet');
-        });
-      }
-    };
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+      
+      refreshTasks();
+    } catch (error) {
+      console.error('Error saving task title:', error);
+      alert('Wystąpił błąd podczas zapisywania tytułu zadania');
+    }
+  };
   
-    // cancel task description editing
-    const cancelEditingTaskDescription = () => {
-      setTaskDescription(originalTaskDescription);
+  const cancelEditingTaskTitle = () => {
+    setTaskTitle(originalTaskTitle);
+    setEditingTaskTitle(false);
+  };
+
+  const saveTaskDescription = async () => {
+    try {
+      await updateTask(task.id, { description: taskDescription });
+
+      setOriginalTaskDescription(taskDescription);
       setEditingTaskDescription(false);
-    };
+
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error saving task description:', error);
+      alert('Wystąpił błąd podczas zapisywania opisu zadania');
+    }
+  };
+  
+  const startEditingTaskDescription = () => {
+    setOriginalTaskDescription(taskDescription); 
+    setEditingTaskDescription(true);
+    setTimeout(() => {
+      if (taskDescriptionInputRef.current) {
+        taskDescriptionInputRef.current.focus();
+      }
+    }, 0);
+  };
+
+  const startEditingSubTaskDescription = () => {
+    if (!expandedSubtaskId) return;
+    const currentSubtask = subtasks.find(s => s.id === expandedSubtaskId);
+    if (currentSubtask) {
+      setSubtaskDescription(currentSubtask.description || '');
+    }
+    setEditingDescription(true);
+    setTimeout(() => {
+      if (descriptionInputRef.current) {
+        descriptionInputRef.current.focus();
+      }
+    }, 0);
+  };
+
+  const handleLabelsChange = (updatedLabels) => {
+    const labelsArray = Array.isArray(updatedLabels) ? updatedLabels : [];
+      
+    const uniqueLabels = [...new Set(labelsArray)];
+      
+    if (uniqueLabels.length === labelsArray.length) {
+      setTaskLabels(uniqueLabels);
+      updateTask(task.id, { labels: uniqueLabels }).catch(error => {
+        console.error('Error updating task labels:', error);
+        alert('Wystąpił błąd podczas aktualizacji etykiet');
+      });
+    }
+  };
+  
+  const cancelEditingTaskDescription = () => {
+    setTaskDescription(originalTaskDescription);
+    setEditingTaskDescription(false);
+  };
 
   const handleaddSubTask = async () => {
     if (!newSubtaskTitle.trim()) return;
@@ -372,24 +450,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     setUserToDelete(null);
   };
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        setShowAssignForm(false);
-        setShowDeleteConfirmation(false);
-        setShowUserDeleteConfirmation(false);
-      }
-    };
-
-    if (showAssignForm || showDeleteConfirmation || showUserDeleteConfirmation) {
-      document.addEventListener('keydown', handleKeyDown);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [showAssignForm, showDeleteConfirmation, showUserDeleteConfirmation]);
-
   const handleAssignUser = async () => {
     if (!selectedUserId) return;
     
@@ -418,22 +478,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       alert('Wystąpił błąd podczas przypisywania użytkownika');
     }
   };
-
-  useEffect(() => {
-    loadTaskData();
-    
-    return () => {
-      Object.values(avatarPreviews).forEach(url => {
-        URL.revokeObjectURL(url);
-      });
-    };
-  }, [task.id]);
-
-  useEffect(() => {
-    if (!loading) {
-      positionPanel();
-    }
-  }, [loading]);
 
   if (loading) {
     return createPortal(
@@ -475,27 +519,66 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       <div className="task-details-panel" ref={panelRef}>
       {/* Header */}
       <div className="panel-header">
-        <h3>{task.title}</h3>
-        <div className="panel-actions">
-          <button 
-            className="assign-user-icon" 
-            onClick={() => setShowAssignForm(!showAssignForm)}
-            title="Przypisz użytkownika"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-          </button>
-          <button
-            className="close-panel-btn"
-            onClick={(event) => {
-              event.stopPropagation();
-              onClose();
-            }}
-          >
-            ×
-          </button>
+        {editingTaskTitle ? (
+          <div className="title-edit-form">
+            <input
+              ref={taskTitleInputRef}
+              type="text"
+              value={taskTitle}
+              onChange={(e) => setTaskTitle(e.target.value)}
+              className="title-input"
+              placeholder="Wprowadź tytuł zadania"
+            />
+          <div className="title-edit-actions">
+            <button
+              onClick={saveTaskTitle}
+              className="save-title-btn"
+              disabled={!taskTitle.trim()}
+            >
+              Zapisz
+            </button>
+            <button
+              onClick={cancelEditingTaskTitle}
+              className="cancel-title-btn"
+            >
+              Anuluj
+            </button>
+          </div>
         </div>
+      ) : (
+        <>
+          <h3>{taskTitle || task.title}</h3>
+          <div className="panel-actions">
+            <button
+              className="edit-title-btn"
+              onClick={startEditingTaskTitle}
+              title="Edytuj tytuł zadania"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </button>
+            <button 
+              className="assign-user-icon" 
+              onClick={() => setShowAssignForm(!showAssignForm)}
+              title="Przypisz użytkownika"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </button>
+            <button
+              className="close-panel-btn"
+              onClick={(event) => {
+                event.stopPropagation();
+                onClose();
+              }}
+            >
+              ×
+            </button>
+          </div>
+        </>
+      )}
       </div>
           
       <div className="task-details-main">
@@ -588,28 +671,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
           </div>
         )}
   
-        {/* Assigned users section */}
-        {assignedUsers.length > 0 && (
-          <div className="assigned-users-bar">
-            <span>Przypisani:</span>
-            <div className="avatar-list">
-              {assignedUsers.map(user => (
-                <div key={user.id} className="avatar-item" title={user.name}>
-                  {renderUserAvatar(user)}
-                  <button 
-                    className="remove-user-btn"
-                    onClick={() => confirmRemoveUser(user.id)}
-                    title="Usuń użytkownika"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-  
-        {/* Subtasks Section - Now the main focus */}
+        {/* Subtasks Section */}
         <div className="subtasks-section">
           <h4>Podzadania</h4>
           
@@ -790,6 +852,27 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
           onLabelsChange={handleLabelsChange}
         />
         </div>
+
+        {/* Assigned users section */}
+        {assignedUsers.length > 0 && (
+          <div className="assigned-users-bar">
+            <span>Przypisani:</span>
+            <div className="avatar-list">
+              {assignedUsers.map(user => (
+                <div key={user.id} className="avatar-item" title={user.name}>
+                  {renderUserAvatar(user)}
+                  <button 
+                    className="remove-user-btn"
+                    onClick={() => confirmRemoveUser(user.id)}
+                    title="Usuń użytkownika"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
   
         {success && (
           <div className="success-message">

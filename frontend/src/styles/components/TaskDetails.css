@@ -25,9 +25,11 @@
   animation: panel-appear 0.3s ease-out;
   display: grid;
   grid-template-columns: 1fr 200px;
+  grid-template-rows: auto 1fr auto;
   grid-template-areas: 
     "header header"
-    "main labels";
+    "main labels"
+    "users users";
 }
 
 @keyframes overlay-appear {
@@ -233,8 +235,9 @@
   display: flex;
   align-items: center;
   padding: 14px 22px;
-  border-bottom: 1px solid #76777c;
   background-color: #d1fdff;
+  border-top: 1px solid #76777c;
+  grid-area: users;
 }
 
 .assigned-users-bar span {
@@ -912,11 +915,10 @@ label {
   background-color: #f5f5f5;
 }
 
-.task-details-main {
-  grid-area: main;
-  border-right: 1px solid #76777c;
-  max-height: 85vh;
+.task-details-main,
+.task-labels-section {
   overflow-y: auto;
+  max-height: calc(85vh - 100px);
 }
 
 @media (max-width: 768px) {
@@ -953,4 +955,102 @@ label {
 .task-description-section .description-header .edit-description-btn {
   position: absolute;
   right: 0;
+}
+
+.title-edit-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+}
+
+.title-input {
+  padding: 8px 12px;
+  border: 1px solid #76777c;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  background-color: #e2e2e2;
+  color: #0e1b36;
+  width: 100%;
+}
+
+.title-input:focus {
+  outline: none;
+  border-color: #86d6ff;
+  box-shadow: 0 0 0 3px rgba(134, 214, 255, 0.25);
+}
+
+.title-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.save-title-btn,
+.cancel-title-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.save-title-btn {
+  background-color: #86d6ff;
+  color: #0e1b36;
+  border: none;
+}
+
+.save-title-btn:hover {
+  background-color: #d1fdff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
+}
+
+.save-title-btn:disabled {
+  background-color: #76777c;
+  color: #e2e2e2;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.cancel-title-btn {
+  background-color: #e2e2e2;
+  color: #0e1b36;
+  border: 1px solid #76777c;
+}
+
+.cancel-title-btn:hover {
+  background-color: #d1fdff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
+}
+
+.edit-title-btn {
+  background: none;
+  border: none;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #0e1b36;
+  border-radius: 6px;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.edit-title-btn:hover {
+  background-color: #86d6ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(14, 27, 54, 0.1);
+}
+
+.edit-title-btn svg {
+  width: 18px;
+  height: 18px;
 }
