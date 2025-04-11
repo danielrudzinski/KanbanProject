@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import TaskDetails from './TaskDetails';
 import EditableText from './EditableText';
-import { getUserAvatar, assignUserToTask, fetchSubTasksByTaskId } from '../services/api';
+import { getUserAvatar, assignUserToTask, fetchSubTasksByTaskId, fetchTask } from '../services/api';
+import { createPortal } from 'react-dom';
 import '../styles/components/Task.css';
 
 function Task({ task, columnId }) {
@@ -14,7 +15,11 @@ function Task({ task, columnId }) {
   const [assignmentError, setAssignmentError] = useState(null);
   const [showWarning, setShowWarning] = useState(false);
   const [hasUnfinishedSubtasks, setHasUnfinishedSubtasks] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
+  const [taskDescription, setTaskDescription] = useState('');
+  const [loadingDescription, setLoadingDescription] = useState(false);
 
+  const descriptionBtnRef = useRef(null);
   const taskRef = useRef(null);
   const warningTimeoutRef = useRef(null);
 
@@ -71,14 +76,172 @@ function Task({ task, columnId }) {
     }
   }, [assignmentError]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showDescription && 
+          !event.target.classList.contains('description-dropdown-btn') && 
+          !event.target.closest('.description-popover')) {
+        setShowDescription(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDescription]);
+
+  useEffect(() => {
+    if (showDescription && descriptionBtnRef.current) {
+      let popover = document.querySelector(`.description-popover[data-task-id="${task.id}"]`);
+      
+      if (!popover && showDescription) {
+        popover = document.createElement('div');
+        popover.className = 'description-popover';
+        popover.setAttribute('data-task-id', task.id);
+        
+        const arrow = document.createElement('div');
+        arrow.className = 'description-popover-arrow';
+        popover.appendChild(arrow);
+        
+        const content = document.createElement('div');
+        content.className = 'description-popover-content';
+        
+        if (loadingDescription) {
+          content.innerHTML = '<p class="loading-description">Ładowanie opisu...</p>';
+        } else if (taskDescription) {
+          content.innerHTML = `<p class="description-content">${taskDescription}</p>`;
+        } else {
+          content.innerHTML = '<p class="empty-description">Brak opisu.</p>';
+        }
+        
+        popover.appendChild(content);
+        document.body.appendChild(popover);
+      }
+      
+      if (!popover) return;
+      
+      popover.style.opacity = '0';
+      const btnRect = descriptionBtnRef.current.getBoundingClientRect();
+      
+      popover.style.left = `${btnRect.left + window.scrollX}px`;
+      popover.style.top = `${btnRect.bottom + window.scrollY + 5}px`;
+      popover.style.width = `${Math.max(200, btnRect.width * 1.5)}px`;
+      
+      const contentElement = popover.querySelector('.description-popover-content');
+      if (contentElement) {
+        if (loadingDescription) {
+          contentElement.innerHTML = '<p class="loading-description">Ładowanie opisu...</p>';
+        } else if (taskDescription) {
+          contentElement.innerHTML = `<p class="description-content">${taskDescription}</p>`;
+        } else {
+          contentElement.innerHTML = '<p class="empty-description">Brak opisu.</p>';
+        }
+      }
+      
+      const arrow = popover.querySelector('.description-popover-arrow');
+      if (arrow) {
+        arrow.style.left = `${btnRect.width / 2}px`;
+      }
+      
+      const popoverRect = popover.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      if (popoverRect.right > viewportWidth) {
+        const newLeft = Math.max(10, viewportWidth - popoverRect.width - 10);
+        popover.style.left = `${newLeft}px`;
+        
+        if (arrow) {
+          const arrowLeft = btnRect.left - newLeft + btnRect.width / 2;
+          arrow.style.left = `${Math.min(arrowLeft, popoverRect.width - 20)}px`;
+        }
+      }
+      
+      if (popoverRect.bottom > viewportHeight) {
+        popover.style.top = `${btnRect.top + window.scrollY - popoverRect.height - 5}px`;
+        
+        if (arrow) {
+          arrow.style.top = 'auto';
+          arrow.style.bottom = '-8px';
+          arrow.style.transform = 'rotate(180deg)';
+        }
+      }
+      
+      setTimeout(() => {
+        popover.style.opacity = '1';
+      }, 10);
+    } else {
+      const popover = document.querySelector(`.description-popover[data-task-id="${task.id}"]`);
+      if (popover) {
+        popover.style.opacity = '0';
+        setTimeout(() => {
+          if (popover.parentNode) {
+            popover.parentNode.removeChild(popover);
+          }
+        }, 200);
+      }
+    }
+  }, [showDescription, loadingDescription, taskDescription, task.id]);
+
+  useEffect(() => {
+    return () => {
+      const popover = document.querySelector(`.description-popover[data-task-id="${task.id}"]`);
+      if (popover && popover.parentNode) {
+        popover.parentNode.removeChild(popover);
+      }
+    };
+  }, [task.id]);
+
+  useEffect(() => {
+    const handleClosePopovers = (e) => {
+      if (!e.detail || e.detail.exceptTaskId !== task.id) {
+        setShowDescription(false);
+      }
+    };
+    
+    window.addEventListener('close-all-popovers', handleClosePopovers);
+    
+    return () => {
+      window.removeEventListener('close-all-popovers', handleClosePopovers);
+    };
+  }, [task.id]);
+
   const handleTaskClick = (e) => {
     if (e.target.className === 'delete-btn' || 
         e.target.className === 'confirm-delete-btn' || 
         e.target.className === 'cancel-delete-btn' ||
         e.target.classList.contains('editable-text') ||
         e.target.classList.contains('editable-text-input') ||
-        e.target.classList.contains('warning-close-btn')) return;
+        e.target.classList.contains('warning-close-btn') ||
+        e.target.classList.contains('description-dropdown-btn') ||
+        e.target.closest('.task-description-dropdown')) return;
     setShowDetails(!showDetails);
+  };
+
+  const handleDescriptionToggle = (e) => {
+    e.stopPropagation();
+    
+    if (showDescription) {
+      setShowDescription(false);
+      return;
+    }
+    
+    window.dispatchEvent(new CustomEvent('close-all-popovers', {
+      detail: { exceptTaskId: task.id }
+    }));
+
+    if (!taskDescription) {
+      setLoadingDescription(true);
+      fetchTask(task.id)
+        .then(taskData => setTaskDescription(taskData.description || ''))
+        .catch(error => console.error('Error fetching task description:', error))
+        .finally(() => setLoadingDescription(false));
+    }
+    
+    setTimeout(() => {
+      setShowDescription(true);
+    }, 10);
   };
 
   const handleDeleteClick = (e) => {
@@ -317,38 +480,50 @@ function Task({ task, columnId }) {
         data-column-id={columnId}
         data-row-id={task.rowId || "null"}
       >
-        <div className="task-content">
-          <EditableText 
-            id={task.id} 
-            text={task.title} 
-            onUpdate={updateTaskName} 
-            className="task-title"
-            inputClassName="task-title-input"
-            type="task"
-          />
-          <div className="task-info-container">
-            {renderTaskLabels()}
-            {renderUserAvatar()}
+        <div className="task-header">
+          <div className="task-content">
+            <EditableText 
+              id={task.id} 
+              text={task.title} 
+              onUpdate={updateTaskName} 
+              className="task-title"
+              inputClassName="task-title-input"
+              type="task"
+            />
+            <div className="task-info-container">
+              {renderTaskLabels()}
+              {renderUserAvatar()}
+            </div>
           </div>
+          
+          <button 
+            className="delete-btn" 
+            title="Usuń zadanie"
+            onClick={handleDeleteClick}
+          >
+            ×
+          </button>
         </div>
         
-        {/* Delete button */}
-        <button 
-          className="delete-btn" 
-          title="Usuń zadanie"
-          onClick={handleDeleteClick}
-        >
-          ×
-        </button>
+        {/* Footer with description dropdown button */}
+        <div className="task-footer">
+          <button 
+            ref={descriptionBtnRef}
+            className="description-dropdown-btn"
+            title={showDescription ? 'Ukryj opis' : 'Pokaż opis'}
+            onClick={handleDescriptionToggle}
+          >
+            {showDescription ? 'Ukryj opis ▲' : 'Pokaż opis ▼'}
+          </button>
+        </div>
         
-        {/* Error message for WIP limit */}
+        {/* Error and warning messages */}
         {assignmentError && (
           <div className="assignment-error">
             {assignmentError}
           </div>
         )}
 
-        {/* Inline warning for unfinished subtasks - only visible during drag operations */}
         {hasUnfinishedSubtasks && showWarning && (
           <div className="subtask-warning">
             <div className="warning-icon">⚠️</div>
@@ -364,6 +539,23 @@ function Task({ task, columnId }) {
           </div>
         )}
       </div>
+
+      {/* Description popover */}
+      {showDescription && createPortal(
+        <div className="description-popover">
+          <div className="description-popover-arrow"></div>
+          <div className="description-popover-content">
+            {loadingDescription ? (
+              <p className="loading-description">Ładowanie opisu...</p>
+            ) : taskDescription ? (
+              <p className="description-content">{taskDescription}</p>
+            ) : (
+              <p className="empty-description">Brak opisu.</p>
+            )}
+          </div>
+        </div>,
+        document.body
+    )}
 
       {isConfirmingDelete && (
         <div className="delete-modal-overlay" onClick={handleCancelDelete}>

@@ -119,6 +119,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     setOriginalTaskDescription(description);
     setTaskTitle(taskData.title);
     setOriginalTaskTitle(taskData.title);
+    setTaskLabels(taskData.labels || []);
       
       // load avatars
       if (assignedData.length > 0) {
