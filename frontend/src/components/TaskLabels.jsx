@@ -62,9 +62,16 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
       setIsPickerReady(false);
       if (buttonRef.current) {
         const rect = buttonRef.current.getBoundingClientRect();
+        const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+        
+        let leftPos = rect.left + window.scrollX;
+        if (leftPos + 250 > viewportWidth) { 
+          leftPos = viewportWidth - 260;
+        }
+        
         setPickerPosition({
           top: rect.bottom + window.scrollY + 5,
-          left: rect.left + window.scrollX
+          left: leftPos
         });
         
         setTimeout(() => {
@@ -82,11 +89,16 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
     const viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
     const viewportHeight = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
     
+    let leftPos = viewportWidth / 2 - 150; 
+    if (leftPos + 300 > viewportWidth) {
+      leftPos = viewportWidth - 310;
+    }
+    
     setFormPosition({
-      top: viewportHeight / 2 - 150,
-      left: viewportWidth / 2 - 150
+      top: Math.max(50, viewportHeight / 2 - 150),
+      left: Math.max(10, leftPos)
     });
-
+  
     setTimeout(() => {
       setShowCustomForm(true);
       setIsFormReady(true);

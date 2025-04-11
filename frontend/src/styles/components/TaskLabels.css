@@ -1,25 +1,30 @@
-.task-labels {
+  .task-labels {
     position: relative;
+    width: 100%;
   }
   
   .labels-container {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    gap: 6px;
   }
   
   .label {
     padding: 2px 8px;
     border-radius: 12px;
     font-size: 12px;
-    margin: 0 4px 4px 0;
     display: inline-flex;
     align-items: center;
     position: relative;
     color: black;
     background-color: rgba(0, 0, 0, 0.05);
+    max-width: calc(100% - 10px);
+    overflow: hidden;
   }
-  
+
   .label-color-dot {
     width: 12px;
     height: 12px;
@@ -30,10 +35,12 @@
   .label-text {
     margin-left: 5px;
     font-size: 11px;
-    opacity: 0;
     margin-right: 4px;
-    transition: opacity 0.3s ease;
-    color: black;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    color: black !important;
   }
 
   .label .label-text {
@@ -261,13 +268,12 @@
   }
   
   .label-picker {
+    position: absolute;
+    max-width: 250px;
+    width: max-content;
     z-index: 2000;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    min-width: 200px;
+    max-height: 300px;
+    overflow-y: auto;
   }
 
   .animated {
