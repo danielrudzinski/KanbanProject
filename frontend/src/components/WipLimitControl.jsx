@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import '../styles/components/Forms.css';
 
@@ -46,7 +46,8 @@ function WipLimitControl({ onClose }) {
       return;
     }
     
-    if (wipLimit === '' || wipLimit < 0) {
+    const parsedLimit = Number(wipLimit);
+    if (wipLimit.trim() === '' || isNaN(parsedLimit) || parsedLimit < 0) {
       setError('Podaj prawidłowy limit WIP (liczba większa lub równa 0)');
       return;
     }
@@ -56,9 +57,9 @@ function WipLimitControl({ onClose }) {
       setError(null);
       
       if (activeTab === 'column') {
-        await updateWipLimit(selectedItem, parseInt(wipLimit));
+        await updateWipLimit(selectedItem, parsedLimit);
       } else {
-        await updateRowWipLimit(selectedItem, parseInt(wipLimit));
+        await updateRowWipLimit(selectedItem, parsedLimit);
       }
       
       setSelectedItem('');
@@ -79,7 +80,7 @@ function WipLimitControl({ onClose }) {
   
   return (
     <div className="form-container">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} role="form">
         <div className="form-header">
           <h3>Ustaw limit WIP</h3>
           <button 
@@ -156,6 +157,12 @@ function WipLimitControl({ onClose }) {
             onChange={(e) => setWipLimit(e.target.value)}
             placeholder="0"
             disabled={isSubmitting || !selectedItem}
+            onInput={(e) => {
+              if (e.target.value < 0) {
+                e.target.value = 0;
+                setWipLimit("0"); 
+              }
+            }}
           />
         </div>
         
