@@ -1,6 +1,7 @@
 package pl.myproject.kanbanproject2.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +28,7 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String name;
+    @Column(name = "enabled")
     private boolean enabled = false;
     private Integer wipLimit;
     @ManyToMany(mappedBy = "users")
