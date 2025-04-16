@@ -29,7 +29,7 @@ public class User implements UserDetails {
     private String password;
     private String name;
     @Column(name = "enabled")
-    private boolean enabled = false;
+    private Boolean enabled = false;
     private Integer wipLimit;
     @ManyToMany(mappedBy = "users")
     @JsonIgnore

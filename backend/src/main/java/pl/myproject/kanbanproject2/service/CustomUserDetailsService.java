@@ -73,7 +73,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         confirmedToken.setConfirmedAt(LocalDateTime.now());
         tokenService.save(confirmedToken);
-        
+        System.out.println(confirmedToken.getToken());
 
         // Update user's enabled status
         enableUser (confirmedToken.getUser());
