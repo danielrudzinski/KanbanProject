@@ -29,11 +29,17 @@ public class AuthenticationController {
     @PostMapping()
     public String postUser(@ModelAttribute("user") User user,
                            Model model,
-                           RedirectAttributes redirectAttributes){
+                           RedirectAttributes redirectAttributes) {
         userDetailsService.registerUser(user);
 
         redirectAttributes.addFlashAttribute("message", "Confirm your email address");
         return "redirect:/";
+    }
+
+        @GetMapping("/confirmToken")
+        public String confirmToken(@RequestParam("token") String token, Model model){
+            userDetailsService.confirmToken(token);
+            return "confirmToken";
+        }
 
     }
-}
