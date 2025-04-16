@@ -21,7 +21,7 @@ public class EmailService {
             message.setSubject("Confirm your email");
             String messageBody= """
                     Thank you for registration. Please confirm your email
-                    http://localhost:8080/register/confirmToken=%s
+                    http://localhost:8080/register/confirmToken?token=%s
                     """.formatted(token);
             message.setText(messageBody);
             mailSender.send(message);

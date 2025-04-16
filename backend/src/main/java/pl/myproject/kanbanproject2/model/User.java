@@ -27,6 +27,7 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String name;
+    private boolean enabled = false;
     private Integer wipLimit;
     @ManyToMany(mappedBy = "users")
     @JsonIgnore
@@ -45,5 +46,23 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return name;
+    }
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 }
