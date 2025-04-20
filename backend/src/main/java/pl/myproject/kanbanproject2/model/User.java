@@ -35,8 +35,7 @@ public class User implements UserDetails {
     @Column(name = "verification_code")
     private String verificationCode;
     @Column(name = "verification_expiration")
-    private LocalDateTime verificationExpiration;
-
+    private LocalDateTime verificationCodeExpiresAt;
     private Integer wipLimit;
     @ManyToMany(mappedBy = "users", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -44,6 +43,12 @@ public class User implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "avatar_id")
     private File avatar;
+
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
