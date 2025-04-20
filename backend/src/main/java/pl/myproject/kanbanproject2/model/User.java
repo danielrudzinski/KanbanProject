@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +32,11 @@ public class User implements UserDetails {
     private String name;
     @Column(name = "enabled")
     private Boolean enabled = false;
+    @Column(name = "verification_code")
+    private String verificationCode;
+    @Column(name = "verification_expiration")
+    private LocalDateTime verificationExpiration;
+
     private Integer wipLimit;
     @ManyToMany(mappedBy = "users", cascade = CascadeType.ALL)
     @JsonIgnore
