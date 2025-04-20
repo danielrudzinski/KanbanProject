@@ -2,6 +2,7 @@ package pl.myproject.kanbanproject2.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,8 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String name;
+    @Column(name = "enabled")
+    private Boolean enabled = false;
     private Integer wipLimit;
     @ManyToMany(mappedBy = "users", cascade = CascadeType.ALL)
     @JsonIgnore
