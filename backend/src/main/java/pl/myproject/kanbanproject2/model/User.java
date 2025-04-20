@@ -24,7 +24,7 @@ public class User {
     private String password;
     private String name;
     private Integer wipLimit;
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(mappedBy = "users", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<Task> tasks = new HashSet<>();
     @OneToOne(cascade = CascadeType.ALL)
