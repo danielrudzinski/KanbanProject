@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import Task from './Task';
 import EditableText from './EditableText';
@@ -9,7 +9,7 @@ function Column({ column, tasks}) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   
-  const { handleDragOver, handleDrop } = dragAndDrop;
+  const { handleDragOver, handleDrop, handleDragStart } = dragAndDrop;
 
   const isOverLimit = column.wipLimit > 0 && tasks.length > column.wipLimit;
 
@@ -43,11 +43,7 @@ function Column({ column, tasks}) {
   
   const onDragStart = (e) => {
     console.log('Column drag start:', column.id);
-    const data = { id: column.id, type: 'column' };
-    const dataString = JSON.stringify(data);
-    e.dataTransfer.setData('application/column', dataString);
-    e.dataTransfer.setData('text/plain', dataString);
-    e.dataTransfer.effectAllowed = 'move';
+    handleDragStart(e, column.id, 'column');
   };
 
   return (
