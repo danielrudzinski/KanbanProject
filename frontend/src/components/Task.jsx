@@ -18,7 +18,8 @@ function Task({ task, columnId }) {
   const [showDescription, setShowDescription] = useState(false);
   const [taskDescription, setTaskDescription] = useState('');
   const [loadingDescription, setLoadingDescription] = useState(false);
-
+  const [taskSubtasks, setTaskSubtasks] = useState([]);
+ 
   const descriptionBtnRef = useRef(null);
   const taskRef = useRef(null);
   const warningTimeoutRef = useRef(null);
@@ -92,97 +93,25 @@ function Task({ task, columnId }) {
   }, [showDescription]);
 
   useEffect(() => {
-    if (showDescription && descriptionBtnRef.current) {
-      let popover = document.querySelector(`.description-popover[data-task-id="${task.id}"]`);
-      
-      if (!popover && showDescription) {
-        popover = document.createElement('div');
-        popover.className = 'description-popover';
-        popover.setAttribute('data-task-id', task.id);
+    if (showDescription) {
+      // When showing description, fetch data if not already loaded
+      if (!taskSubtasks.length) {
+        setLoadingDescription(true);
         
-        const arrow = document.createElement('div');
-        arrow.className = 'description-popover-arrow';
-        popover.appendChild(arrow);
-        
-        const content = document.createElement('div');
-        content.className = 'description-popover-content';
-        
-        if (loadingDescription) {
-          content.innerHTML = '<p class="loading-description">Ładowanie opisu...</p>';
-        } else if (taskDescription) {
-          content.innerHTML = `<p class="description-content">${taskDescription}</p>`;
-        } else {
-          content.innerHTML = '<p class="empty-description">Brak opisu.</p>';
-        }
-        
-        popover.appendChild(content);
-        document.body.appendChild(popover);
+        Promise.all([
+          fetchTask(task.id).then(taskData => setTaskDescription(taskData.description || '')),
+          fetchSubTasksByTaskId(task.id).then(subtasks => setTaskSubtasks(subtasks || []))
+        ])
+        .catch(error => console.error('Error fetching task details:', error))
+        .finally(() => setLoadingDescription(false));
       }
       
-      if (!popover) return;
-      
-      popover.style.opacity = '0';
-      const btnRect = descriptionBtnRef.current.getBoundingClientRect();
-      
-      popover.style.left = `${btnRect.left + window.scrollX}px`;
-      popover.style.top = `${btnRect.bottom + window.scrollY + 5}px`;
-      popover.style.width = `${Math.max(200, btnRect.width * 1.5)}px`;
-      
-      const contentElement = popover.querySelector('.description-popover-content');
-      if (contentElement) {
-        if (loadingDescription) {
-          contentElement.innerHTML = '<p class="loading-description">Ładowanie opisu...</p>';
-        } else if (taskDescription) {
-          contentElement.innerHTML = `<p class="description-content">${taskDescription}</p>`;
-        } else {
-          contentElement.innerHTML = '<p class="empty-description">Brak opisu.</p>';
-        }
-      }
-      
-      const arrow = popover.querySelector('.description-popover-arrow');
-      if (arrow) {
-        arrow.style.left = `${btnRect.width / 2}px`;
-      }
-      
-      const popoverRect = popover.getBoundingClientRect();
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      
-      if (popoverRect.right > viewportWidth) {
-        const newLeft = Math.max(10, viewportWidth - popoverRect.width - 10);
-        popover.style.left = `${newLeft}px`;
-        
-        if (arrow) {
-          const arrowLeft = btnRect.left - newLeft + btnRect.width / 2;
-          arrow.style.left = `${Math.min(arrowLeft, popoverRect.width - 20)}px`;
-        }
-      }
-      
-      if (popoverRect.bottom > viewportHeight) {
-        popover.style.top = `${btnRect.top + window.scrollY - popoverRect.height - 5}px`;
-        
-        if (arrow) {
-          arrow.style.top = 'auto';
-          arrow.style.bottom = '-8px';
-          arrow.style.transform = 'rotate(180deg)';
-        }
-      }
-      
-      setTimeout(() => {
-        popover.style.opacity = '1';
-      }, 10);
-    } else {
-      const popover = document.querySelector(`.description-popover[data-task-id="${task.id}"]`);
-      if (popover) {
-        popover.style.opacity = '0';
-        setTimeout(() => {
-          if (popover.parentNode) {
-            popover.parentNode.removeChild(popover);
-          }
-        }, 200);
-      }
+      // Dispatch event to close other popovers
+      window.dispatchEvent(new CustomEvent('close-all-popovers', {
+        detail: { exceptTaskId: task.id }
+      }));
     }
-  }, [showDescription, loadingDescription, taskDescription, task.id]);
+  }, [showDescription, task.id, taskSubtasks.length]);
 
   useEffect(() => {
     return () => {
@@ -227,21 +156,8 @@ function Task({ task, columnId }) {
       return;
     }
     
-    window.dispatchEvent(new CustomEvent('close-all-popovers', {
-      detail: { exceptTaskId: task.id }
-    }));
-
-    if (!taskDescription) {
-      setLoadingDescription(true);
-      fetchTask(task.id)
-        .then(taskData => setTaskDescription(taskData.description || ''))
-        .catch(error => console.error('Error fetching task description:', error))
-        .finally(() => setLoadingDescription(false));
-    }
-    
-    setTimeout(() => {
-      setShowDescription(true);
-    }, 10);
+    // All the data fetching will now happen in the useEffect
+    setShowDescription(true);
   };
 
   const handleDeleteClick = (e) => {
@@ -510,10 +426,10 @@ function Task({ task, columnId }) {
           <button 
             ref={descriptionBtnRef}
             className="description-dropdown-btn"
-            title={showDescription ? 'Ukryj opis' : 'Pokaż opis'}
+            title={showDescription ? 'Ukryj szczegóły' : 'Pokaż szczegóły'}
             onClick={handleDescriptionToggle}
           >
-            {showDescription ? 'Ukryj opis ▲' : 'Pokaż opis ▼'}
+            {showDescription ? 'Ukryj szczegóły ▲' : 'Pokaż szczegóły ▼'}
           </button>
         </div>
         
@@ -542,19 +458,61 @@ function Task({ task, columnId }) {
 
       {/* Description popover */}
       {showDescription && createPortal(
-        <div className="description-popover">
-          <div className="description-popover-arrow"></div>
-          <div className="description-popover-content">
-            {loadingDescription ? (
-              <p className="loading-description">Ładowanie opisu...</p>
-            ) : taskDescription ? (
-              <p className="description-content">{taskDescription}</p>
-            ) : (
-              <p className="empty-description">Brak opisu.</p>
-            )}
-          </div>
-        </div>,
-        document.body
+      <div 
+        className="description-popover" 
+        data-task-id={task.id} 
+        style={{
+          position: 'fixed', 
+          opacity: 1,
+          zIndex: 1000,
+          left: descriptionBtnRef.current ? 
+            descriptionBtnRef.current.getBoundingClientRect().left : window.innerWidth / 2 - 150,
+          top: descriptionBtnRef.current ? 
+            descriptionBtnRef.current.getBoundingClientRect().bottom + 5 : 100,
+          width: '300px',
+          visibility: 'visible' 
+        }}
+      >
+        <div className="description-popover-arrow" style={{left: '50%'}}></div>
+        <div className="description-popover-content">
+          {loadingDescription ? (
+            <p className="loading-description">Ładowanie szczegółów...</p>
+          ) : (
+            <>
+              <div className="popover-section">
+                <h4 className="popover-section-title">Opis zadania</h4>
+                {taskDescription ? (
+                  <p className="description-content">{taskDescription}</p>
+                ) : (
+                  <p className="empty-description">Brak opisu.</p>
+                )}
+              </div>
+          
+              <div className="popover-section subtasks-preview">
+                <h4 className="popover-section-title">Podzadania</h4>
+                {taskSubtasks && taskSubtasks.length > 0 ? (
+                  <ul className="subtasks-preview-list">
+                    {taskSubtasks.map(subtask => (
+                      <li 
+                        key={subtask.id} 
+                        className={`subtask-preview-item ${subtask.completed ? 'completed' : ''}`}
+                      >
+                        <span className={`subtask-checkbox ${subtask.completed ? 'checked' : ''}`}>
+                          {subtask.completed ? '✓' : ''}
+                        </span>
+                        <span className="subtask-title">{subtask.title}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="empty-subtasks">Brak podzadań.</p>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>,
+      document.body
     )}
 
       {isConfirmingDelete && (
