@@ -119,8 +119,7 @@ describe('TaskLabels Component', () => {
     await act(async () => {
       fireEvent.click(highPriorityOption);
     });
-    
-    // Check if API was called correctly
+
     await waitFor(() => {
       expect(addLabelToTask).toHaveBeenCalledWith(1, 'High Priority');
       expect(mockLabelsChange).toHaveBeenCalledWith([...initialLabels, 'High Priority']);
@@ -223,7 +222,6 @@ describe('TaskLabels Component', () => {
       fireEvent.click(submitButton);
     });
     
-    // Check if API was called correctly
     await waitFor(() => {
       expect(addLabelToTask).toHaveBeenCalledWith(1, 'Custom Label');
       expect(mockLabelsChange).toHaveBeenCalledWith([...initialLabels, 'Custom Label']);
@@ -353,7 +351,6 @@ describe('TaskLabels Component', () => {
   });
   
   test('handles API errors gracefully when adding labels', async () => {
-    // Setup API mock to throw an error
     addLabelToTask.mockRejectedValue(new Error('API error'));
     global.alert = jest.fn();
     global.console.error = jest.fn();

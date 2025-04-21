@@ -44,7 +44,6 @@ describe('Header Component', () => {
   };
 
   beforeEach(() => {
-    // Reset window scrollY before each test
     global.window.scrollY = 0;
   });
 

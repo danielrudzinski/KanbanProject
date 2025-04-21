@@ -243,7 +243,7 @@ describe('Bench Component', () => {
   });
   
   test('cleans up avatar URLs on unmount', async () => {
-    getUserAvatar.mockResolvedValue('blob:http://localhost:3000/12345');
+    getUserAvatar.mockResolvedValue('blob:http://localhost:5173/12345');
     
     const { unmount } = renderBench();
     
