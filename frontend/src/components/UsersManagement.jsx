@@ -221,13 +221,11 @@ function UsersManagement() {
 
   const deleteUser = (userId) => {
     if (window.confirm('Czy na pewno chcesz usunąć tego użytkownika?')) {
-      // Send delete request to backend
       fetch(`/users/${userId}`, {
         method: 'DELETE'
       })
         .then(response => {
           if (response.ok || response.status === 404) {
-            // Remove user from state
             setUsers(users.filter(user => user.id !== userId));
           } else {
             throw new Error('Błąd podczas usuwania użytkownika');

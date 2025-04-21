@@ -21,7 +21,7 @@ export const fetchColumns = async (retries = 3) => {
       console.error('Error fetching columns:', error);
       if (retries === 1) throw error;
       retries--;
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 };
@@ -79,7 +79,6 @@ export const updateColumnWipLimit = async (columnId, wipLimit) => {
       try {
         return await response.json();
       } catch (parseError) {
-        // If JSON parsing fails but status is OK, return a synthetic success response
         console.warn('JSON parse error but update likely succeeded:', parseError);
         return {
           id: columnId,
@@ -88,7 +87,6 @@ export const updateColumnWipLimit = async (columnId, wipLimit) => {
       }
     }
 
-    // Handle error responses
     throw new Error(`Error updating WIP limit: ${response.status}`);
   } catch (error) {
     console.error(`Error updating WIP limit for column ${columnId}:`, error);
@@ -250,7 +248,6 @@ export const updateTaskColumn = async (taskId, columnId) => {
       } catch (parseError) {
         console.warn("Failed to parse error response:", parseError.message);
         
-        // In case of JSON parsing error, check test expectations
         if (response.status === 400) {
           throw new Error(`Error updating task column: ${response.status} - Column WIP limit exceeded`);
         } else {
@@ -342,7 +339,7 @@ export async function updateUserWipLimit(userId, wipLimit) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(parseInt(wipLimit)), // Convert to number first
+      body: JSON.stringify(parseInt(wipLimit)), 
     });
 
     if (!response.ok) {
@@ -523,18 +520,15 @@ export const updateTaskName = async (id, name) => {
       throw new Error(`Failed to update task: ${response.status}`);
     }
     
-    // Check if the content type is JSON - carefully handle potential undefined headers
     const contentType = response.headers?.get?.('content-type');
     if (contentType && contentType.includes('application/json')) {
       return await response.json();
     } else {
-      // Try to parse as JSON first, if it fails, handle as text
       try {
         return await response.json();
       } catch (e) {
         console.warn('Failed to parse JSON response:', e.message);
         await response.text();
-        // Fetch the updated task data
         return await fetchTask(id);
       }
     }
@@ -557,7 +551,7 @@ export const fetchRows = async (retries = 3) => {
       console.error('Error fetching rows:', error);
       if (retries === 1) throw error;
       retries--;
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+      await new Promise(resolve => setTimeout(resolve, 1000)); 
     }
   }
 };
