@@ -560,7 +560,7 @@ describe('WipLimitControl Component', () => {
         jest.spyOn(React, 'useState').mockImplementationOnce(() => [manipulatableRef, jest.fn()]);
         jest.spyOn(React, 'useState').mockImplementationOnce(() => [false, jest.fn()]);
         jest.spyOn(React, 'useState').mockImplementationOnce(() => [null, jest.fn()]);
-        jest.spyOn(React, 'useState').mockImplementationOnce(() => ['row', jest.fn()]); // 'row' instead of 'column'
+        jest.spyOn(React, 'useState').mockImplementationOnce(() => ['row', jest.fn()]);
         
         render(
             <KanbanContext.Provider value={mockContextValue}>

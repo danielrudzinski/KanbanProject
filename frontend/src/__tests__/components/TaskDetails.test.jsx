@@ -252,7 +252,6 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
     
-    // Find ALL expand buttons and click the first one
     const expandButtons = await screen.findAllByTitle('Pokaż opis');
     fireEvent.click(expandButtons[0]);
     
@@ -313,7 +312,6 @@ describe('TaskDetails Component', () => {
       fireEvent.click(screen.getByText('Tak'));
     });
     
-    // Wait for the API call to complete
     await waitFor(() => {
       expect(api.deleteSubTask).toHaveBeenCalledWith(mockSubtasks[0].id);
       expect(onSubtaskUpdateMock).toHaveBeenCalled();
@@ -365,7 +363,6 @@ describe('TaskDetails Component', () => {
     const submitButton = screen.getByText('Przypisz');
     fireEvent.click(submitButton);
     
-    // Verify API calls happened without waiting for UI side effects
     await waitFor(() => {
       expect(api.assignUserToTask).toHaveBeenCalledWith(mockTask.id, 2);
     });
@@ -661,7 +658,6 @@ describe('TaskDetails Component', () => {
       fireEvent.click(screen.getByText('Tak'));
     });
     
-    // The key assertion - wait for the API call
     await waitFor(() => {
       expect(api.removeUserFromTask).toHaveBeenCalled();
     });
@@ -716,7 +712,6 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText(/Czy na pewno chcesz usunąć podzadanie:/)).not.toBeInTheDocument();
     });
     
-    // Check that API was not called
     expect(api.deleteSubTask).not.toHaveBeenCalled();
   });
   
@@ -735,7 +730,6 @@ describe('TaskDetails Component', () => {
     
     expect(screen.queryByText('Usuń podzadanie')).not.toBeInTheDocument();
     
-    // The delete API should not have been called
     expect(api.deleteSubTask).not.toHaveBeenCalled();
   });
   

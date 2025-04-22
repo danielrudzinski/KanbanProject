@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import EditableText from './EditableText';
 import '../styles/components/Row.css';
@@ -31,11 +31,19 @@ function Row({ row, children }) {
   
   const onDragOver = (e) => {
     handleDragOver(e);
+    e.currentTarget.classList.add('drag-over');
   };
-  
+
+  const onDragLeave = (e) => {
+    e.currentTarget.classList.remove('drag-over');
+  };
+
   const onDrop = (e) => {
     handleDrop(e, null, row.id);
+    e.currentTarget.classList.remove('drag-over');
   };
+
+  const isOverLimit = row.taskCount > row.wipLimit;
 
   return (
     <div 
@@ -44,6 +52,7 @@ function Row({ row, children }) {
       draggable="true"
       onDragStart={onDragStart}
       onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
       onDrop={onDrop}
     >
       <div className="row-header">
@@ -68,9 +77,9 @@ function Row({ row, children }) {
         </div>
 
         {row.wipLimit > 0 && (
-          <span className={`wip-limit ${row.isOverLimit ? 'exceeded' : ''}`}>
+          <span className={`wip-limit ${isOverLimit ? 'exceeded' : ''}`}>
             Limit: {row.wipLimit}
-            {row.isOverLimit && ' (przekroczony!)'}
+            {isOverLimit && ' (przekroczony!)'}
           </span>
         )}
       </div>
