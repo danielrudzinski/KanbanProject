@@ -5,6 +5,9 @@
   box-shadow: 0 1px 3px rgba(14, 27, 54, 0.1);
   padding: 1rem 1rem 0.75rem;
   margin-bottom: 1.5rem;
+  width: fit-content;
+  min-width: 120px; 
+  max-width: 100%; 
   cursor: pointer;
   position: relative;
   transition: all 0.2s ease;
@@ -58,14 +61,16 @@
 /* ====== TASK CONTENT ====== */
 .task-content {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
   width: 100%;
   color: #0e1b36;
+  justify-content: flex-start;
 }
 
 .task-title {
-  flex-grow: 1;
+  flex: 0 1 auto;
   margin-right: 8px;
+  max-width: 100%;
 }
 
 /* ====== DELETE BUTTON ====== */
@@ -104,6 +109,7 @@
   margin-left: auto;
   margin-right: 18px;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 /* ====== AVATAR STYLES ====== */
@@ -345,8 +351,6 @@
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   padding: 12px;
-  min-width: 250px;
-  max-height: 400px;
   overflow-y: auto;
   pointer-events: auto;
   opacity: 0; /* Start hidden */
@@ -572,47 +576,4 @@
     stroke-dashoffset: -9;
   }
 }
-  
-  .popover-section-title {
-    color: #d1fdff;
-    border-bottom-color: rgba(134, 214, 255, 0.3);
-  }
-  
-  .subtask-checkbox {
-    background-color: #1a2944;
-    border-color: #86d6ff;
-    color: #d1fdff;
-  }
-  
-  /* Assignment styles */
-  .assign-btn {
-    background-color: #86d6ff;
-  }
-  
-  .assign-btn:hover {
-    background-color: #d1fdff;
-  }
-  
-  .user-avatar img {
-    background-color: #0e1b36;
-  }
-
-  /* Warning styles */
-  .subtask-warning {
-    background-color: rgba(255, 215, 0, 0.15);
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    color: #ffd700;
-  }
-  
-  .warning-message {
-    color: #ffd700;
-  }
-  
-  .warning-close-btn {
-    color: #ffd700;
-  }
-  
-  .warning-close-btn:hover {
-    color: #fff;
-  }
 

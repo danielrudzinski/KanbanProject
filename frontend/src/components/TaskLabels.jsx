@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { addLabelToTask, removeLabelFromTask, getAllLabels } from '../services/api';
 import '../styles/components/TaskLabels.css';
 import { useKanban } from '../context/KanbanContext';
+import { toast } from 'react-toastify';
 
 // Keep the PREDEFINED_LABELS array for default options
 const PREDEFINED_LABELS = [
@@ -112,7 +113,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
       );
   
       if (labelExists) {
-        alert('Ta etykieta została już dodana do zadania');
+        toast.warning('Ta etykieta została już dodana do zadania');
         return;
       }
   
@@ -128,7 +129,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
       refreshTasks();
     } catch (error) {
       console.error('Error adding label:', error);
-      alert('Wystąpił błąd podczas dodawania etykiety');
+      toast.error('Wystąpił błąd podczas dodawania etykiety');
     }
   };
   
@@ -156,7 +157,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
       onLabelsChange(updatedLabels);
     } catch (error) {
       console.error('Error removing label:', error);
-      alert('Wystąpił błąd podczas usuwania etykiety');
+      toast.error('Wystąpił błąd podczas usuwania etykiety');
     }
   };
 

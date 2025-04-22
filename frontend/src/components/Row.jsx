@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import EditableText from './EditableText';
+import { toast } from 'react-toastify';
 import '../styles/components/Row.css';
 
 function Row({ row, children }) {
@@ -13,7 +14,7 @@ function Row({ row, children }) {
     if (rows.length > 1) {
       setIsConfirmingDelete(true);
     } else {
-      alert('Nie można usunąć ostatniego wiersza.');
+      toast.warning('Nie można usunąć ostatniego wiersza.');
     }
   };
 

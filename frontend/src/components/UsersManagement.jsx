@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import '../styles/components/Users.css';
+import { toast } from 'react-toastify';
 
 function UsersManagement() {
   const [name, setName] = useState('');
@@ -57,7 +58,7 @@ function UsersManagement() {
       await Promise.all(avatarPromises);
     } catch (error) {
       console.error('Błąd podczas ładowania użytkowników:', error);
-      alert('Wystąpił błąd podczas ładowania użytkowników');
+      toast.error('Wystąpił błąd podczas ładowania użytkowników');
     }
   }, [fetchUserAvatar]);
 
@@ -77,12 +78,12 @@ function UsersManagement() {
   
     try {
       if (file.size > MAX_FILE_SIZE) {
-        alert('Plik jest zbyt duży. Maksymalny rozmiar to 10MB.');
+        toast.info('Plik jest zbyt duży. Maksymalny rozmiar to 10MB.');
         return;
       }
   
       if (!ALLOWED_TYPES.includes(file.type)) {
-        alert('Dozwolone są tylko pliki JPG i PNG.');
+        toast.info('Dozwolone są tylko pliki JPG i PNG.');
         return;
       }
   
@@ -135,10 +136,10 @@ function UsersManagement() {
         }
       }
   
-      alert('Avatar został pomyślnie zaktualizowany');
+      toast.info('Avatar został pomyślnie zaktualizowany');
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      alert(`Wystąpił błąd podczas uploadu avatara: ${error.message}`);
+      toast.warning(`Wystąpił błąd podczas uploadu avatara: ${error.message}`);
     }
   };
   
@@ -179,12 +180,12 @@ function UsersManagement() {
 
   const addUser = () => {
     if (name.trim() === '' || email.trim() === '' || password.trim() === '') {
-      alert('Proszę wypełnić wszystkie pola!');
+      toast.warning('Proszę wypełnić wszystkie pola!');
       return;
     }
 
     if (!isValidEmail(email)) {
-      alert('Proszę podać poprawny adres email!');
+      toast.info('Proszę podać poprawny adres email!');
       return;
     }
 
@@ -215,7 +216,7 @@ function UsersManagement() {
       })
       .catch(error => {
         console.error('Błąd:', error);
-        alert('Wystąpił błąd podczas dodawania użytkownika');
+        toast.error('Wystąpił błąd podczas dodawania użytkownika');
       });
   };
 
@@ -233,7 +234,7 @@ function UsersManagement() {
         })
         .catch(error => {
           console.error('Błąd:', error);
-          alert('Wystąpił błąd podczas usuwania użytkownika');
+          toast.error('Wystąpił błąd podczas usuwania użytkownika');
         });
     }
   };

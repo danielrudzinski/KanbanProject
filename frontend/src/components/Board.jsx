@@ -2,6 +2,7 @@ import { useKanban } from '../context/KanbanContext';
 import React, { useEffect } from 'react';
 import Task from './Task';
 import EditableText from './EditableText';
+import { toast } from 'react-toastify';
 import '../styles/components/Board.css';
 
 function Board() {
@@ -115,7 +116,7 @@ function Board() {
         deleteRow(rowId);
       }
     } else {
-      alert('Nie można usunąć ostatniego wiersza.');
+      toast.error('Nie można usunąć ostatniego wiersza.');
     }
   };
 

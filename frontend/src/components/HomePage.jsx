@@ -77,7 +77,7 @@ const HomePage = () => {
       await authService.verifyAccount({ email: verificationEmail, verificationCode });
       setActiveTab('login');
       setShowVerification(false);
-      alert('Account verified successfully! Please log in.');
+      toast.success('Account verified successfully! Please log in.');
     } catch (error) {
       setError(error.message);
     } finally {
@@ -88,7 +88,7 @@ const HomePage = () => {
   const handleResendCode = async () => {
     try {
       await authService.resendVerificationCode(verificationEmail);
-      alert('Verification code sent to your email.');
+      toast.info('Verification code sent to your email.');
     } catch (error) {
       setError(error.message);
     }
