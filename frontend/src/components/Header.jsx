@@ -1,16 +1,24 @@
-import { Link } from 'react-router-dom';
-import React, { useEffect,useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import AddTaskForm from './AddTaskForm';
 import AddBoardItemForm from './AddRowColumnForm';
 import WipLimitControl from './WipLimitControl';
+import { useAuth } from '../context/AuthContext';
 import logo from '../../public/kanban-logo.png';
 
 function Header() {
   const [activeForm, setActiveForm] = useState(null); // 'task', 'boardItem', or 'wip'
   const [isSticky, setIsSticky] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleFormToggle = (formType) => {
     setActiveForm(activeForm === formType ? null : formType);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   useEffect(() => {
@@ -71,6 +79,17 @@ function Header() {
             </svg>
             Użytkownicy
           </Link>
+          
+          <button 
+            className="nav-link logout-btn"
+            onClick={handleLogout}
+            style={{ marginLeft: 'auto' }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20" style={{ marginRight: '0.5rem', verticalAlign: 'middle' }}>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Wyloguj
+          </button>
         </div>
       </header>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
@@ -15,8 +15,26 @@ const HomePage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const navigate = useNavigate();
+
+  const { token, isLoading } = useAuth();
+
+  useEffect(() => {
+    const validateToken = async () => {
+      if (token && !isLoading) {
+        const expiration = localStorage.getItem('tokenExpiration');
+        if (expiration && new Date().getTime() > parseInt(expiration)) {
+          logout();
+          return;
+        }
+        
+        navigate('/board');
+      }
+    };
+    
+    validateToken();
+  }, [token, isLoading, navigate, logout]);
   
   const handleLogin = async (e) => {
     e.preventDefault();

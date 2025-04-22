@@ -13,7 +13,7 @@ export function setupApiInterceptors() {
       if (expiration && new Date().getTime() > expiration) {
         localStorage.removeItem('token');
         localStorage.removeItem('tokenExpiration');
-        window.location.href = '/login';
+        window.location.href = '/';
         return;
       }
     

@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import TaskDetails from './TaskDetails';
 import EditableText from './EditableText';
-import { getUserAvatar, assignUserToTask, fetchSubTasksByTaskId, fetchTask } from '../services/api';
+import Xarrow from "react-xarrows";
+import { getUserAvatar, assignUserToTask, fetchSubTasksByTaskId, fetchTask, getChildTasks } from '../services/api';
 import { createPortal } from 'react-dom';
 import '../styles/components/Task.css';
 
@@ -18,6 +19,10 @@ function Task({ task, columnId }) {
   const [showDescription, setShowDescription] = useState(false);
   const [taskDescription, setTaskDescription] = useState('');
   const [loadingDescription, setLoadingDescription] = useState(false);
+  const [isParentTask] = useState(false); 
+  const [childColumns] = useState(new Set());
+  const [isDragging, setIsDragging] = useState(false);
+  const [relationshipData, setRelationshipData] = useState({ children: [], parent: null });
 
   const descriptionBtnRef = useRef(null);
   const taskRef = useRef(null);
@@ -207,6 +212,24 @@ function Task({ task, columnId }) {
     };
   }, [task.id]);
 
+  useEffect(() => {
+    const loadRelationships = async () => {
+      try {
+        const childTasks = await getChildTasks(task.id);
+        const taskData = await fetchTask(task.id);
+        
+        setRelationshipData({
+          children: childTasks || [],
+          parent: taskData.parentTaskId || null
+        });
+      } catch (error) {
+        console.error('Error loading task relationships:', error);
+      }
+    };
+    
+    loadRelationships();
+  }, [task.id]);
+
   const handleTaskClick = (e) => {
     if (e.target.className === 'delete-btn' || 
         e.target.className === 'confirm-delete-btn' || 
@@ -290,14 +313,17 @@ function Task({ task, columnId }) {
   };
 
   const onDragStartHandler = (e) => {
-    console.log('Task drag start:', { taskId: task.id, columnId });
+    console.log('Task drag start:', { taskId: task.id, columnId, isParentTask });
     
     const data = {
       id: task.id,
       type: 'task',
       sourceColumnId: columnId,
-      sourceRowId: task.rowId
+      sourceRowId: task.rowId,
+      isParentTask: isParentTask,
+      childColumns: Array.from(childColumns)
     };
+
     const dataString = JSON.stringify(data);
     e.dataTransfer.setData('application/task', dataString);
     e.dataTransfer.setData('taskId', task.id);
@@ -307,6 +333,9 @@ function Task({ task, columnId }) {
     if (taskRef.current) {
       taskRef.current.classList.add('dragging');
     }
+
+    setIsDragging(true);
+    document.body.classList.add('showing-task-relationships');
 
     if (hasUnfinishedSubtasks) {
       setShowWarning(true);
@@ -402,6 +431,9 @@ function Task({ task, columnId }) {
     if (taskRef.current) {
       taskRef.current.classList.remove('dragging');
     }
+    setIsDragging(false);
+    document.body.classList.remove('showing-task-relationships');
+
   };
 
   const handleCloseWarning = (e) => {
@@ -468,7 +500,8 @@ function Task({ task, columnId }) {
     <>
       <div
         ref={taskRef}
-        className={`task ${isDragOver ? 'user-drag-over' : ''}`}
+        id={`task-${task.id}`}
+        className={`task ${isDragOver ? 'user-drag-over' : ''} ${isParentTask ? 'parent-task' : ''}`}
         draggable="true"
         onClick={handleTaskClick}
         onDragStart={onDragStartHandler}
@@ -479,12 +512,13 @@ function Task({ task, columnId }) {
         data-task-id={task.id}
         data-column-id={columnId}
         data-row-id={task.rowId || "null"}
+        data-is-parent={isParentTask}
       >
         <div className="task-header">
           <div className="task-content">
             <EditableText 
               id={task.id} 
-              text={task.title} 
+              text={task.title || "Untitled Task"} 
               onUpdate={updateTaskName} 
               className="task-title"
               inputClassName="task-title-input"
@@ -528,17 +562,60 @@ function Task({ task, columnId }) {
           <div className="subtask-warning">
             <div className="warning-icon">⚠️</div>
             <div className="warning-message">
-              Nieukończone podzadania
+              {"Nieukończone podzadania"}
             </div>
-            <button 
-              className="warning-close-btn" 
-              onClick={handleCloseWarning}
-            >
-              ×
-            </button>
+          <button 
+            className="warning-close-btn" 
+            onClick={handleCloseWarning}
+          >
+            ×
+          </button>
           </div>
         )}
       </div>
+
+      {isDragging && relationshipData.children.map(child => (
+        <Xarrow
+          key={`arrow-${task.id}-${child.id}`}
+          start={`task-${task.id}`}
+          end={`task-${child.id}`}
+          color="#86d6ff"
+          strokeWidth={3}
+          path="smooth"
+          startAnchor="auto"
+          endAnchor="auto"
+          curveness={0.3}
+          zIndex={9999}
+          animateDrawing={0.5}
+          showHead={true}
+          headSize={6}
+          labels={{ middle: 
+            <div style={{ 
+              width: '12px', 
+              height: '12px', 
+              borderRadius: '50%', 
+              backgroundColor: '#86d6ff',
+              boxShadow: '0 0 5px rgba(134, 214, 255, 0.8)'
+            }}/>
+          }}
+        />
+      ))}
+
+      {isDragging && relationshipData.parent && (
+        <Xarrow
+          key={`arrow-${relationshipData.parent}-${task.id}`}
+          start={`task-${relationshipData.parent}`}
+          end={`task-${task.id}`}
+          color="#0e1b36"
+          strokeWidth={3}
+          path="straight"
+          startAnchor="auto"
+          endAnchor="auto"
+          dashness={{ strokeLen: 5, nonStrokeLen: 5, animation: 1 }}
+          zIndex={9999}
+          showHead={true}
+        />
+      )}
 
       {/* Description popover */}
       {showDescription && createPortal(

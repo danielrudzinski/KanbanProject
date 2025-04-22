@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
   {
-    ignores: ['dist', 'coverage', 'src/__tests__']
+    ignores: ['dist', 'coverage', 'src/__tests__', 'cypress.config.js', 'cypress/e2e/*', 'cypress/support/*'],
   },  
   {
     files: ['**/*.{js,jsx}'],

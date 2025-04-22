@@ -506,3 +506,38 @@
     border-bottom-color: #1a2944;
   }
 }
+
+.showing-task-relationships .task {
+  position: relative !important;
+  z-index: 100 !important; 
+}
+
+.task.dragging {
+  opacity: 0.8 !important; /* More visible while dragging */
+  background-color: rgba(134, 214, 255, 0.2) !important;
+  outline: 2px solid #86d6ff !important;
+  box-shadow: 0 0 15px rgba(134, 214, 255, 0.3) !important;
+}
+
+/* Create a glow effect for arrows */
+#root .xarrow {
+  filter: drop-shadow(0 0 3px rgba(134, 214, 255, 0.6));
+  pointer-events: none !important;
+}
+
+/* For child relationships - blue strong arrows */
+#root .xarrow[data-type="child"] path {
+  stroke-width: 3;
+}
+
+/* For parent relationships - darker dashed arrows */
+#root .xarrow[data-type="parent"] path {
+  stroke-dasharray: 6, 3;
+  animation: dash 1s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -9;
+  }
+}

@@ -16,6 +16,9 @@ export const fetchColumns = async (retries = 3) => {
       if (!response.ok) {
         throw new Error(`Error fetching columns: ${response.status}`);
       }
+      if (response.status === 204 || response.status === 200) {
+        return true; // No content or success
+      }
       return await response.json();
     } catch (error) {
       console.error('Error fetching columns:', error);
@@ -845,6 +848,85 @@ export const deleteUserAvatar = async (userId) => {
     return await response.text();
   } catch (error) {
     console.error(`Error deleting avatar for user ${userId}:`, error);
+    throw error;
+  }
+};
+
+export const assignParentTask = async (childTaskId, parentTaskId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${childTaskId}/parent/${parentTaskId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error assigning parent task: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Error assigning parent task for ${childTaskId}:`, error);
+    throw error;
+  }
+};
+
+export const removeParentTask = async (childTaskId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${childTaskId}/parent`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error removing parent task: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Error removing parent task for ${childTaskId}:`, error);
+    throw error;
+  }
+};
+
+export const getChildTasks = async (taskId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}/children`);
+    if (!response.ok) {
+      throw new Error(`Error fetching child tasks: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching child tasks for ${taskId}:`, error);
+    throw error;
+  }
+};
+
+export const getParentTask = async (taskId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}/parent`);
+    if (!response.ok) {
+      throw new Error(`Error fetching parent task: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching parent task for ${taskId}:`, error);
+    throw error;
+  }
+};
+
+export const canTaskBeCompleted = async (taskId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}/can-complete`);
+    if (!response.ok) {
+      throw new Error(`Error checking if task can be completed: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error checking if task ${taskId} can be completed:`, error);
     throw error;
   }
 };
