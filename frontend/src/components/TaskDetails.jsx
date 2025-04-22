@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { createPortal } from 'react-dom';
-import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask } from '../services/api';
+import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask, assignParentTask, removeParentTask, getChildTasks, fetchTasks } from '../services/api';
 import '../styles/components/TaskDetails.css';
 import TaskLabels from './TaskLabels';
 
@@ -30,6 +30,11 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const [editingTaskTitle, setEditingTaskTitle] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [originalTaskTitle, setOriginalTaskTitle] = useState('');
+  const [parentTask, setParentTask] = useState(null);
+  const [availableTasks, setAvailableTasks] = useState([]);
+  const [showParentSelector, setShowParentSelector] = useState(false);
+  const [selectedParentId, setSelectedParentId] = useState('');
+  const [childTasks, setChildTasks] = useState([]);
 
   const panelRef = useRef(null);
   const descriptionInputRef = useRef(null);
@@ -92,26 +97,38 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       setLoading(true);
       const taskData = await fetchTask(task.id);
       let assignedData = [];
-    if (taskData.userIds && taskData.userIds.length > 0) {
-      const usersData = await fetchUsers();
-      assignedData = usersData.filter(user => 
-        taskData.userIds.includes(user.id)
-      );
-    } else {
-      try {
-        const response = await fetch(`/tasks/${task.id}/users`);
-        if (response.ok) {
-          const data = await response.json();
-          assignedData = Array.isArray(data) ? data : [];
-        }
-      } catch (error) {
-        console.error('Error fetching assigned users:', error);
+      
+      if (taskData.userIds && taskData.userIds.length > 0) {
+        const usersData = await fetchUsers();
+        assignedData = usersData.filter(user => 
+          taskData.userIds.includes(user.id)
+        );
       }
-    }
-    
-    setAssignedUsers(assignedData);
-    const usersData = await fetchUsers();
-    setUsers(usersData || []);
+      
+      // Move these blocks OUTSIDE the userIds conditional
+      if (taskData.parentTaskId) {
+        try {
+          const parentTaskData = await fetchTask(taskData.parentTaskId);
+          setParentTask(parentTaskData);
+        } catch (error) {
+          console.error('Error fetching parent task:', error);
+          setParentTask(null);
+        }
+      } else {
+        setParentTask(null);
+      }
+  
+      try {
+        const childTasksData = await getChildTasks(task.id);
+        setChildTasks(childTasksData || []);
+      } catch (error) {
+        console.error('Error fetching child tasks:', error);
+        setChildTasks([]);
+      }
+      
+      setAssignedUsers(assignedData);
+      const usersData = await fetchUsers();
+      setUsers(usersData || []);
     const subtasksData = await fetchSubTasksByTaskId(task.id);
     setSubtasks(subtasksData || []);
     const description = taskData.description || '';
@@ -477,6 +494,58 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     } catch (error) {
       console.error('Error assigning user:', error);
       alert('Wystąpił błąd podczas przypisywania użytkownika');
+    }
+  };
+
+  const handleShowParentSelector = async () => {
+    try {
+      const allTasks = await fetchTasks();
+      const invalidIds = new Set([task.id, ...childTasks.map(child => child.id)]);
+      const validTasks = allTasks.filter(t => !invalidIds.has(t.id));
+      
+      setAvailableTasks(validTasks);
+      setShowParentSelector(true);
+    } catch (error) {
+      console.error('Error fetching available parent tasks:', error);
+      alert('Nie można pobrać dostępnych zadań nadrzędnych');
+    }
+  };
+
+  const handleAssignParent = async () => {
+    if (!selectedParentId) return;
+    
+    try {
+      await assignParentTask(task.id, parseInt(selectedParentId));
+      
+      await loadTaskData();
+      refreshTasks();
+      
+      setSuccess(true);
+      setSelectedParentId('');
+      setShowParentSelector(false);
+      
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error assigning parent task:', error);
+      alert('Wystąpił błąd podczas przypisywania zadania nadrzędnego');
+    }
+  };
+
+  const handleRemoveParent = async () => {
+    try {
+      await removeParentTask(task.id);
+      await loadTaskData();
+      refreshTasks();
+      
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error removing parent task:', error);
+      alert('Wystąpił błąd podczas usuwania zadania nadrzędnego');
     }
   };
 
@@ -853,6 +922,77 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
           onLabelsChange={handleLabelsChange}
         />
         </div>
+
+        {/* Parent Task section */}
+        <div className="task-parent-section">
+          <h4>Zadanie nadrzędne</h4>
+    
+        {parentTask ? (
+          <div className="current-parent-task">
+            <p>Obecnie: <strong>{parentTask.title}</strong></p>
+            <button 
+              onClick={handleRemoveParent}
+              className="remove-parent-btn"
+              title="Usuń zadanie nadrzędne"
+            >
+              Usuń powiązanie
+            </button>
+          </div>
+       ) : (
+          <p className="no-parent">Brak zadania nadrzędnego</p>
+        )}
+    
+        <button
+          className="assign-parent-btn"
+          onClick={handleShowParentSelector}
+        >
+          {parentTask ? 'Zmień zadanie nadrzędne' : 'Przypisz zadanie nadrzędne'}
+        </button>
+    
+        {showParentSelector && (
+          <div className="parent-selector">
+            <select 
+              value={selectedParentId}
+              onChange={(e) => setSelectedParentId(e.target.value)}
+            >
+              <option value="">Wybierz zadanie nadrzędne</option>
+              {availableTasks.map(availableTask => (
+                <option key={availableTask.id} value={availableTask.id}>
+                {availableTask.title}
+                </option>
+              ))}
+            </select>
+            <div className="parent-selector-actions">
+              <button 
+                onClick={handleAssignParent} 
+                disabled={!selectedParentId}
+                className="confirm-parent-btn"
+              >
+                Przypisz
+              </button>
+              <button 
+                onClick={() => setShowParentSelector(false)}
+                className="cancel-parent-btn"
+              >
+                Anuluj
+              </button>
+            </div>
+          </div>
+        )}
+    
+        {childTasks.length > 0 && (
+          <div className="child-tasks-section">
+            <h5>Zadania podrzędne:</h5>
+            <ul className="child-tasks-list">
+              {childTasks.map(childTask => (
+                <li key={childTask.id} className="child-task-item">
+                  {childTask.title}
+                </li>
+             ))}
+            </ul>
+          </div>
+        )}
+      </div>
 
         {/* Assigned users section */}
         {assignedUsers.length > 0 && (

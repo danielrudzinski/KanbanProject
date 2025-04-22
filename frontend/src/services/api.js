@@ -16,12 +16,15 @@ export const fetchColumns = async (retries = 3) => {
       if (!response.ok) {
         throw new Error(`Error fetching columns: ${response.status}`);
       }
+      if (response.status === 204 || response.status === 200) {
+        return true; // No content or success
+      }
       return await response.json();
     } catch (error) {
       console.error('Error fetching columns:', error);
       if (retries === 1) throw error;
       retries--;
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 };
@@ -79,7 +82,6 @@ export const updateColumnWipLimit = async (columnId, wipLimit) => {
       try {
         return await response.json();
       } catch (parseError) {
-        // If JSON parsing fails but status is OK, return a synthetic success response
         console.warn('JSON parse error but update likely succeeded:', parseError);
         return {
           id: columnId,
@@ -88,7 +90,6 @@ export const updateColumnWipLimit = async (columnId, wipLimit) => {
       }
     }
 
-    // Handle error responses
     throw new Error(`Error updating WIP limit: ${response.status}`);
   } catch (error) {
     console.error(`Error updating WIP limit for column ${columnId}:`, error);
@@ -250,7 +251,6 @@ export const updateTaskColumn = async (taskId, columnId) => {
       } catch (parseError) {
         console.warn("Failed to parse error response:", parseError.message);
         
-        // In case of JSON parsing error, check test expectations
         if (response.status === 400) {
           throw new Error(`Error updating task column: ${response.status} - Column WIP limit exceeded`);
         } else {
@@ -342,7 +342,7 @@ export async function updateUserWipLimit(userId, wipLimit) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(parseInt(wipLimit)), // Convert to number first
+      body: JSON.stringify(parseInt(wipLimit)), 
     });
 
     if (!response.ok) {
@@ -523,18 +523,15 @@ export const updateTaskName = async (id, name) => {
       throw new Error(`Failed to update task: ${response.status}`);
     }
     
-    // Check if the content type is JSON - carefully handle potential undefined headers
     const contentType = response.headers?.get?.('content-type');
     if (contentType && contentType.includes('application/json')) {
       return await response.json();
     } else {
-      // Try to parse as JSON first, if it fails, handle as text
       try {
         return await response.json();
       } catch (e) {
         console.warn('Failed to parse JSON response:', e.message);
         await response.text();
-        // Fetch the updated task data
         return await fetchTask(id);
       }
     }
@@ -557,7 +554,7 @@ export const fetchRows = async (retries = 3) => {
       console.error('Error fetching rows:', error);
       if (retries === 1) throw error;
       retries--;
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+      await new Promise(resolve => setTimeout(resolve, 1000)); 
     }
   }
 };
@@ -851,6 +848,85 @@ export const deleteUserAvatar = async (userId) => {
     return await response.text();
   } catch (error) {
     console.error(`Error deleting avatar for user ${userId}:`, error);
+    throw error;
+  }
+};
+
+export const assignParentTask = async (childTaskId, parentTaskId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${childTaskId}/parent/${parentTaskId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error assigning parent task: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Error assigning parent task for ${childTaskId}:`, error);
+    throw error;
+  }
+};
+
+export const removeParentTask = async (childTaskId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${childTaskId}/parent`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error removing parent task: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Error removing parent task for ${childTaskId}:`, error);
+    throw error;
+  }
+};
+
+export const getChildTasks = async (taskId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}/children`);
+    if (!response.ok) {
+      throw new Error(`Error fetching child tasks: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching child tasks for ${taskId}:`, error);
+    throw error;
+  }
+};
+
+export const getParentTask = async (taskId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}/parent`);
+    if (!response.ok) {
+      throw new Error(`Error fetching parent task: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching parent task for ${taskId}:`, error);
+    throw error;
+  }
+};
+
+export const canTaskBeCompleted = async (taskId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}/can-complete`);
+    if (!response.ok) {
+      throw new Error(`Error checking if task can be completed: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error checking if task ${taskId} can be completed:`, error);
     throw error;
   }
 };

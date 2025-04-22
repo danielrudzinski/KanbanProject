@@ -40,4 +40,12 @@ public class Task {
     private Set<User> users = new HashSet<>();
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubTask> subTasks = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "parent_task_id")
+    @JsonIgnoreProperties("childTasks")
+    private Task parentTask;
+
+    @OneToMany(mappedBy = "parentTask")
+    @JsonIgnoreProperties("parentTask")
+    private Set<Task> childTasks = new HashSet<>();
 }

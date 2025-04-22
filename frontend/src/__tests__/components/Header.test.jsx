@@ -34,6 +34,13 @@ jest.mock('../../components/AddRowColumnForm', () => {
   };
 });
 
+jest.mock('../../context/AuthContext', () => ({
+  useAuth: jest.fn(() => ({
+    logout: jest.fn(),
+    token: 'fake-token'
+  }))
+}));
+
 describe('Header Component', () => {
   const renderHeader = () => {
     return render(

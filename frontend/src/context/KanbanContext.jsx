@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { toast } from 'react-toastify';
 import { 
   fetchColumns, 
   fetchTasks, 
@@ -465,13 +466,33 @@ export function KanbanProvider({ children }) {
       const rowChanged = newRowId !== undefined && newRowId !== task.rowId;
       
       if (!columnChanged && !rowChanged) return;
+      
+      if (columnChanged) {
+        const targetColumn = columns.find(col => col.id === newColumnId);
+        
+        if (task.childTaskIds && task.childTaskIds.length > 0) {
+          const childTasks = tasks.filter(t => task.childTaskIds.includes(t.id));
+          const childColumnPositions = childTasks.map(childTask => {
+            const childColumn = columns.find(col => col.id === childTask.columnId);
+            return childColumn ? childColumn.position : -1;
+          });
+          
+          const minChildPosition = Math.min(...childColumnPositions.filter(p => p >= 0));
+          
+          if (targetColumn && targetColumn.position > minChildPosition) {
+            toast.warning("Nie można przesunąć zadania nadrzędnego za jego zadania podrzędne");
+            return;
+          }
+        }
+      }
+  
       let updatedTask = { ...task };
-
+  
       if (columnChanged) {
         await updateTaskColumn(taskId, newColumnId);
         updatedTask.columnId = newColumnId;
       }
-
+  
       if (rowChanged) {
         await updateTaskRow(taskId, newRowId);
         updatedTask.rowId = newRowId;
@@ -628,7 +649,7 @@ export function KanbanProvider({ children }) {
   
   const handleDragOver = (e) => {
     if (e.preventDefault) {
-      e.preventDefault(); // Necessary to allow dropping
+      e.preventDefault();
     }
     
     e.dataTransfer.dropEffect = 'move';
@@ -674,7 +695,7 @@ export function KanbanProvider({ children }) {
     updateRowName: handleUpdateRowName,
     getUserWipLimit: handlegetUserWipLimit,
     updateUserWipLimit: handleUpdateUserWipLimit,
-    dragAndDrop // Export drag and drop handlers
+    dragAndDrop
   };
   
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;
