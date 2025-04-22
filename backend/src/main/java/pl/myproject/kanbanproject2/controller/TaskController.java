@@ -86,4 +86,33 @@ public class TaskController {
         Set<String> labels = taskService.getAllLabels();
         return ResponseEntity.ok(labels);
     }
+    @PutMapping("/{childTaskId}/parent/{parentTaskId}")
+    public ResponseEntity<TaskDTO> assignParentTask(@PathVariable Integer childTaskId, @PathVariable Integer parentTaskId) {
+        return ResponseEntity.ok(taskService.assignParentTask(childTaskId, parentTaskId));
+    }
+
+    @DeleteMapping("/{childTaskId}/parent")
+    public ResponseEntity<TaskDTO> removeParentTask(@PathVariable Integer childTaskId) {
+        return ResponseEntity.ok(taskService.removeParentTask(childTaskId));
+    }
+
+    @GetMapping("/{taskId}/children")
+    public ResponseEntity<List<TaskDTO>> getChildTasks(@PathVariable Integer taskId) {
+        return ResponseEntity.ok(taskService.getChildTasks(taskId));
+    }
+
+    @GetMapping("/{taskId}/parent")
+    public ResponseEntity<TaskDTO> getParentTask(@PathVariable Integer taskId) {
+        return ResponseEntity.ok(taskService.getParentTask(taskId));
+    }
+
+    @PatchMapping("/{taskId}/complete/{status}")
+    public ResponseEntity<TaskDTO> updateTaskCompletion(@PathVariable Integer taskId, @PathVariable boolean status) {
+        return ResponseEntity.ok(taskService.updateTaskCompletion(taskId, status));
+    }
+
+    @GetMapping("/{taskId}/can-complete")
+    public ResponseEntity<Boolean> canTaskBeCompleted(@PathVariable Integer taskId) {
+        return ResponseEntity.ok(taskService.canTaskBeCompleted(taskId));
+    }
 }

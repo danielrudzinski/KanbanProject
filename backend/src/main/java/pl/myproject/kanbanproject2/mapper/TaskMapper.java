@@ -35,6 +35,20 @@ public class TaskMapper implements Function<Task, TaskDTO> {
                     .collect(java.util.stream.Collectors.toSet());
         }
 
+        // Dodane mapowanie dla parentTaskId
+        Integer parentTaskId = null;
+        if (task.getParentTask() != null) {
+            parentTaskId = task.getParentTask().getId();
+        }
+
+        // Dodane mapowanie dla childTaskIds
+        Set<Integer> childTaskIds = null;
+        if (task.getChildTasks() != null && !task.getChildTasks().isEmpty()) {
+            childTaskIds = task.getChildTasks().stream()
+                    .map(Task::getId)
+                    .collect(java.util.stream.Collectors.toSet());
+        }
+
         Set<String> labels = task.getLabels();
 
         return new TaskDTO(
@@ -46,8 +60,9 @@ public class TaskMapper implements Function<Task, TaskDTO> {
                 userIds,
                 labels,
                 task.isCompleted(),
-                task.getDescription()
-
+                task.getDescription(),
+                parentTaskId,    // nowe pole
+                childTaskIds     // nowe pole
         );
     }
 }

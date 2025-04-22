@@ -235,4 +235,142 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error retrieving labels", e);
         }
     }
+    public TaskDTO assignParentTask(Integer childTaskId, Integer parentTaskId) {
+        try {
+            Task childTask = taskRepository.findById(childTaskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+            Task parentTask = taskRepository.findById(parentTaskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania nadrzędnego o takim id"));
+
+            // Sprawdzenie czy nie tworzymy cyklu (rodzic nie może być jednocześnie dzieckiem)
+            if (isTaskInHierarchy(childTask, parentTask)) {
+                throw new RuntimeException("Zależność tworzyłaby cykl, co jest niedozwolone");
+            }
+
+            childTask.setParentTask(parentTask);
+            parentTask.getChildTasks().add(childTask);
+
+            Task updatedTask = taskRepository.save(childTask);
+            taskRepository.save(parentTask);
+
+            return taskMapper.apply(updatedTask);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        }
+    }
+
+    public TaskDTO removeParentTask(Integer childTaskId) {
+        try {
+            Task childTask = taskRepository.findById(childTaskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+            if (childTask.getParentTask() != null) {
+                Task parentTask = childTask.getParentTask();
+                parentTask.getChildTasks().remove(childTask);
+                childTask.setParentTask(null);
+
+                taskRepository.save(parentTask);
+            }
+
+            Task updatedTask = taskRepository.save(childTask);
+            return taskMapper.apply(updatedTask);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+    }
+
+    public List<TaskDTO> getChildTasks(Integer taskId) {
+        try {
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+            return task.getChildTasks().stream()
+                    .map(taskMapper::apply)
+                    .collect(Collectors.toList());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+    }
+
+    public TaskDTO getParentTask(Integer taskId) {
+        try {
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+            if (task.getParentTask() == null) {
+                throw new EntityNotFoundException("Zadanie nie ma zadania nadrzędnego");
+            }
+
+            return taskMapper.apply(task.getParentTask());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+    }
+
+
+    private boolean isTaskInHierarchy(Task potentialParent, Task task) {
+        if (potentialParent.getId().equals(task.getId())) {
+            return true;
+        }
+
+        return task.getChildTasks().stream()
+                .anyMatch(childTask -> isTaskInHierarchy(potentialParent, childTask));
+    }
+
+
+    public boolean canTaskBeCompleted(Integer taskId) {
+        try {
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+            // Jeśli zadanie ma rodzica i rodzic nie jest zakończony, zwracamy false
+            if (task.getParentTask() != null && !task.getParentTask().isCompleted()) {
+                return false;
+            }
+
+            return true;
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+    }
+
+
+    public TaskDTO updateTaskCompletion(Integer taskId, boolean completed) {
+        try {
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+            if (completed && !canTaskBeCompleted(taskId)) {
+                throw new RuntimeException("Nie można zakończyć zadania przed zakończeniem zadań nadrzędnych");
+            }
+
+            task.setCompleted(completed);
+
+
+            if (!completed) {
+                updateDependentTasksCompletion(task);
+            }
+
+            Task updatedTask = taskRepository.save(task);
+            return taskMapper.apply(updatedTask);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        }
+    }
+
+
+    private void updateDependentTasksCompletion(Task parentTask) {
+        parentTask.getChildTasks().forEach(childTask -> {
+            if (childTask.isCompleted()) {
+                childTask.setCompleted(false);
+                taskRepository.save(childTask);
+                updateDependentTasksCompletion(childTask);
+            }
+        });
+    }
 }
