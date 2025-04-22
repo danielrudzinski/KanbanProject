@@ -61,8 +61,8 @@ public class TaskMapper implements Function<Task, TaskDTO> {
                 labels,
                 task.isCompleted(),
                 task.getDescription(),
-                parentTaskId,    // nowe pole
-                childTaskIds     // nowe pole
+                parentTaskId,    
+                childTaskIds
         );
     }
 }
