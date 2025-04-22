@@ -100,5 +100,5 @@ public class UserController {
             boolean isWithinLimit = userService.checkWipStatus(id);
             return ResponseEntity.ok(isWithinLimit);
         }
-    
+
 }

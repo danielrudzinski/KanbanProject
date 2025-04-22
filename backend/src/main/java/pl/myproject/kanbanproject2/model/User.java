@@ -9,10 +9,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,39 +47,40 @@ public class User implements UserDetails {
     @JoinColumn(name = "avatar_id")
     private File avatar;
 
+    //constructor for creating an unverified user
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }
 
-    @Override
-    public String getUsername() {
-        return "";
-    }
-
+    //TODO: add proper boolean checks
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;
     }
-
+    @Override
+    public String getUsername() {
+        return email;
+    }
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return enabled;
     }
 }
