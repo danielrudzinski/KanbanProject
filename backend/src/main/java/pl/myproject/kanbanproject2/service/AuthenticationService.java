@@ -1,4 +1,5 @@
 package pl.myproject.kanbanproject2.service;
+import io.jsonwebtoken.Jwt;
 import jakarta.mail.MessagingException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,6 +10,8 @@ import pl.myproject.kanbanproject2.dto.LoginUserDto;
 import pl.myproject.kanbanproject2.dto.VerifyUserDto;
 import pl.myproject.kanbanproject2.repository.UserRepository;
 import pl.myproject.kanbanproject2.model.User;
+import pl.myproject.kanbanproject2.response.LoginResponse;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
@@ -19,18 +22,22 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private final JwtService jwtService;
 
     public AuthenticationService(
             UserRepository userRepository,
             AuthenticationManager authenticationManager,
             PasswordEncoder passwordEncoder,
-            EmailService emailService
+            EmailService emailService,
+            JwtService jwtService
     ) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.jwtService = jwtService;
     }
+
 
     public User signup(RegisterUserDto input) {
         User user = new User(input.getUsername(), input.getEmail(), passwordEncoder.encode(input.getPassword()));
@@ -58,6 +65,7 @@ public class AuthenticationService {
         return user;
     }
 
+
     public void verifyUser(VerifyUserDto input) {
         Optional<User> optionalUser = userRepository.findByEmail(input.getEmail());
         if (optionalUser.isPresent()) {
@@ -76,6 +84,23 @@ public class AuthenticationService {
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+    public LoginResponse login(LoginUserDto input) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword())
+        );
+
+        User user = userRepository.findByEmail(input.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.isEnabled()) {
+            throw new RuntimeException("Account not verified. Please verify your account.");
+        }
+
+        String jwtToken = jwtService.generateToken(user);
+        long expiresIn = jwtService.getExpirationTime();
+
+        return new LoginResponse(jwtToken, expiresIn);
     }
 
     public void resendVerificationCode(String email) {
