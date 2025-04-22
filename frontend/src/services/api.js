@@ -16,9 +16,6 @@ export const fetchColumns = async (retries = 3) => {
       if (!response.ok) {
         throw new Error(`Error fetching columns: ${response.status}`);
       }
-      if (response.status === 204 || response.status === 200) {
-        return true; // No content or success
-      }
       return await response.json();
     } catch (error) {
       console.error('Error fetching columns:', error);
