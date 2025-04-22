@@ -40,6 +40,10 @@ public class AuthenticationService {
 
 
     public User signup(RegisterUserDto input) {
+        if (userRepository.findByEmail(input.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Użytkownik z podanym adresem e-mail już istnieje.");
+        }
+
         User user = new User(input.getUsername(), input.getEmail(), passwordEncoder.encode(input.getPassword()));
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
@@ -47,6 +51,7 @@ public class AuthenticationService {
         sendVerificationEmail(user);
         return userRepository.save(user);
     }
+
 
     public User authenticate(LoginUserDto input) {
         User user = userRepository.findByEmail(input.getEmail())
