@@ -69,7 +69,7 @@ function EditableText({
       ref={spanRef} 
       onDoubleClick={handleDoubleClick} 
       className={`editable-text ${className}`}
-      title={text} // Add tooltip for very long names
+      title={text}
       data-type={type}
     >
       {text}

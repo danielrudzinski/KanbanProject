@@ -1,34 +1,82 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { setupApiInterceptors } from './services/apiInterceptor';
+import { KanbanProvider } from './context/KanbanContext';
+import HomePage from './components/HomePage';
 import Board from './components/Board';
 import UsersManagement from './components/UsersManagement';
-import Bench from './components/Bench';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import Bench from './components/Bench';
 import './styles/App.css';
 
-function App() {
+setupApiInterceptors();
+
+const ProtectedRoute = ({ children }) => {
+  const { token, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <div>Loading authentication...</div>;
+  }
+  
+  if (!token) {
+    return <Navigate to="/" />;
+  }
+  
+  return children;
+};
+
+function Dashboard() {
   return (
-    <Router>
+    <KanbanProvider>
       <div className="app-container">
         <Header />
         <div className="content-container">
-          <Routes>
-            <Route path="/" element={<KanbanBoard />} />
-            <Route path="/users" element={<UsersManagement />} />
-          </Routes>
+          <div className="app">
+            <Bench />
+            <Board />
+          </div>
         </div>
         <Footer />
       </div>
-    </Router>
+    </KanbanProvider>
   );
 }
 
-function KanbanBoard() {
+function App() {
   return (
-    <div className="app">
-      <Bench />
-      <Board />
-    </div>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route 
+            path="/board" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/users" 
+            element={
+              <ProtectedRoute>
+                <KanbanProvider>
+                  <div className="app-container">
+                    <Header />
+                    <div className="content-container">
+                      <UsersManagement />
+                    </div>
+                    <Footer />
+                  </div>
+                </KanbanProvider>
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

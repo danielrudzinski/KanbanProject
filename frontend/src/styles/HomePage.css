@@ -1,0 +1,106 @@
+.home-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+  }
+  
+  .auth-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 400px;
+    max-width: 90%;
+  }
+  
+  .auth-container h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #333;
+  }
+  
+  .tabs {
+    display: flex;
+    margin-bottom: 2rem;
+  }
+  
+  .tabs button {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-bottom: 2px solid #ddd;
+    transition: all 0.3s;
+  }
+  
+  .tabs button.active {
+    border-bottom-color: #007bff;
+    color: #007bff;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #0056b3;
+  }
+  
+  button[type="submit"]:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    margin-bottom: 1rem;
+    font-size: 14px;
+  }
+  
+  .verification-form {
+    text-align: center;
+  }
+  
+  .verification-form h2 {
+    margin-bottom: 1rem;
+  }
+  
+  .verification-form p {
+    margin-bottom: 2rem;
+    color: #666;
+  }
+  
+  .resend-link {
+    margin-top: 1rem;
+    font-size: 14px;
+  }
+  
+  .resend-link span {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+  }

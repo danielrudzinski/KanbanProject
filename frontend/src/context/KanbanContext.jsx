@@ -628,7 +628,7 @@ export function KanbanProvider({ children }) {
   
   const handleDragOver = (e) => {
     if (e.preventDefault) {
-      e.preventDefault(); // Necessary to allow dropping
+      e.preventDefault();
     }
     
     e.dataTransfer.dropEffect = 'move';
@@ -674,7 +674,7 @@ export function KanbanProvider({ children }) {
     updateRowName: handleUpdateRowName,
     getUserWipLimit: handlegetUserWipLimit,
     updateUserWipLimit: handleUpdateUserWipLimit,
-    dragAndDrop // Export drag and drop handlers
+    dragAndDrop
   };
   
   return <KanbanContext.Provider value={value}>{children}</KanbanContext.Provider>;
