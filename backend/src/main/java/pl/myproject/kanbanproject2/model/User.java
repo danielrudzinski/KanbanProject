@@ -48,7 +48,7 @@ public class User implements UserDetails {
     @JoinColumn(name = "avatar_id")
     private File avatar;
 
-    //constructor for creating an unverified user
+
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
@@ -61,7 +61,7 @@ public class User implements UserDetails {
         return List.of();
     }
 
-    //TODO: add proper boolean checks
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

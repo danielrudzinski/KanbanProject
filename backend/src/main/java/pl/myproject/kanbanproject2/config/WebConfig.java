@@ -24,13 +24,13 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        // Find Jackson converter
+
         for (HttpMessageConverter<?> converter : converters) {
             if (converter instanceof MappingJackson2HttpMessageConverter) {
                 MappingJackson2HttpMessageConverter jacksonConverter =
                         (MappingJackson2HttpMessageConverter) converter;
 
-                // Add explicit support for charset=UTF-8
+
                 List<MediaType> supportedMediaTypes =
                         Arrays.asList(
                                 MediaType.APPLICATION_JSON,

@@ -70,7 +70,7 @@ public class UserController {
         @PostMapping("/{id}/avatar")
         public ResponseEntity<String> uploadAvatar (@PathVariable Integer id, @RequestParam("file") MultipartFile file){
             userService.uploadAvatar(id, file);
-            return ResponseEntity.ok("Avatar uploaded successfully!");
+            return ResponseEntity.ok("Avatar dodany pomyślnie!");
         }
 
         @GetMapping("/{id}/avatar")
@@ -86,7 +86,7 @@ public class UserController {
         @DeleteMapping("/{id}/avatar")
         public ResponseEntity<String> deleteAvatar (@PathVariable Integer id){
             userService.deleteAvatar(id);
-            return ResponseEntity.ok("Avatar deleted successfully!");
+            return ResponseEntity.ok("Avatar usunięty pomyślnie!");
         }
 
         @PatchMapping("/{id}/wip-limit")

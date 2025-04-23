@@ -1,8 +1,12 @@
 package pl.myproject.kanbanproject2.model;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "files")
+@Getter
+@Setter
 public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,37 +26,6 @@ public class File {
         this.data = data;
     }
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    // Gettery i settery
 }

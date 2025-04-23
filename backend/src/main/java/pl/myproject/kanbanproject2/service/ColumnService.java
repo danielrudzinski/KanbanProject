@@ -31,7 +31,7 @@ public class ColumnService {
     }
 
     public Column addNewColumn(Column column) {
-        // If position is not set, set it to the last position + 1
+
         if (column.getPosition() == null) {
             long count = columnRepository.count();
             column.setPosition((int) count + 1);

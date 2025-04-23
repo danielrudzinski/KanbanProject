@@ -77,7 +77,7 @@ public class SubTaskMapper {
                 .collect(Collectors.toList());
     }
 
-    // Metoda pomocnicza do aktualizacji istniejącej encji na podstawie DTO
+
     public void updateEntityFromDto(SubTaskDTO dto, SubTask entity) {
         if (dto == null || entity == null) {
             return;

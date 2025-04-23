@@ -34,7 +34,7 @@ public class SubTaskService {
     }
 
     public SubTask addSubTask(SubTask subTask) {
-        // If position is not set, set it to the last position + 1
+
         if (subTask.getPosition() == null) {
             long count = subTaskRepository.count();
             subTask.setPosition((int) count + 1);
