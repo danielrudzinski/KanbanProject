@@ -60,14 +60,28 @@ public class TaskService {
     }
 
     public void deleteTask(Integer id) {
-        try {
-            if (!taskRepository.existsById(id)) {
-                throw new EntityNotFoundException("Nie ma zadania o takim id");
-            }
-            taskRepository.deleteById(id);
-        } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+
+        if (task.getParentTask() != null) {
+            Task parent = task.getParentTask();
+            parent.getChildTasks().remove(task);
+            task.setParentTask(null);
+            taskRepository.save(parent);
         }
+
+
+        if (task.getChildTasks() != null && !task.getChildTasks().isEmpty()) {
+            for (Task child : task.getChildTasks()) {
+                child.setParentTask(null);
+                taskRepository.save(child);
+            }
+            task.getChildTasks().clear();
+        }
+
+
+        taskRepository.delete(task);
     }
 
     public TaskDTO getTaskById(Integer id) {
