@@ -126,7 +126,7 @@ public class AuthenticationService {
 
     private void sendVerificationEmail(User user) {
         String subject = "Account Verification";
-        String verificationCode = user.getVerificationCode();
+        String verificationCode = " " + user.getVerificationCode();
         String htmlMessage = "<html>"
                 + "<body style=\"font-family: Arial, sans-serif;\">"
                 + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
