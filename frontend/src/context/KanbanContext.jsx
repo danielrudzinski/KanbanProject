@@ -480,7 +480,8 @@ export function KanbanProvider({ children }) {
           const minChildPosition = Math.min(...childColumnPositions.filter(p => p >= 0));
           
           if (targetColumn && targetColumn.position > minChildPosition) {
-            toast.warning("Nie można przesunąć zadania nadrzędnego za jego zadania podrzędne");
+            const childTaskTitles = childTasks.map(childTask => `"${childTask.title}"`).join(", ");
+            toast.warning(`Nie mozesz zmienic pozycji zadania "${task.title}" przed ukonczeniem zadań: ${childTaskTitles}`);
             return;
           }
         }
