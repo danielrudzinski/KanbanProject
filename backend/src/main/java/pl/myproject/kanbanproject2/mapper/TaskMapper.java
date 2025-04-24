@@ -42,7 +42,7 @@ public class TaskMapper implements Function<Task, TaskDTO> {
         }
 
 
-        Set<Integer> childTaskIds = java.util.Collections.emptySet();
+        Set<Integer> childTaskIds = null;
         if (task.getChildTasks() != null && !task.getChildTasks().isEmpty()) {
             childTaskIds = task.getChildTasks().stream()
                     .map(Task::getId)
