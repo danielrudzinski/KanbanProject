@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { authService } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 import '../styles/HomePage.css';
