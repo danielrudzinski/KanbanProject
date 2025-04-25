@@ -462,8 +462,8 @@ export function KanbanProvider({ children }) {
     try {
       const task = tasks.find(t => t.id === taskId);
       if (!task) return;
-      const columnChanged = newColumnId !== undefined && newColumnId !== task.columnId;
-      const rowChanged = newRowId !== undefined && newRowId !== task.rowId;
+      const columnChanged = newColumnId !== undefined && newColumnId !== null && newColumnId !== "null" && newColumnId !== task.columnId;
+      const rowChanged = newRowId !== undefined && newRowId !== null && newRowId !== "null" && newRowId !== task.rowId;
       
       if (!columnChanged && !rowChanged) return;
       
@@ -602,7 +602,16 @@ export function KanbanProvider({ children }) {
         if (sourceColumnId === targetColumnId && sourceRowId === targetRowId) {
           return;
         }
-        handleMoveTask(taskId, targetColumnId, targetRowId);
+        
+        if (targetRowId && (!targetColumnId || targetColumnId === "null")) {
+          handleMoveTask(taskId, sourceColumnId, targetRowId);
+        } 
+        else if (targetColumnId && (!targetRowId || targetRowId === "null")) {
+          handleMoveTask(taskId, targetColumnId, sourceRowId);
+        }
+        else {
+          handleMoveTask(taskId, targetColumnId, targetRowId);
+        }
       } catch (err) {
         try {
           const taskId = e.dataTransfer.getData('taskId');
