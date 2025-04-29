@@ -373,3 +373,23 @@
   border-radius: 3px;
   background-color: rgba(255, 0, 0, 0.1);
 }
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(118, 119, 124, 0.3);
+  border-radius: 50%;
+  border-top-color: #76777c;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  display: inline;
+  vertical-align: middle;
+}

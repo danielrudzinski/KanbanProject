@@ -4,7 +4,6 @@ import AddTaskForm from './AddTaskForm';
 import AddBoardItemForm from './AddRowColumnForm';
 import WipLimitControl from './WipLimitControl';
 import { useAuth } from '../context/AuthContext';
-import logo from '../../public/kanban-logo.png';
 
 function Header() {
   const [activeForm, setActiveForm] = useState(null); // 'task', 'boardItem', or 'wip'
@@ -37,7 +36,7 @@ function Header() {
     <>
       <header className={`app-header ${isSticky ? 'sticky' : ''}`}>
         <Link to="/">
-          <img src={logo} alt="Kanban Logo" className="app-logo" />
+          <img src="/kanban-logo.png" alt="Kanban Logo" className="app-logo" />
           <h1 className="app-title">Tablica Kanban</h1>
           <p className="app-subtitle">Zarządzaj swoimi zadaniami efektywnie</p>
         </Link>

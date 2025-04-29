@@ -32,7 +32,12 @@ function Board() {
   }, [columns.length, rows.length]);
 
   if (loading) {
-    return <div className="board-loading">Loading kanban board...</div>;
+    return (
+      <div className="board-loading">
+        <span className="loading-spinner"></span>
+        <span className="loading-text">Loading kanban board...</span>
+      </div>
+    );
   }
 
   if (error) {
