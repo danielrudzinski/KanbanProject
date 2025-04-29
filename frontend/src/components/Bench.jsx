@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { fetchUsers, getUserAvatar, updateUserWipLimit } from '../services/api';
 import '../styles/components/Bench.css';
+import { toast } from 'react-toastify';
 
 function Bench() {
   const { refreshTasks } = useKanban();
@@ -43,6 +44,7 @@ function Bench() {
     } catch (error) {
       console.error('Error loading users:', error);
       setError('Wystąpił błąd podczas ładowania użytkowników');
+      toast.error(`Błąd podczas ładowania użytkowników: ${error.message}`);
       setLoading(false);
     }
   };
@@ -65,10 +67,11 @@ function Bench() {
     setIsOpen(!isOpen);
   };
 
-  const handleDragStart = (e, userId) => {
+  const handleDragStart = (e, userId, userName) => {
     e.dataTransfer.setData('application/user', JSON.stringify({ 
       userId: userId,
-      type: 'user'
+      type: 'user',
+      userName: userName
     }));
     e.dataTransfer.effectAllowed = 'copy';
   };
@@ -103,9 +106,13 @@ function Bench() {
         [userId]: false
       });
       
+      const userName = users.find(u => u.id === userId)?.name || 'użytkownika';
+      const limitText = newLimit ? newLimit : 'Unlimited';
+      toast.success(`Limit WIP dla ${userName} został zaktualizowany do ${limitText}`);
       refreshTasks();
     } catch (error) {
       console.error('Error updating WIP limit:', error);
+      toast.error(`Błąd podczas aktualizacji limitu WIP: ${error.message}`);
     }
   };
 
@@ -162,7 +169,7 @@ function Bench() {
               key={user.id} 
               className="user-card"
               draggable="true"
-              onDragStart={(e) => handleDragStart(e, user.id)}
+              onDragStart={(e) => handleDragStart(e, user.id, user.name)}
             >
               <div className="user-avatar">
                 <img 

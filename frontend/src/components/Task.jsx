@@ -5,6 +5,7 @@ import EditableText from './EditableText';
 import Xarrow from "react-xarrows";
 import { getUserAvatar, assignUserToTask, fetchSubTasksByTaskId, fetchTask, getChildTasks } from '../services/api';
 import { createPortal } from 'react-dom';
+import { toast } from 'react-toastify';
 import '../styles/components/Task.css';
 
 function Task({ task, columnId }) {
@@ -314,6 +315,7 @@ function Task({ task, columnId }) {
         
         if (userData.type === 'user') {
           const userId = userData.userId;
+          const userName = userData.userName || 'Unknown User';
           
           console.log(`Attempting to assign user ${userId} to task ${task.id}`);
           
@@ -326,6 +328,8 @@ function Task({ task, columnId }) {
             
             refreshTasks();
             setAssignmentError(null);
+            
+            toast.success(`Użytkownik ${userName} został przypisany do zadania "${task.title}"`);
           } catch (error) {
             setAssignmentError(error.message || 'Error assigning user to task');
             console.error('Error assigning user:', error.message);

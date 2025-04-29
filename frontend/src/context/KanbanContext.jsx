@@ -90,10 +90,12 @@ export function KanbanProvider({ children }) {
       setTasks(tasks.map(task => 
         task.id === taskId ? { ...task, title: newName } : task
       ));
+      toast.success(`Nazwa zadania została zaktualizowana`);
       return true;
     } catch (err) {
       console.error('Error updating task name:', err);
       setError(err.message);
+      toast.error(`Błąd podczas aktualizacji nazwy zadania: ${err.message}`);
       return false;
     }
   };
@@ -120,10 +122,12 @@ export function KanbanProvider({ children }) {
         });
       }
       
+      toast.success(`Nazwa kolumny została zaktualizowana`);
       return true;
     } catch (err) {
       console.error('Error updating column name:', err);
       setError(err.message);
+      toast.error(`Błąd podczas aktualizacji nazwy kolumny: ${err.message}`);
       return false;
     }
   };
@@ -134,10 +138,12 @@ export function KanbanProvider({ children }) {
       setRows(rows.map(row => 
         row.id === rowId ? { ...row, name: newName } : row
       ));
+      toast.success(`Nazwa wiersza została zaktualizowana`);
       return true;
     } catch (err) {
       console.error('Error updating row name:', err);
       setError(err.message);
+      toast.error(`Błąd podczas aktualizacji nazwy wiersza: ${err.message}`);
       return false;
     }
   };
@@ -147,6 +153,7 @@ export function KanbanProvider({ children }) {
       if (!columns || columns.length === 0) {
         const errorMessage = 'Nie ma żadnej kolumny. Dodaj najpierw kolumnę.';
         setError(errorMessage);
+        toast.error(errorMessage);
         await new Promise(resolve => setTimeout(resolve, 10));
         throw new Error(errorMessage);
       }
@@ -165,9 +172,11 @@ export function KanbanProvider({ children }) {
       }
       
       await refreshTasks();
+      toast.success(`Zadanie "${title}" zostało dodane`);
       return newTask;
     } catch (err) {
       setError(err.message);
+      toast.error(`Błąd podczas dodawania zadania: ${err.message}`);
       throw err;
     }
   };
@@ -267,9 +276,11 @@ export function KanbanProvider({ children }) {
       }));
       
       setColumns([...columns, newColumn]);
+      toast.success(`Kolumna "${name}" została dodana`);
       return newColumn;
     } catch (err) {
       setError(err.message);
+      toast.error(`Błąd podczas dodawania kolumny: ${err.message}`);
       throw err;
     }
   };
@@ -293,28 +304,30 @@ export function KanbanProvider({ children }) {
         });
       }
       
+      toast.success(`Wiersz "${name}" został dodany`);
       return newRow;
     } catch (err) {
       setError(err.message);
+      toast.error(`Błąd podczas dodawania wiersza: ${err.message}`);
       throw err;
     }
   };
 
   const handleUpdateWipLimit = async (columnId, newLimit) => {
     try {
+      const columnToUpdate = columns.find(col => String(col.id) === String(columnId));
+      const columnName = columnToUpdate ? columnToUpdate.name : 'kolumny';
+      
       await updateColumnWipLimit(columnId, newLimit);
       const updatedColumns = await fetchColumns();
-      const columnOrderMap = {};
-      columns.forEach((col, index) => {
-        columnOrderMap[col.id] = index;
-      });
-      
       const sortedUpdatedColumns = updatedColumns.sort((a, b) => a.position - b.position);
       
       setColumns(sortedUpdatedColumns);
+      toast.success(`Limit WIP dla ${columnName} został zaktualizowany do ${newLimit}`);
     } catch (err) {
       console.error('Failed to update WIP limit:', err);
       setError('Failed to update WIP limit. Please try again.');
+      toast.error(`Błąd podczas aktualizacji limitu WIP: ${err.message}`);
     }
   };
 
@@ -338,33 +351,45 @@ export function KanbanProvider({ children }) {
         )
       );
     
+      toast.success(`Limit WIP użytkownika został zaktualizowany do ${wipLimit}`);
       return result;
     } catch (err) {
       console.error('Error updating user WIP limit:', err);
       setError(err.message);
+      toast.error(`Błąd podczas aktualizacji limitu WIP użytkownika: ${err.message}`);
       throw err;
     }
   };
   
   const handleUpdateRowWipLimit = async (rowId, newLimit) => {
     try {
+      const rowToUpdate = rows.find(r => String(r.id) === String(rowId));
+      const rowName = rowToUpdate ? rowToUpdate.name : 'wiersza';
+      
       await updateRowWipLimit(rowId, newLimit);
       const updatedRows = await fetchRows();
       const sortedRows = updatedRows.sort((a, b) => a.position - b.position);
+      
       setRows(sortedRows);
+      toast.success(`Limit WIP dla ${rowName} został zaktualizowany do ${newLimit}`);
     } catch (err) {
       console.error('Failed to update row WIP limit:', err);
       setError('Failed to update row WIP limit. Please try again.');
+      toast.error(`Błąd podczas aktualizacji limitu WIP wiersza: ${err.message}`);
     }
   };
   
   const handleDeleteColumn = async (columnId) => {
     try {
+      const columnToDelete = columns.find(col => col.id === columnId);
+      const columnName = columnToDelete ? columnToDelete.name : 'kolumna';
+      
       const alternativeColumn = columns.find(col => col.id !== columnId);
       
       if (!alternativeColumn) {
         await deleteColumn(columnId);
         setColumns([]);
+        toast.info(`Ostatnia kolumna "${columnName}" została usunięta`);
         return;
       }
       
@@ -396,16 +421,21 @@ export function KanbanProvider({ children }) {
       
       setTasks(updatedTasks);
       await refreshTasks();
+      toast.success(`Kolumna "${columnName}" została usunięta`);
       
     } catch (err) {
       console.error('Error deleting column:', err);
       setError(err.message);
+      toast.error(`Błąd podczas usuwania kolumny: ${err.message}`);
       throw err;
     }
   };
   
   const handleDeleteRow = async (rowId) => {
     try {
+      const rowToDelete = rows.find(row => row.id === rowId);
+      const rowName = rowToDelete ? rowToDelete.name : 'wiersz';
+      
       const isLastRow = rows.length === 1;
       const tasksToUpdate = tasks.filter(task => task.rowId === rowId);
     
@@ -441,19 +471,31 @@ export function KanbanProvider({ children }) {
         setTasks(updatedTasks);
       }
       await refreshBoard();
+      
+      if (isLastRow) {
+        toast.info(`Ostatni wiersz "${rowName}" został usunięty`);
+      } else {
+        toast.success(`Wiersz "${rowName}" został usunięty`);
+      }
     } catch (err) {
       console.error('Error deleting row:', err);
       setError(err.message);
+      toast.error(`Błąd podczas usuwania wiersza: ${err.message}`);
       throw err;
     }
   };
   
   const handleDeleteTask = async (taskId) => {
     try {
+      const taskToDelete = tasks.find(task => task.id === taskId);
+      const taskTitle = taskToDelete ? taskToDelete.title : 'zadanie';
+      
       await deleteTask(taskId);
       setTasks(tasks.filter(task => task.id !== taskId));
+      toast.success(`Zadanie "${taskTitle}" zostało usunięte`);
     } catch (err) {
       setError(err.message);
+      toast.error(`Błąd podczas usuwania zadania: ${err.message}`);
       throw err;
     }
   };
@@ -488,20 +530,35 @@ export function KanbanProvider({ children }) {
       }
   
       let updatedTask = { ...task };
+      let targetColumnName = '';
+      let targetRowName = '';
   
       if (columnChanged) {
         await updateTaskColumn(taskId, newColumnId);
         updatedTask.columnId = newColumnId;
+        const targetColumn = columns.find(col => col.id === newColumnId);
+        targetColumnName = targetColumn ? targetColumn.name : '';
       }
   
       if (rowChanged) {
         await updateTaskRow(taskId, newRowId);
         updatedTask.rowId = newRowId;
+        const targetRow = rows.find(row => row.id === newRowId);
+        targetRowName = targetRow ? targetRow.name : '';
       }
       
       setTasks(tasks.map(t => t.id === taskId ? updatedTask : t));
+      
+      if (columnChanged && rowChanged) {
+        toast.success(`Zadanie "${task.title}" zostało przeniesione do kolumny "${targetColumnName}" i wiersza "${targetRowName}"`);
+      } else if (columnChanged) {
+        toast.success(`Zadanie "${task.title}" zostało przeniesione do kolumny "${targetColumnName}"`);
+      } else if (rowChanged) {
+        toast.success(`Zadanie "${task.title}" zostało przeniesione do wiersza "${targetRowName}"`);
+      }
     } catch (err) {
       setError(err.message);
+      toast.error(`Błąd podczas przenoszenia zadania: ${err.message}`);
       throw err;
     }
   };
@@ -513,8 +570,11 @@ export function KanbanProvider({ children }) {
       
       if (columnIndex === -1 || targetIndex === -1) return;
       
+      const movedColumn = columns[columnIndex];
+      const targetColumn = columns[targetIndex];
+      
       const newColumns = [...columns];
-      const [movedColumn] = newColumns.splice(columnIndex, 1);
+      newColumns.splice(columnIndex, 1);
       newColumns.splice(targetIndex, 0, movedColumn);
       setColumns(newColumns);
       
@@ -527,10 +587,11 @@ export function KanbanProvider({ children }) {
       });
       
       await Promise.all(updatePromises);
-      
+      toast.success(`Kolumna "${movedColumn.name}" została przesunięta`);
     } catch (err) {
       console.error('Error moving column:', err);
       setError(err.message);
+      toast.error(`Błąd podczas przesuwania kolumny: ${err.message}`);
       throw err;
     }
   };
@@ -541,8 +602,10 @@ export function KanbanProvider({ children }) {
       const targetIndex = rows.findIndex(row => row.id === targetRowId);
       
       if (rowIndex === -1 || targetIndex === -1 || rowId === targetRowId) return;
+      
+      const movedRow = rows[rowIndex];
       const newRows = [...rows];
-      const [movedRow] = newRows.splice(rowIndex, 1);
+      newRows.splice(rowIndex, 1);
       newRows.splice(targetIndex, 0, movedRow);
       
       setRows(newRows);
@@ -556,10 +619,11 @@ export function KanbanProvider({ children }) {
       });
       
       await Promise.all(updatePromises);
-      
+      toast.success(`Wiersz "${movedRow.name}" został przesunięty`);
     } catch (err) {
       console.error('Error moving row:', err);
       setError(err.message);
+      toast.error(`Błąd podczas przesuwania wiersza: ${err.message}`);
       throw err;
     }
   };
