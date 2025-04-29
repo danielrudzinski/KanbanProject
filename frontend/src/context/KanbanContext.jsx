@@ -23,6 +23,7 @@ import {
   updateColumnName,
   getUserWipLimit,
   updateUserWipLimit,
+  assignUserToTask,
 } from '../services/api';
 
 const KanbanContext = createContext();
@@ -504,35 +505,18 @@ export function KanbanProvider({ children }) {
     try {
       const task = tasks.find(t => t.id === taskId);
       if (!task) return;
+      
       const columnChanged = newColumnId !== undefined && newColumnId !== null && newColumnId !== "null" && newColumnId !== task.columnId;
       const rowChanged = newRowId !== undefined && newRowId !== null && newRowId !== "null" && newRowId !== task.rowId;
       
       if (!columnChanged && !rowChanged) return;
       
-      if (columnChanged) {
-        const targetColumn = columns.find(col => col.id === newColumnId);
-        
-        if (task.childTaskIds && task.childTaskIds.length > 0) {
-          const childTasks = tasks.filter(t => task.childTaskIds.includes(t.id));
-          const childColumnPositions = childTasks.map(childTask => {
-            const childColumn = columns.find(col => col.id === childTask.columnId);
-            return childColumn ? childColumn.position : -1;
-          });
-          
-          const minChildPosition = Math.min(...childColumnPositions.filter(p => p >= 0));
-          
-          if (targetColumn && targetColumn.position > minChildPosition) {
-            const childTaskTitles = childTasks.map(childTask => `"${childTask.title}"`).join(", ");
-            toast.warning(`Nie mozesz zmienic pozycji zadania "${task.title}" przed ukonczeniem zadań: ${childTaskTitles}`);
-            return;
-          }
-        }
-      }
-  
-      let updatedTask = { ...task };
       let targetColumnName = '';
       let targetRowName = '';
-  
+
+      const originalUserIds = task.userIds || [];
+      const updatedTask = { ...task };
+      
       if (columnChanged) {
         await updateTaskColumn(taskId, newColumnId);
         updatedTask.columnId = newColumnId;
@@ -543,23 +527,40 @@ export function KanbanProvider({ children }) {
       if (rowChanged) {
         await updateTaskRow(taskId, newRowId);
         updatedTask.rowId = newRowId;
+        
         const targetRow = rows.find(row => row.id === newRowId);
         targetRowName = targetRow ? targetRow.name : '';
       }
       
-      setTasks(tasks.map(t => t.id === taskId ? updatedTask : t));
-      
-      if (columnChanged && rowChanged) {
-        toast.success(`Zadanie "${task.title}" zostało przeniesione do kolumny "${targetColumnName}" i wiersza "${targetRowName}"`);
-      } else if (columnChanged) {
-        toast.success(`Zadanie "${task.title}" zostało przeniesione do kolumny "${targetColumnName}"`);
-      } else if (rowChanged) {
-        toast.success(`Zadanie "${task.title}" zostało przeniesione do wiersza "${targetRowName}"`);
+      if (originalUserIds.length > 0) {
+        for (const userId of originalUserIds) {
+          try {
+            await assignUserToTask(taskId, userId);
+          } catch (userErr) {
+            console.error(`Error reassigning user ${userId} to task ${taskId}:`, userErr);
+          }
+        }
       }
+      
+      updatedTask.userIds = originalUserIds;
+      setTasks(prevTasks => prevTasks.map(t => 
+        t.id === taskId ? updatedTask : t
+      ));
+      
+      let message = `Zadanie "${task.title}" zostało przeniesione`;
+      if (columnChanged && rowChanged) {
+        message += ` do kolumny "${targetColumnName}" i wiersza "${targetRowName}"`;
+      } else if (columnChanged) {
+        message += ` do kolumny "${targetColumnName}"`;
+      } else if (rowChanged) {
+        message += ` do wiersza "${targetRowName}"`;
+      }
+      
+      toast.success(message);
     } catch (err) {
+      console.error('Error moving task:', err);
       setError(err.message);
       toast.error(`Błąd podczas przenoszenia zadania: ${err.message}`);
-      throw err;
     }
   };
 
