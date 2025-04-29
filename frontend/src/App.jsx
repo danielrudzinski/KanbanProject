@@ -3,8 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { setupApiInterceptors } from './services/apiInterceptor';
 import { KanbanProvider } from './context/KanbanContext';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import HomePage from './components/HomePage';
 import Board from './components/Board';
 import UsersManagement from './components/UsersManagement';
@@ -57,7 +55,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
-                <ToastContainer position="bottom-right" autoClose={3000} />
               </ProtectedRoute>
             } 
           />

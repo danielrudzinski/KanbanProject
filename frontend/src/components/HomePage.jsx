@@ -15,7 +15,8 @@ const HomePage = () => {
   const [showVerification, setShowVerification] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+  const [longLoading, setLongLoading] = useState(false);
+
   const { login, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -27,6 +28,7 @@ const HomePage = () => {
         const expiration = localStorage.getItem('tokenExpiration');
         if (expiration && new Date().getTime() > parseInt(expiration)) {
           logout();
+          toast.info('Your session has expired. Please sign in again.');
           return;
         }
         
@@ -36,6 +38,22 @@ const HomePage = () => {
     
     validateToken();
   }, [token, isLoading, navigate, logout]);
+
+  useEffect(() => {
+    let timeoutId;
+    
+    if (loading) {
+      timeoutId = setTimeout(() => {
+        setLongLoading(true);
+      }, 5000);
+    } else {
+      setLongLoading(false);
+    }
+    
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [loading]);
   
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -45,9 +63,11 @@ const HomePage = () => {
     try {
       const response = await authService.login({ email, password });
       login(response.token, response.expiresIn);
+      toast.success('Successfully signed in!');
       navigate('/board');
     } catch (error) {
       setError(error.message);
+      toast.error('Login failed: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -60,10 +80,12 @@ const HomePage = () => {
     
     try {
       await authService.register({ username, email, password });
+      toast.success('Account created! Please verify your email.');
       setShowVerification(true);
       setVerificationEmail(email);
     } catch (error) {
       setError(error.message);
+      toast.error('Registration failed: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -81,6 +103,7 @@ const HomePage = () => {
       toast.success('Account verified successfully! Please log in.');
     } catch (error) {
       setError(error.message);
+      toast.error('Verification failed: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -118,9 +141,19 @@ const HomePage = () => {
               
               {error && <div className="error-message">{error}</div>}
               
-              <button type="submit" disabled={loading}>
-                {loading ? 'Verifying...' : 'Verify Account'}
+              <button type="submit" disabled={loading} className="auth-button">
+              {loading ? (
+                  <>
+                  <span className="loading-spinner"></span>
+                  <span className="loading-text">Verifying...</span>
+                  </>
+                ) : 'Verify Account'}
               </button>
+              {loading && longLoading && (  
+                <div className="long-loading-message">
+                  Please wait! We are working on handling this.
+                </div>
+              )}
               
               <p className="resend-link">
                 Didn't receive a code?{' '}
@@ -169,9 +202,19 @@ const HomePage = () => {
                   
                   {error && <div className="error-message">{error}</div>}
                   
-                  <button type="submit" disabled={loading}>
-                    {loading ? 'Signing In...' : 'Sign In'}
+                  <button type="submit" disabled={loading} className="auth-button">
+                    {loading ? (
+                      <>
+                        <span className="loading-spinner"></span>
+                        <span className="loading-text">Signing In...</span>
+                      </>
+                    ) : 'Sign In'}
                   </button>
+                  {loading && longLoading && (
+                    <div className="long-loading-message">
+                      Please wait! We are working on handling this.
+                    </div>
+                  )}
                 </form>
               ) : (
                 <form onSubmit={handleRegister}>
@@ -205,9 +248,19 @@ const HomePage = () => {
                   
                   {error && <div className="error-message">{error}</div>}
                   
-                  <button type="submit" disabled={loading}>
-                    {loading ? 'Registering...' : 'Register'}
-                  </button>
+                  <button type="submit" disabled={loading} className="auth-button">
+              {loading ? (
+                  <>
+                    <span className="loading-spinner"></span>
+                    <span className="loading-text">Registering...</span>
+                  </>
+                ) : 'Register'}
+              </button>
+              {loading && longLoading && (
+                <div className="long-loading-message">
+                  Please wait! We are working on handling this.
+                </div>
+              )}
                 </form>
               )}
             </div>
