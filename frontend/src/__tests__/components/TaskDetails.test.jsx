@@ -4,6 +4,16 @@ import '@testing-library/jest-dom';
 import TaskDetails from '../../components/TaskDetails';
 import * as api from '../../services/api';
 import { KanbanProvider } from '../../context/KanbanContext';
+import { toast } from 'react-toastify';
+
+jest.mock('react-toastify', () => ({
+  toast: {
+    error: jest.fn(),
+    success: jest.fn(),
+    info: jest.fn(),
+    warning: jest.fn()
+  }
+}));
 
 jest.mock('../../services/api');
 
@@ -385,6 +395,11 @@ describe('TaskDetails Component', () => {
   });
 
   test('allows canceling user removal', async () => {
+    api.fetchTask.mockResolvedValue({
+      ...mockTask,
+      userIds: [1, 3] 
+    });
+    
     renderTaskDetails();
     
     await waitFor(() => {
@@ -524,37 +539,42 @@ describe('TaskDetails Component', () => {
         'Error adding subtask:',
         expect.any(Error)
       );
+      expect(toast.error).toHaveBeenCalledWith('Wystąpił błąd podczas dodawania podzadania');
     });
   });
 
   test('handles error when deleting a subtask', async () => {
     api.deleteSubTask.mockRejectedValueOnce(new Error('Failed to delete subtask'));
-    
+  
     renderTaskDetails();
-    
+  
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
-    
+  
     const deleteButtons = await screen.findAllByTitle('Usuń podzadanie');
     fireEvent.click(deleteButtons[0]);
-    
+  
+    await waitFor(() => {
+      expect(screen.getByText(/Czy na pewno chcesz usunąć podzadanie:/)).toBeInTheDocument();
+    });
+  
     const confirmButton = screen.getByText('Tak');
     fireEvent.click(confirmButton);
-    
+  
     await waitFor(() => {
       expect(api.deleteSubTask).toHaveBeenCalled();
       expect(console.error).toHaveBeenCalledWith(
         'Error deleting subtask:',
         expect.any(Error)
       );
+      expect(toast.error).toHaveBeenCalledWith('Wystąpił błąd podczas usuwania podzadania');
     });
   });
 
   test('handles error when assigning a user to task', async () => {
     api.assignUserToTask.mockRejectedValueOnce(new Error('Failed to assign user'));
     console.error = jest.fn();
-    window.alert = jest.fn();
     
     renderTaskDetails();
     
@@ -583,7 +603,7 @@ describe('TaskDetails Component', () => {
         'Error assigning user:',
         expect.any(Error)
       );
-      expect(window.alert).toHaveBeenCalledWith('Wystąpił błąd podczas przypisywania użytkownika');
+      expect(toast.error).toHaveBeenCalledWith('Wystąpił błąd podczas przypisywania użytkownika');
     });
   });
 
@@ -593,8 +613,6 @@ describe('TaskDetails Component', () => {
         data: { message: 'User is already assigned to this task' }
       }
     });
-    
-    window.alert = jest.fn();
     
     renderTaskDetails();
     
@@ -612,7 +630,7 @@ describe('TaskDetails Component', () => {
     fireEvent.click(confirmButton);
     
     await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('Wystąpił błąd podczas przypisywania użytkownika');
+      expect(toast.error).toHaveBeenCalledWith('Wystąpił błąd podczas przypisywania użytkownika');
     });
         
     act(() => {
@@ -623,14 +641,14 @@ describe('TaskDetails Component', () => {
   test('handles removing a user from task', async () => {
     api.removeUserFromTask.mockResolvedValue({ success: true });
     
+    // Add this line to include userIds in the mock task
+    api.fetchTask.mockResolvedValue({
+      ...mockTask,
+      userIds: [1, 3] // IDs corresponding to the mockAssignedUsers
+    });
+    
     global.fetch = jest.fn().mockImplementation((url) => {
-      if (url.includes('/tasks/1/users')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(mockAssignedUsers)
-        });
-      }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+      // Keep your existing implementation
     });
   
     renderTaskDetails();
@@ -889,13 +907,32 @@ describe('TaskDetails Component', () => {
   });
   
   test('handles assigned user avatar loading errors', async () => {
-    api.getUserAvatar.mockRejectedValueOnce(new Error("Failed to load avatar"));
+    api.fetchTask.mockResolvedValueOnce({ 
+      ...mockTask,
+      userIds: [1, 3]
+    });
+    
+    api.getUserAvatar
+      .mockRejectedValueOnce(new Error("Failed to load avatar"))
+      .mockResolvedValueOnce('avatar-url.jpg');
+    
     renderTaskDetails();
+    
     await waitFor(() => {
       expect(screen.queryByText('Ładowanie...')).not.toBeInTheDocument();
     });
+    
+    await waitFor(() => {
+      expect(screen.getByText('Przypisani:')).toBeInTheDocument();
+    });
+    
     const avatarList = document.querySelector('.avatar-list');
     expect(avatarList).toBeInTheDocument();
+    
+    expect(console.error).toHaveBeenCalledWith(
+      'Error fetching user avatar:',
+      expect.any(Error)
+    );
   });
   
   test('handles subtask checkbox interaction edge cases', async () => {

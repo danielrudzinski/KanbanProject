@@ -8,11 +8,8 @@ afterEach(() => {
   cy.on('window:confirm', () => true);
   
   cy.deleteTasks();
-  cy.wait(500);
   cy.deleteColumns();
-  cy.wait(500);
   cy.deleteRows();
-  cy.wait(500);
 });
 
 describe('Row Management', () => {

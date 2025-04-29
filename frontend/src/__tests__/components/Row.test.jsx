@@ -3,6 +3,16 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Row from '../../components/Row';
 import KanbanContext from '../../context/KanbanContext';
+import { toast } from 'react-toastify';
+
+jest.mock('react-toastify', () => ({
+  toast: {
+    error: jest.fn(),
+    success: jest.fn(),
+    info: jest.fn(),
+    warning: jest.fn()
+  }
+}));
 
 jest.mock('../../components/EditableText', () => {
   return function MockEditableText({ id, text, onUpdate, type, className }) {
@@ -259,11 +269,7 @@ describe('Row Component', () => {
     );
   });
 
-  test('shows alert when trying to delete the last row', () => {
-    const originalAlert = window.alert;
-    const mockAlert = jest.fn();
-    window.alert = mockAlert;
-
+  test('shows toast warning when trying to delete the last row', () => {
     const singleRowContext = {
       ...mockContextValue,
       rows: [mockRow]
@@ -278,11 +284,9 @@ describe('Row Component', () => {
     const deleteButton = screen.getByTitle('Usuń wiersz');
     fireEvent.click(deleteButton);
     
-    expect(mockAlert).toHaveBeenCalledWith('Nie można usunąć ostatniego wiersza.');
+    expect(toast.warning).toHaveBeenCalledWith('Nie można usunąć ostatniego wiersza.');
     expect(screen.queryByText('Czy na pewno chcesz usunąć ten wiersz?')).not.toBeInTheDocument();
     expect(mockDeleteRow).not.toHaveBeenCalled();
-
-    window.alert = originalAlert;
   });
 
   test('does not show exceeded WIP limit warning when tasks do not exceed limit', () => {

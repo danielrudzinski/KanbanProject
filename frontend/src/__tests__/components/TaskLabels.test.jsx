@@ -3,11 +3,21 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import TaskLabels from '../../components/TaskLabels';
 import { addLabelToTask, removeLabelFromTask, getAllLabels } from '../../services/api';
 import KanbanContext from '../../context/KanbanContext';
+import { toast } from 'react-toastify';
 
 jest.mock('../../services/api', () => ({
   addLabelToTask: jest.fn(),
   removeLabelFromTask: jest.fn(),
   getAllLabels: jest.fn()
+}));
+
+jest.mock('react-toastify', () => ({
+  toast: {
+    error: jest.fn(),
+    success: jest.fn(),
+    info: jest.fn(),
+    warning: jest.fn()
+  }
 }));
 
 jest.mock('react-dom', () => {
@@ -320,8 +330,6 @@ describe('TaskLabels Component', () => {
   });
   
   test('prevents adding duplicate labels', async () => {
-    global.alert = jest.fn();
-    
     await act(async () => {
       render(
         <KanbanContext.Provider value={mockContextValue}>
@@ -345,15 +353,14 @@ describe('TaskLabels Component', () => {
     });
     
     await waitFor(() => {
-      expect(global.alert).toHaveBeenCalledWith('Ta etykieta została już dodana do zadania');
+      expect(toast.warning).toHaveBeenCalledWith('Ta etykieta została już dodana do zadania');
       expect(addLabelToTask).not.toHaveBeenCalled();
     });
   });
   
   test('handles API errors gracefully when adding labels', async () => {
     addLabelToTask.mockRejectedValue(new Error('API error'));
-    global.alert = jest.fn();
-    global.console.error = jest.fn();
+    console.error = jest.fn();
     
     await act(async () => {
       render(
@@ -380,14 +387,13 @@ describe('TaskLabels Component', () => {
     await waitFor(() => {
       expect(addLabelToTask).toHaveBeenCalledWith(1, 'High Priority');
       expect(console.error).toHaveBeenCalled();
-      expect(global.alert).toHaveBeenCalledWith('Wystąpił błąd podczas dodawania etykiety');
+      expect(toast.error).toHaveBeenCalledWith('Wystąpił błąd podczas dodawania etykiety');
     });
   });
   
   test('handles API errors gracefully when removing labels', async () => {
     removeLabelFromTask.mockRejectedValue(new Error('API error'));
-    global.alert = jest.fn();
-    global.console.error = jest.fn();
+    console.error = jest.fn();
     
     await act(async () => {
       render(
@@ -409,7 +415,8 @@ describe('TaskLabels Component', () => {
     await waitFor(() => {
       expect(removeLabelFromTask).toHaveBeenCalledWith(1, 'Bug');
       expect(console.error).toHaveBeenCalled();
-      expect(global.alert).toHaveBeenCalledWith('Wystąpił błąd podczas usuwania etykiety');
+      expect(toast.error).toHaveBeenCalledWith('Wystąpił błąd podczas usuwania etykiety');
     });
   });
+
 });

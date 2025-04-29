@@ -2,6 +2,16 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import KanbanContext from '../../context/KanbanContext';
 import Board from '../../components/Board';
+import { toast } from 'react-toastify';
+
+jest.mock('react-toastify', () => ({
+  toast: {
+    error: jest.fn(),
+    success: jest.fn(),
+    info: jest.fn(),
+    warning: jest.fn()
+  }
+}));
 
 jest.mock('../../components/Task', () => {
   return function MockTask({ task, columnId }) {
@@ -274,14 +284,11 @@ describe('Board Component', () => {
       );
   });
         
-  test('shows alert when trying to delete the last row', () => {
+  test('shows toast error when trying to delete the last row', () => {
     const singleRowContext = {
       ...mockContextValue,
       rows: [mockRows[0]]
     };
-            
-    const originalAlert = window.alert;
-    window.alert = jest.fn();
             
     render(
       <KanbanContext.Provider value={singleRowContext}>
@@ -291,13 +298,9 @@ describe('Board Component', () => {
             
     const deleteButton = screen.getByTitle('Usuń wiersz');
     fireEvent.click(deleteButton);
-    expect(window.alert).toHaveBeenCalledWith(
-      'Nie można usunąć ostatniego wiersza.'
-    );
-            
-     expect(mockContextValue.deleteRow).not.toHaveBeenCalled();
-
-     window.alert = originalAlert;
+    
+    expect(toast.error).toHaveBeenCalledWith('Nie można usunąć ostatniego wiersza.');
+    expect(mockContextValue.deleteRow).not.toHaveBeenCalled();
   });
         
   test('shows loading state correctly', () => {
