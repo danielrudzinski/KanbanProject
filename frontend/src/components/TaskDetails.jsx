@@ -5,6 +5,7 @@ import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAva
 import '../styles/components/TaskDetails.css';
 import TaskLabels from './TaskLabels';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const { refreshTasks } = useKanban();
@@ -36,6 +37,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const [showParentSelector, setShowParentSelector] = useState(false);
   const [selectedParentId, setSelectedParentId] = useState('');
   const [childTasks, setChildTasks] = useState([]);
+  const { t } = useTranslation();
 
   const panelRef = useRef(null);
   const descriptionInputRef = useRef(null);
@@ -106,7 +108,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         );
       }
       
-      // Move these blocks OUTSIDE the userIds conditional
       if (taskData.parentTaskId) {
         try {
           const parentTaskData = await fetchTask(taskData.parentTaskId);
@@ -130,14 +131,14 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       setAssignedUsers(assignedData);
       const usersData = await fetchUsers();
       setUsers(usersData || []);
-    const subtasksData = await fetchSubTasksByTaskId(task.id);
-    setSubtasks(subtasksData || []);
-    const description = taskData.description || '';
-    setTaskDescription(description);
-    setOriginalTaskDescription(description);
-    setTaskTitle(taskData.title);
-    setOriginalTaskTitle(taskData.title);
-    setTaskLabels(taskData.labels || []);
+      const subtasksData = await fetchSubTasksByTaskId(task.id);
+      setSubtasks(subtasksData || []);
+      const description = taskData.description || '';
+      setTaskDescription(description);
+      setOriginalTaskDescription(description);
+      setTaskTitle(taskData.title);
+      setOriginalTaskTitle(taskData.title);
+      setTaskLabels(taskData.labels || []);
       
       // load avatars
       if (assignedData.length > 0) {
@@ -194,7 +195,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       refreshTasks();
     } catch (error) {
       console.error('Error saving task title:', error);
-      toast.error('Wystąpił błąd podczas zapisywania tytułu zadania');
+      toast.error(t('notifications.errorOccurred', { message: error.message }));
     }
   };
   
@@ -216,7 +217,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       }, 3000);
     } catch (error) {
       console.error('Error saving task description:', error);
-      toast.error('Wystąpił błąd podczas zapisywania opisu zadania');
+      toast.error(t('notifications.errorOccurred', { message: error.message }));
     }
   };
   
@@ -554,7 +555,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     return createPortal(
       <div className="task-details-overlay">
         <div className="task-details-panel loading">
-          <p>Ładowanie...</p>
+          <p>{t('board.loading')}</p>
         </div>
       </div>,
       document.body
@@ -598,7 +599,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
               className="title-input"
-              placeholder="Wprowadź tytuł zadania"
+              placeholder={t('taskActions.editTitle')}
             />
           <div className="title-edit-actions">
             <button
@@ -606,13 +607,13 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               className="save-title-btn"
               disabled={!taskTitle.trim()}
             >
-              Zapisz
+              {t('taskActions.yes')}
             </button>
             <button
               onClick={cancelEditingTaskTitle}
               className="cancel-title-btn"
             >
-              Anuluj
+              {t('taskActions.no')}
             </button>
           </div>
         </div>
@@ -623,7 +624,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
             <button
               className="edit-title-btn"
               onClick={startEditingTaskTitle}
-              title="Edytuj tytuł zadania"
+              title={t('taskActions.editTitle')}
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -632,7 +633,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
             <button 
               className="assign-user-icon" 
               onClick={() => setShowAssignForm(!showAssignForm)}
-              title="Przypisz użytkownika"
+              title={t('bench.title')}
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -656,12 +657,12 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
           {/* Task Description Section */}
           <div className="task-description-section">
           <div className="description-header">
-            <h4>Opis zadania:</h4>
+            <h4>{t('taskActions.description')}:</h4>
             {!editingTaskDescription && (
               <button 
                 onClick={startEditingTaskDescription}
                 className="edit-description-btn"
-                title="Edytuj opis zadania"
+                title={t('taskActions.editTitle')}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -676,7 +677,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                 ref={taskDescriptionInputRef}
                 value={taskDescription} 
                 onChange={(e) => setTaskDescription(e.target.value)}
-                placeholder="Wprowadź opis zadania"
+                placeholder={t('taskActions.description')}
                 className="description-textarea"
                 rows={4}
               ></textarea>
@@ -685,13 +686,13 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                   onClick={saveTaskDescription}
                   className="save-description-btn"
                 >
-                  Zapisz
+                  {t('taskActions.yes')}
                 </button>
                 <button 
                   onClick={cancelEditingTaskDescription}
                   className="cancel-edit-btn"
                 >
-                  Anuluj
+                  {t('taskActions.no')}
                 </button>
               </div>
             </div>
@@ -700,7 +701,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               {taskDescription ? (
                 <p className="description-content">{taskDescription}</p>
               ) : (
-                <p className="empty-description">Brak opisu. Kliknij ikonę edycji, aby dodać opis.</p>
+                <p className="empty-description">{t('taskActions.noDescription')}</p>
               )}
             </div>
           )}
@@ -710,7 +711,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         {showAssignForm && (
           <div className="assign-user-dropdown">
             <div className="dropdown-header">
-              <h4>Przypisz użytkownika</h4>
+              <h4>{t('bench.title')}</h4>
               <button 
                 className="close-dropdown" 
                 onClick={() => setShowAssignForm(false)}
@@ -722,7 +723,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               value={selectedUserId}
               onChange={(e) => setSelectedUserId(e.target.value)}
             >
-              <option value="">Wybierz użytkownika</option>
+              <option value="">{t('forms.wipLimit.selectUser')}</option>
               {users
                 .filter(user => !assignedUsers.some(assignedUser => assignedUser.id === user.id))
                 .map(user => (
@@ -737,21 +738,21 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               disabled={!selectedUserId}
               className="assign-btn"
             >
-              Przypisz
+              {t('taskActions.yes')}
             </button>
           </div>
         )}
   
         {/* Subtasks Section */}
         <div className="subtasks-section">
-          <h4>Podzadania</h4>
+          <h4>{t('taskActions.subtasks')}</h4>
           
           <div className="add-subtask-form">
             <input
               type="text"
               value={newSubtaskTitle}
               onChange={(e) => setNewSubtaskTitle(e.target.value)}
-              placeholder="Nazwa podzadania"
+              placeholder={t('taskActions.subtasks')}
               className="subtask-input"
             />
             <button 
@@ -759,7 +760,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               disabled={!newSubtaskTitle.trim()}
               className="add-subtask-btn"
             >
-              Dodaj
+              {t('header.addTask')}
             </button>
           </div>
           
@@ -786,17 +787,17 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                       <button
                         className="description-toggle-btn dark-bg-with-text"
                         onClick={() => toggleSubtaskExpansion(subtask.id)}
-                        title={expandedSubtaskId === subtask.id ? "Ukryj opis" : "Pokaż opis"}
+                        title={expandedSubtaskId === subtask.id ? t('taskActions.hideDetails') : t('taskActions.showDetails')}
                       >
                         <span className={expandedSubtaskId === subtask.id ? "arrow-icon rotated" : "arrow-icon"}>
                           ▼
                         </span>
-                        <span className="button-text">{expandedSubtaskId === subtask.id ? "Ukryj" : "Opis"}</span>
+                        <span className="button-text">{expandedSubtaskId === subtask.id ? t('taskActions.hideDetails') : t('taskActions.showDetails')}</span>
                       </button>
                       <button
                         className="delete-subtask-btn"
                         onClick={() => confirmdeleteSubTask(subtask.id)}
-                        title="Usuń podzadanie"
+                        title={t('taskActions.delete')}
                       >
                         ×
                       </button>
@@ -811,7 +812,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                             ref={descriptionInputRef}
                             value={subtaskDescription} 
                             onChange={(e) => setSubtaskDescription(e.target.value)}
-                            placeholder="Wprowadź opis podzadania"
+                            placeholder={t('taskActions.description')}
                             className="description-textarea"
                             rows={4}
                           ></textarea>
@@ -820,24 +821,24 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                               onClick={saveSubtaskDescription}
                               className="save-description-btn"
                             >
-                              Zapisz
+                              {t('taskActions.yes')}
                             </button>
                             <button 
                               onClick={cancelEditingDescription}
                               className="cancel-edit-btn"
                             >
-                              Anuluj
+                              {t('taskActions.no')}
                             </button>
                           </div>
                         </div>
                       ) : (
                         <div className="description-display">
                           <div className="description-header">
-                            <h5>Opis:</h5>
+                            <h5>{t('taskActions.description')}:</h5>
                             <button 
                               onClick={startEditingSubTaskDescription}
                               className="edit-description-btn"
-                              title="Edytuj opis"
+                              title={t('taskActions.editTitle')}
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -847,7 +848,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                           {subtaskDescription ? (
                             <p className="description-content">{subtaskDescription}</p>
                           ) : (
-                            <p className="empty-description">Brak opisu. Kliknij ikonę edycji, aby dodać opis.</p>
+                            <p className="empty-description">{t('taskActions.noDescription')}</p>
                           )}
                         </div>
                       )}
@@ -857,7 +858,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               ))}
             </div>
           ) : (
-            <p className="no-subtasks">Brak podzadań</p>
+            <p className="no-subtasks">{t('taskActions.noSubtasks')}</p>
           )}
         </div>
   
@@ -868,20 +869,20 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
           onClick={canceldeleteSubTask}
           >
             <div className="delete-confirmation-dialog">
-              <h4>Potwierdź usunięcie</h4>
-              <p>Czy na pewno chcesz usunąć podzadanie: <strong>{subtaskToDelete.title}</strong>?</p>
+              <h4>{t('taskActions.confirmDelete')}</h4>
+              <p>{t('taskActions.confirmDelete')} <strong>{subtaskToDelete.title}</strong>?</p>
               <div className="confirmation-actions">
                 <button 
                   onClick={handledeleteSubTask}
                   className="confirm-btn"
                 >
-                  Tak
+                  {t('taskActions.yes')}
                 </button>
                 <button 
                   onClick={canceldeleteSubTask}
                   className="cancel-btn"
                 >
-                  Nie
+                  {t('taskActions.no')}
                 </button>
               </div>
             </div>
@@ -895,20 +896,20 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
            onClick={canceldeleteSubTask}
            >
             <div className="delete-confirmation-dialog">
-              <h4>Potwierdź usunięcie</h4>
-              <p>Czy na pewno chcesz usunąć użytkownika: <strong>{userToDelete.name}</strong> z tego zadania?</p>
+              <h4>{t('taskActions.confirmDeleteAssignedUser')}</h4>
+              <p>{t('taskActions.confirmDeleteAssignedUser')} <strong>{userToDelete.name}</strong>?</p>
               <div className="confirmation-actions">
                 <button 
                   onClick={handleRemoveUser}
                   className="confirm-btn"
                 >
-                  Tak
+                  {t('taskActions.yes')}
                 </button>
                 <button 
                   onClick={cancelRemoveUser}
                   className="cancel-btn"
                 >
-                  Nie
+                  {t('taskActions.no')}
                 </button>
               </div>
             </div>
@@ -916,7 +917,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         )}
         </div>
         <div className="task-labels-section">
-        <h4>Etykiety</h4>
+        <h4>Labels</h4>
         <TaskLabels
           taskId={task.id}
           initialLabels={taskLabels}
@@ -926,28 +927,28 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
 
         {/* Parent Task section */}
         <div className="task-parent-section">
-          <h4>Zadanie nadrzędne</h4>
+          <h4>Parent Task</h4>
     
         {parentTask ? (
           <div className="current-parent-task">
-            <p>Obecnie: <strong>{parentTask.title}</strong></p>
+            <p>Current: <strong>{parentTask.title}</strong></p>
             <button 
               onClick={handleRemoveParent}
               className="remove-parent-btn"
-              title="Usuń zadanie nadrzędne"
+              title={t('taskActions.delete')}
             >
-              Usuń powiązanie
+              Remove link
             </button>
           </div>
        ) : (
-          <p className="no-parent">Brak zadania nadrzędnego</p>
+          <p className="no-parent">No parent task</p>
         )}
     
         <button
           className="assign-parent-btn"
           onClick={handleShowParentSelector}
         >
-          {parentTask ? 'Zmień zadanie nadrzędne' : 'Przypisz zadanie nadrzędne'}
+          {parentTask ? 'Change parent task' : 'Assign parent task'}
         </button>
     
         {showParentSelector && (
@@ -956,7 +957,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               value={selectedParentId}
               onChange={(e) => setSelectedParentId(e.target.value)}
             >
-              <option value="">Wybierz zadanie nadrzędne</option>
+              <option value="">{t('forms.wipLimit.selectUser')}</option>
               {availableTasks.map(availableTask => (
                 <option key={availableTask.id} value={availableTask.id}>
                 {availableTask.title}
@@ -969,13 +970,13 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                 disabled={!selectedParentId}
                 className="confirm-parent-btn"
               >
-                Przypisz
+                {t('taskActions.yes')}
               </button>
               <button 
                 onClick={() => setShowParentSelector(false)}
                 className="cancel-parent-btn"
               >
-                Anuluj
+                {t('taskActions.no')}
               </button>
             </div>
           </div>
@@ -983,7 +984,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     
         {childTasks.length > 0 && (
           <div className="child-tasks-section">
-            <h5>Zadania podrzędne:</h5>
+            <h5>Child Tasks:</h5>
             <ul className="child-tasks-list">
               {childTasks.map(childTask => (
                 <li key={childTask.id} className="child-task-item">
@@ -998,7 +999,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         {/* Assigned users section */}
         {assignedUsers.length > 0 && (
           <div className="assigned-users-bar">
-            <span>Przypisani:</span>
+            <span>{t('bench.title')}:</span>
             <div className="avatar-list">
               {assignedUsers.map(user => (
                 <div key={user.id} className="avatar-item" title={user.name}>
@@ -1006,7 +1007,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                   <button 
                     className="remove-user-btn"
                     onClick={() => confirmRemoveUser(user.id)}
-                    title="Usuń użytkownika"
+                    title={t('taskActions.delete')}
                   >
                     ×
                   </button>
@@ -1018,7 +1019,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   
         {success && (
           <div className="success-message">
-            Operacja zakończona pomyślnie!
+            {t('notifications.taskUpdated')}
           </div>
         )}
       </div>

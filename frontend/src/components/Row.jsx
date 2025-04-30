@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import EditableText from './EditableText';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import '../styles/components/Row.css';
 
 function Row({ row, children }) {
@@ -9,12 +10,13 @@ function Row({ row, children }) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const { handleDragStart, handleDragOver, handleDrop } = dragAndDrop;
   const { rows } = useKanban();
+  const { t } = useTranslation();
 
   const handleDeleteClick = () => {
     if (rows.length > 1) {
       setIsConfirmingDelete(true);
     } else {
-      toast.warning('Nie można usunąć ostatniego wiersza.');
+      toast.warning(t('row.lastRowWarning'));
     }
   };
 
@@ -79,18 +81,18 @@ function Row({ row, children }) {
 
         {row.wipLimit > 0 && (
           <span className={`wip-limit ${isOverLimit ? 'exceeded' : ''}`}>
-            Limit: {row.wipLimit}
-            {isOverLimit && ' (przekroczony!)'}
+            {t('row.wipLimit')}: {row.wipLimit}
+            {isOverLimit && ` (${t('row.wipExceeded')})`}
           </span>
         )}
       </div>
 
       {isConfirmingDelete && (
         <div className="delete-confirmation">
-          <p>Czy na pewno chcesz usunąć ten wiersz?</p>
+          <p>{t('row.deleteConfirm')}</p>
           <div className="confirmation-buttons">
-            <button onClick={handleConfirmDelete}>Tak</button>
-            <button onClick={handleCancelDelete}>Nie</button>
+            <button onClick={handleConfirmDelete}>{t('taskActions.yes')}</button>
+            <button onClick={handleCancelDelete}>{t('taskActions.no')}</button>
           </div>
         </div>
       )}

@@ -6,6 +6,7 @@ import Xarrow from "react-xarrows";
 import { getUserAvatar, assignUserToTask, fetchSubTasksByTaskId, fetchTask, getChildTasks } from '../services/api';
 import { createPortal } from 'react-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import '../styles/components/Task.css';
 
 function Task({ task, columnId }) {
@@ -29,6 +30,8 @@ function Task({ task, columnId }) {
   const descriptionBtnRef = useRef(null);
   const taskRef = useRef(null);
   const warningTimeoutRef = useRef(null);
+
+  const { t } = useTranslation();
 
   const checkUnfinishedSubtasks = useCallback(async () => {
     try {
@@ -452,7 +455,7 @@ function Task({ task, columnId }) {
           
           <button 
             className="delete-btn" 
-            title="Usuń zadanie"
+            title={t('taskActions.delete')}
             onClick={handleDeleteClick}
           >
             ×
@@ -464,10 +467,10 @@ function Task({ task, columnId }) {
           <button 
             ref={descriptionBtnRef}
             className="description-dropdown-btn"
-            title={showDescription ? 'Ukryj szczegóły' : 'Pokaż szczegóły'}
+            title={showDescription ? t('taskActions.hideDetails') : t('taskActions.showDetails')}
             onClick={handleDescriptionToggle}
           >
-            {showDescription ? 'Ukryj szczegóły ▲' : 'Pokaż szczegóły ▼'}
+            {showDescription ? `${t('taskActions.hideDetails')} ▲` : `${t('taskActions.showDetails')} ▼`}
           </button>
         </div>
         
@@ -599,10 +602,14 @@ function Task({ task, columnId }) {
       {isConfirmingDelete && (
         <div className="delete-modal-overlay" onClick={handleCancelDelete}>
           <div className="delete-modal" onClick={e => e.stopPropagation()}>
-            <p>Czy na pewno chcesz usunąć to zadanie?</p>
+            <p>{t('taskActions.confirmDelete')}</p>
             <div className="confirmation-buttons">
-              <button className="confirm-delete-btn" onClick={handleConfirmDelete}>Tak</button>
-              <button className="cancel-delete-btn" onClick={handleCancelDelete}>Nie</button>
+              <button className="confirm-delete-btn" onClick={handleConfirmDelete}>
+                {t('taskActions.yes')}
+              </button>
+              <button className="cancel-delete-btn" onClick={handleCancelDelete}>
+                {t('taskActions.no')}
+              </button>
             </div>
           </div>
         </div>

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { authService } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 import '../styles/HomePage.css';
 
 const HomePage = () => {
@@ -16,7 +18,8 @@ const HomePage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [longLoading, setLongLoading] = useState(false);
-
+  
+  const { t } = useTranslation();
   const { login, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -28,7 +31,7 @@ const HomePage = () => {
         const expiration = localStorage.getItem('tokenExpiration');
         if (expiration && new Date().getTime() > parseInt(expiration)) {
           logout();
-          toast.info('Your session has expired. Please sign in again.');
+          toast.info(t('auth.sessionExpired', 'Your session has expired. Please sign in again.'));
           return;
         }
         
@@ -37,7 +40,7 @@ const HomePage = () => {
     };
     
     validateToken();
-  }, [token, isLoading, navigate, logout]);
+  }, [token, isLoading, navigate, logout, t]);
 
   useEffect(() => {
     let timeoutId;
@@ -63,11 +66,11 @@ const HomePage = () => {
     try {
       const response = await authService.login({ email, password });
       login(response.token, response.expiresIn);
-      toast.success('Successfully signed in!');
+      toast.success(t('auth.loginSuccess', 'Successfully signed in!'));
       navigate('/board');
     } catch (error) {
       setError(error.message);
-      toast.error('Login failed: ' + error.message);
+      toast.error(t('auth.loginFailed', 'Login failed:') + ' ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -80,12 +83,12 @@ const HomePage = () => {
     
     try {
       await authService.register({ username, email, password });
-      toast.success('Account created! Please verify your email.');
+      toast.success(t('auth.registerSuccess', 'Account created! Please verify your email.'));
       setShowVerification(true);
       setVerificationEmail(email);
     } catch (error) {
       setError(error.message);
-      toast.error('Registration failed: ' + error.message);
+      toast.error(t('auth.registerFailed', 'Registration failed:') + ' ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -100,10 +103,10 @@ const HomePage = () => {
       await authService.verifyAccount({ email: verificationEmail, verificationCode });
       setActiveTab('login');
       setShowVerification(false);
-      toast.success('Account verified successfully! Please log in.');
+      toast.success(t('auth.verifySuccess', 'Account verified successfully! Please log in.'));
     } catch (error) {
       setError(error.message);
-      toast.error('Verification failed: ' + error.message);
+      toast.error(t('auth.verifyFailed', 'Verification failed:') + ' ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -112,7 +115,7 @@ const HomePage = () => {
   const handleResendCode = async () => {
     try {
       await authService.resendVerificationCode(verificationEmail);
-      toast.info('Verification code sent to your email.');
+      toast.info(t('auth.codeSent', 'Verification code sent to your email.'));
     } catch (error) {
       setError(error.message);
     }
@@ -120,19 +123,22 @@ const HomePage = () => {
   
   return (
     <div className="home-container">
+      <div className="language-switcher-container">
+        <LanguageSwitcher />
+      </div>
       <div className="auth-container">
-        <h1>Kanban Project</h1>
+        <h1>{t('board.title', 'Kanban Project')}</h1>
         
         {showVerification ? (
           <div className="verification-form">
-            <h2>Verify Your Account</h2>
-            <p>Enter the verification code sent to your email</p>
+            <h2>{t('auth.verifyAccount', 'Verify Your Account')}</h2>
+            <p>{t('auth.enterCode', 'Enter the verification code sent to your email')}</p>
             
             <form onSubmit={handleVerify}>
               <div className="form-group">
                 <input
                   type="text"
-                  placeholder="Verification Code"
+                  placeholder={t('auth.verificationCode', 'Verification Code')}
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
                   required
@@ -145,19 +151,19 @@ const HomePage = () => {
               {loading ? (
                   <>
                   <span className="loading-spinner"></span>
-                  <span className="loading-text">Verifying...</span>
+                  <span className="loading-text">{t('auth.verifying', 'Verifying...')}</span>
                   </>
-                ) : 'Verify Account'}
+                ) : t('auth.verifyAccount', 'Verify Account')}
               </button>
               {loading && longLoading && (  
                 <div className="long-loading-message">
-                  Please wait! We are working on handling this.
+                  {t('auth.pleaseWait', 'Please wait! We are working on handling this.')}
                 </div>
               )}
               
               <p className="resend-link">
-                Didn't receive a code?{' '}
-                <span onClick={handleResendCode}>Resend Code</span>
+                {t('auth.noCode', 'Didn\'t receive a code?')}{' '}
+                <span onClick={handleResendCode}>{t('auth.resendCode', 'Resend Code')}</span>
               </p>
             </form>
           </div>
@@ -168,13 +174,13 @@ const HomePage = () => {
                 className={activeTab === 'login' ? 'active' : ''}
                 onClick={() => setActiveTab('login')}
               >
-                Login
+                {t('auth.login', 'Login')}
               </button>
               <button
                 className={activeTab === 'register' ? 'active' : ''}
                 onClick={() => setActiveTab('register')}
               >
-                Register
+                {t('auth.register', 'Register')}
               </button>
             </div>
             
@@ -184,7 +190,7 @@ const HomePage = () => {
                   <div className="form-group">
                     <input
                       type="email"
-                      placeholder="Email"
+                      placeholder={t('auth.email', 'Email')}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -193,7 +199,7 @@ const HomePage = () => {
                   <div className="form-group">
                     <input
                       type="password"
-                      placeholder="Password"
+                      placeholder={t('auth.password', 'Password')}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -206,13 +212,13 @@ const HomePage = () => {
                     {loading ? (
                       <>
                         <span className="loading-spinner"></span>
-                        <span className="loading-text">Signing In...</span>
+                        <span className="loading-text">{t('auth.signingIn', 'Signing In...')}</span>
                       </>
-                    ) : 'Sign In'}
+                    ) : t('auth.signIn', 'Sign In')}
                   </button>
                   {loading && longLoading && (
                     <div className="long-loading-message">
-                      Please wait! We are working on handling this.
+                      {t('auth.pleaseWait', 'Please wait! We are working on handling this.')}
                     </div>
                   )}
                 </form>
@@ -221,7 +227,7 @@ const HomePage = () => {
                   <div className="form-group">
                     <input
                       type="text"
-                      placeholder="Username"
+                      placeholder={t('auth.username', 'Username')}
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
@@ -230,7 +236,7 @@ const HomePage = () => {
                   <div className="form-group">
                     <input
                       type="email"
-                      placeholder="Email"
+                      placeholder={t('auth.email', 'Email')}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -239,7 +245,7 @@ const HomePage = () => {
                   <div className="form-group">
                     <input
                       type="password"
-                      placeholder="Password"
+                      placeholder={t('auth.password', 'Password')}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -249,18 +255,18 @@ const HomePage = () => {
                   {error && <div className="error-message">{error}</div>}
                   
                   <button type="submit" disabled={loading} className="auth-button">
-              {loading ? (
-                  <>
-                    <span className="loading-spinner"></span>
-                    <span className="loading-text">Registering...</span>
-                  </>
-                ) : 'Register'}
-              </button>
-              {loading && longLoading && (
-                <div className="long-loading-message">
-                  Please wait! We are working on handling this.
-                </div>
-              )}
+                    {loading ? (
+                      <>
+                        <span className="loading-spinner"></span>
+                        <span className="loading-text">{t('auth.registering', 'Registering...')}</span>
+                      </>
+                    ) : t('auth.register', 'Register')}
+                  </button>
+                  {loading && longLoading && (
+                    <div className="long-loading-message">
+                      {t('auth.pleaseWait', 'Please wait! We are working on handling this.')}
+                    </div>
+                  )}
                 </form>
               )}
             </div>

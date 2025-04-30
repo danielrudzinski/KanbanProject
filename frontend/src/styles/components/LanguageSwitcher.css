@@ -1,0 +1,20 @@
+.language-switcher {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+  
+  .language-switcher button {
+    background: none;
+    border: 1px solid #ccc;
+    margin: 0 5px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  
+  .language-switcher button.active {
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }

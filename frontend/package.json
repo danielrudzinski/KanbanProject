@@ -17,8 +17,12 @@
   },
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
+    "i18next": "^25.0.2",
+    "i18next-browser-languagedetector": "^8.0.5",
+    "i18next-http-backend": "^3.0.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-i18next": "^15.5.1",
     "react-router-dom": "^7.3.0",
     "react-toastify": "^11.0.5",
     "react-xarrows": "^2.0.2"

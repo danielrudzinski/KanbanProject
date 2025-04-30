@@ -1,0 +1,124 @@
+{
+    "taskActions": {
+      "delete": "Delete task",
+      "showDetails": "Show details",
+      "hideDetails": "Hide details",
+      "confirmDelete": "Do you want to delete this task?",
+      "confirmDeleteAssignedUser": "Do you want to delete this user's assignment to this task?",
+      "yes": "Yes",
+      "no": "No",
+      "editTitle": "Edit task title",
+      "subtasks": "Subtasks",
+      "description": "Task description",
+      "noDescription": "No description available.",
+      "noSubtasks": "No subtasks.",
+      "incompleteSubtasks": "Incomplete subtasks"
+    },
+    "board": {
+      "loading": "Loading kanban board...",
+      "error": "Error: {{message}}",
+      "addColumn": "Add column",
+      "addRow": "Add row",
+      "title": "Kanban Board",
+      "subtitle": "Manage your tasks efficiently"
+    },
+    "notifications": {
+      "taskAdded": "Task \"{{title}}\" has been added",
+      "taskMoved": "Task \"{{title}}\" has been moved to column \"{{column}}\"",
+      "taskDeleted": "Task deleted successfully",
+      "errorOccurred": "Error: {{message}}",
+      "columnAdded": "Column \"{{name}}\" has been added",
+      "columnDeleted": "Column \"{{name}}\" has been deleted",
+      "columnUpdated": "Column name has been updated",
+      "rowAdded": "Row \"{{name}}\" has been added",
+      "rowDeleted": "Row has been deleted",
+      "rowUpdated": "Row name has been updated",
+      "wipLimitUpdated": "WIP limit for {{name}} has been updated to {{limit}}",
+      "lastRowWarning": "Cannot delete the last row.",
+      "taskUpdated": "Task has been updated",
+      "noColumnError": "There are no columns. Please add a column first.",
+      "lastRowDeleted": "Last row \"{{name}}\" has been deleted",
+      "lastColumnDeleted": "Last column \"{{name}}\" has been deleted",
+      "userWipLimitUpdated": "User's WIP limit has been updated to {{limit}}",
+      "rowWipLimitUpdated": "WIP limit for row {{name}} has been updated to {{limit}}",
+      "taskMovedToColumnAndRow": "Task \"{{title}}\" has been moved to column \"{{column}}\" and row \"{{row}}\"",
+      "taskMovedToRow": "Task \"{{title}}\" has been moved to row \"{{row}}\"",
+      "columnMoved": "Column \"{{name}}\" has been moved",
+      "rowMoved": "Row \"{{name}}\" has been moved"
+    },
+    "column": {
+      "deleteConfirm": "Are you sure you want to delete this column?",
+      "wipLimit": "Limit",
+      "wipExceeded": "exceeded!",
+      "noLimit": "No limit",
+      "taskCount": "Tasks"
+    },
+    "row": {
+      "deleteConfirm": "Are you sure you want to delete this row?",
+      "wipLimit": "Limit",
+      "wipExceeded": "exceeded!",
+      "lastRowWarning": "Cannot delete the last row."
+    },
+    "header": {
+      "addTask": "Add task",
+      "wipLimit": "WIP Limit",
+      "addBoardItem": "Add row/column",
+      "users": "Users",
+      "logout": "Logout"
+    },
+    "forms": {
+      "wipLimit": {
+        "title": "Set WIP Limit",
+        "close": "Close form",
+        "columnTab": "Columns",
+        "rowTab": "Rows",
+        "selectColumn": "Select column",
+        "selectRow": "Select row",
+        "selectUser": "Select user",
+        "limitLabel": "WIP Limit",
+        "noLimit": "0 = no limit",
+        "submit": "Set limit",
+        "submitting": "Updating...",
+        "cancel": "Cancel",
+        "error": {
+          "selectRequired": "Please select a {{type}}!",
+          "invalidLimit": "Please enter a valid WIP limit (number greater than or equal to 0)"
+        }
+      }
+    },
+    "bench": {
+      "title": "Team",
+      "loading": "Loading...",
+      "wipLimit": "WIP Limit",
+      "unlimited": "∞",
+      "tasks": "Tasks",
+      "editLimit": "Edit WIP limit",
+      "saveLimit": "Save WIP limit",
+      "cancel": "Cancel"
+    },
+    "auth": {
+      "login": "Login",
+      "register": "Register",
+      "email": "Email",
+      "password": "Password",
+      "username": "Username",
+      "signIn": "Sign In",
+      "signingIn": "Signing In...",
+      "registering": "Registering...",
+      "verifying": "Verifying...",
+      "verifyAccount": "Verify Account",
+      "verificationCode": "Verification Code",
+      "enterCode": "Enter the verification code sent to your email",
+      "noCode": "Didn't receive a code?",
+      "resendCode": "Resend Code",
+      "pleaseWait": "Please wait! We are working on handling this.",
+      "sessionExpired": "Your session has expired. Please sign in again.",
+      "loginSuccess": "Successfully signed in!",
+      "loginFailed": "Login failed:",
+      "registerSuccess": "Account created! Please verify your email.",
+      "registerFailed": "Registration failed:",
+      "verifySuccess": "Account verified successfully! Please log in.",
+      "verifyFailed": "Verification failed:",
+      "codeSent": "Verification code sent to your email."
+    }
+  }

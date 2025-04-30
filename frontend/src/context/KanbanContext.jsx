@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import { 
   fetchColumns, 
   fetchTasks, 
@@ -37,7 +38,8 @@ export function KanbanProvider({ children }) {
   const [error, setError] = useState(null);
   const [draggedItem, setDraggedItem] = useState(null);
   const [columnMap, setColumnMap] = useState({});
-  
+  const { t } = useTranslation();
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -91,12 +93,12 @@ export function KanbanProvider({ children }) {
       setTasks(tasks.map(task => 
         task.id === taskId ? { ...task, title: newName } : task
       ));
-      toast.success(`Nazwa zadania została zaktualizowana`);
+      toast.success(t('notifications.taskUpdated'));
       return true;
     } catch (err) {
       console.error('Error updating task name:', err);
       setError(err.message);
-      toast.error(`Błąd podczas aktualizacji nazwy zadania: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       return false;
     }
   };
@@ -123,12 +125,12 @@ export function KanbanProvider({ children }) {
         });
       }
       
-      toast.success(`Nazwa kolumny została zaktualizowana`);
+      toast.success(t('notifications.columnUpdated'));
       return true;
     } catch (err) {
       console.error('Error updating column name:', err);
       setError(err.message);
-      toast.error(`Błąd podczas aktualizacji nazwy kolumny: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       return false;
     }
   };
@@ -139,12 +141,12 @@ export function KanbanProvider({ children }) {
       setRows(rows.map(row => 
         row.id === rowId ? { ...row, name: newName } : row
       ));
-      toast.success(`Nazwa wiersza została zaktualizowana`);
+      toast.success(t('notifications.rowUpdated'));
       return true;
     } catch (err) {
       console.error('Error updating row name:', err);
       setError(err.message);
-      toast.error(`Błąd podczas aktualizacji nazwy wiersza: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       return false;
     }
   };
@@ -152,7 +154,7 @@ export function KanbanProvider({ children }) {
   const handleAddTask = async (title, rowId) => {
     try {
       if (!columns || columns.length === 0) {
-        const errorMessage = 'Nie ma żadnej kolumny. Dodaj najpierw kolumnę.';
+        const errorMessage = t('notifications.noColumnError');
         setError(errorMessage);
         toast.error(errorMessage);
         await new Promise(resolve => setTimeout(resolve, 10));
@@ -173,11 +175,11 @@ export function KanbanProvider({ children }) {
       }
       
       await refreshTasks();
-      toast.success(`Zadanie "${title}" zostało dodane`);
+      toast.success(t('notifications.taskAdded', { title }));
       return newTask;
     } catch (err) {
       setError(err.message);
-      toast.error(`Błąd podczas dodawania zadania: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       throw err;
     }
   };
@@ -277,11 +279,11 @@ export function KanbanProvider({ children }) {
       }));
       
       setColumns([...columns, newColumn]);
-      toast.success(`Kolumna "${name}" została dodana`);
+      toast.success(t('notifications.columnAdded', { name }));
       return newColumn;
     } catch (err) {
       setError(err.message);
-      toast.error(`Błąd podczas dodawania kolumny: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       throw err;
     }
   };
@@ -305,11 +307,11 @@ export function KanbanProvider({ children }) {
         });
       }
       
-      toast.success(`Wiersz "${name}" został dodany`);
+      toast.success(t('notifications.rowAdded', { name }));
       return newRow;
     } catch (err) {
       setError(err.message);
-      toast.error(`Błąd podczas dodawania wiersza: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       throw err;
     }
   };
@@ -324,11 +326,11 @@ export function KanbanProvider({ children }) {
       const sortedUpdatedColumns = updatedColumns.sort((a, b) => a.position - b.position);
       
       setColumns(sortedUpdatedColumns);
-      toast.success(`Limit WIP dla ${columnName} został zaktualizowany do ${newLimit}`);
+      toast.success(t('notifications.wipLimitUpdated', { name: columnName, limit: newLimit }));
     } catch (err) {
       console.error('Failed to update WIP limit:', err);
       setError('Failed to update WIP limit. Please try again.');
-      toast.error(`Błąd podczas aktualizacji limitu WIP: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
     }
   };
 
@@ -352,12 +354,12 @@ export function KanbanProvider({ children }) {
         )
       );
     
-      toast.success(`Limit WIP użytkownika został zaktualizowany do ${wipLimit}`);
+      toast.success(t('notifications.userWipLimitUpdated', { limit: wipLimit }));
       return result;
     } catch (err) {
       console.error('Error updating user WIP limit:', err);
       setError(err.message);
-      toast.error(`Błąd podczas aktualizacji limitu WIP użytkownika: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       throw err;
     }
   };
@@ -372,11 +374,11 @@ export function KanbanProvider({ children }) {
       const sortedRows = updatedRows.sort((a, b) => a.position - b.position);
       
       setRows(sortedRows);
-      toast.success(`Limit WIP dla ${rowName} został zaktualizowany do ${newLimit}`);
+      toast.success(t('notifications.rowWipLimitUpdated', { name: rowName, limit: newLimit }));
     } catch (err) {
       console.error('Failed to update row WIP limit:', err);
       setError('Failed to update row WIP limit. Please try again.');
-      toast.error(`Błąd podczas aktualizacji limitu WIP wiersza: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
     }
   };
   
@@ -390,7 +392,7 @@ export function KanbanProvider({ children }) {
       if (!alternativeColumn) {
         await deleteColumn(columnId);
         setColumns([]);
-        toast.info(`Ostatnia kolumna "${columnName}" została usunięta`);
+        toast.info(t('notifications.lastColumnDeleted', { name: columnName }));
         return;
       }
       
@@ -422,12 +424,12 @@ export function KanbanProvider({ children }) {
       
       setTasks(updatedTasks);
       await refreshTasks();
-      toast.success(`Kolumna "${columnName}" została usunięta`);
+      toast.success(t('notifications.columnDeleted', { name: columnName }));
       
     } catch (err) {
       console.error('Error deleting column:', err);
       setError(err.message);
-      toast.error(`Błąd podczas usuwania kolumny: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       throw err;
     }
   };
@@ -474,14 +476,14 @@ export function KanbanProvider({ children }) {
       await refreshBoard();
       
       if (isLastRow) {
-        toast.info(`Ostatni wiersz "${rowName}" został usunięty`);
+        toast.info(t('notifications.lastRowDeleted', { name: rowName }));
       } else {
-        toast.success(`Wiersz "${rowName}" został usunięty`);
+        toast.success(t('notifications.rowDeleted', { name: rowName }));
       }
     } catch (err) {
       console.error('Error deleting row:', err);
       setError(err.message);
-      toast.error(`Błąd podczas usuwania wiersza: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       throw err;
     }
   };
@@ -493,10 +495,10 @@ export function KanbanProvider({ children }) {
       
       await deleteTask(taskId);
       setTasks(tasks.filter(task => task.id !== taskId));
-      toast.success(`Zadanie "${taskTitle}" zostało usunięte`);
+      toast.success(t('notifications.taskDeleted'));
     } catch (err) {
       setError(err.message);
-      toast.error(`Błąd podczas usuwania zadania: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       throw err;
     }
   };
@@ -547,20 +549,30 @@ export function KanbanProvider({ children }) {
         t.id === taskId ? updatedTask : t
       ));
       
-      let message = `Zadanie "${task.title}" zostało przeniesione`;
+      let message;
       if (columnChanged && rowChanged) {
-        message += ` do kolumny "${targetColumnName}" i wiersza "${targetRowName}"`;
+        message = t('notifications.taskMovedToColumnAndRow', { 
+          title: task.title, 
+          column: targetColumnName, 
+          row: targetRowName 
+        });
       } else if (columnChanged) {
-        message += ` do kolumny "${targetColumnName}"`;
+        message = t('notifications.taskMoved', { 
+          title: task.title,
+          column: targetColumnName
+        });
       } else if (rowChanged) {
-        message += ` do wiersza "${targetRowName}"`;
+        message = t('notifications.taskMovedToRow', { 
+          title: task.title,
+          row: targetRowName
+        });
       }
       
       toast.success(message);
     } catch (err) {
       console.error('Error moving task:', err);
       setError(err.message);
-      toast.error(`Błąd podczas przenoszenia zadania: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
     }
   };
 
@@ -588,11 +600,11 @@ export function KanbanProvider({ children }) {
       });
       
       await Promise.all(updatePromises);
-      toast.success(`Kolumna "${movedColumn.name}" została przesunięta`);
+      toast.success(t('notifications.columnMoved', { name: movedColumn.name }));
     } catch (err) {
       console.error('Error moving column:', err);
       setError(err.message);
-      toast.error(`Błąd podczas przesuwania kolumny: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       throw err;
     }
   };
@@ -620,11 +632,11 @@ export function KanbanProvider({ children }) {
       });
       
       await Promise.all(updatePromises);
-      toast.success(`Wiersz "${movedRow.name}" został przesunięty`);
+      toast.success(t('notifications.rowMoved', { name: movedRow.name }));
     } catch (err) {
       console.error('Error moving row:', err);
       setError(err.message);
-      toast.error(`Błąd podczas przesuwania wiersza: ${err.message}`);
+      toast.error(t('notifications.errorOccurred', { message: err.message }));
       throw err;
     }
   };

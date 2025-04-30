@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import Task from './Task';
 import EditableText from './EditableText';
+import { useTranslation } from 'react-i18next';
 import '../styles/components/Column.css';
 
 function Column({ column, tasks}) {
   const { deleteColumn, dragAndDrop, updateColumnName } = useKanban();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const { t } = useTranslation();
   
   const { handleDragOver, handleDrop, handleDragStart } = dragAndDrop;
 
@@ -70,7 +72,7 @@ function Column({ column, tasks}) {
           <span className="task-count">{tasks.length}</span>
           <button 
             className="delete-column-btn" 
-            title="Usuń kolumnę"
+            title={t('taskActions.delete')}
             onClick={handleDeleteClick}
           >
             ×
@@ -79,18 +81,18 @@ function Column({ column, tasks}) {
 
         {column.wipLimit > 0 && (
           <span className={`wip-limit ${isOverLimit ? 'exceeded' : ''}`}>
-            Limit: {column.wipLimit}
-            {isOverLimit && ' (przekroczony!)'}
+            {t('column.wipLimit')}: {column.wipLimit}
+            {isOverLimit && ` (${t('column.wipExceeded')})`}
           </span>
         )}
       </div>
 
       {isConfirmingDelete && (
         <div className="delete-confirmation">
-          <p>Czy na pewno chcesz usunąć tę kolumnę?</p>
+          <p>{t('column.deleteConfirm')}</p>
           <div className="confirmation-buttons">
-            <button onClick={handleConfirmDelete}>Tak</button>
-            <button onClick={handleCancelDelete}>Nie</button>
+            <button onClick={handleConfirmDelete}>{t('taskActions.yes')}</button>
+            <button onClick={handleCancelDelete}>{t('taskActions.no')}</button>
           </div>
         </div>
       )}

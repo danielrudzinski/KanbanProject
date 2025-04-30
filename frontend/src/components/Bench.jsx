@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { fetchUsers, getUserAvatar, updateUserWipLimit } from '../services/api';
+import { useTranslation } from 'react-i18next';
 import '../styles/components/Bench.css';
 import { toast } from 'react-toastify';
 
@@ -13,6 +14,7 @@ function Bench() {
   const [avatarPreviews, setAvatarPreviews] = useState({});
   const [editingWipLimit, setEditingWipLimit] = useState({});
   const [wipLimits, setWipLimits] = useState({});
+  const { t } = useTranslation();
 
   const loadUsers = async () => {
     try {
@@ -107,7 +109,7 @@ function Bench() {
       });
       
       const userName = users.find(u => u.id === userId)?.name || 'użytkownika';
-      const limitText = newLimit ? newLimit : 'Unlimited';
+      const limitText = newLimit ? newLimit : '∞';
       toast.success(`Limit WIP dla ${userName} został zaktualizowany do ${limitText}`);
       refreshTasks();
     } catch (error) {
@@ -135,8 +137,8 @@ function Bench() {
           {isOpen ? '◀' : '▶'}
         </button>
         <div className="bench">
-          <h3>Zespół</h3>
-          <div className="loading">Ładowanie...</div>
+          <h3>{t('bench.title')}</h3>
+          <div className="loading">{t('bench.loading')}</div>
         </div>
       </div>
     );
@@ -162,7 +164,7 @@ function Bench() {
         {isOpen ? '◀' : '▶'}
       </button>
       <div className="bench">
-        <h3>Zespół</h3>
+        <h3>{t('bench.title')}</h3>
         <div className="user-list">
           {users.map(user => (
             <div 
@@ -191,7 +193,7 @@ function Bench() {
                         type="number" 
                         min="1"
                         value={wipLimits[user.id] || ''} 
-                        placeholder="Unlimited"
+                        placeholder="∞"
                         onChange={(e) => handleWipLimitChange(user.id, e.target.value)}
                         onClick={(e) => e.stopPropagation()}
                       />
@@ -224,7 +226,7 @@ function Bench() {
                         startEditWipLimit(user.id);
                       }}
                     >
-                      <span>WIP Limit: {user.wipLimit ? user.wipLimit : 'Unlimited'}</span>
+                      <span>WIP Limit: {user.wipLimit ? user.wipLimit : '∞'}</span>
                       <button 
                         className="edit-wip-btn" 
                         title="Edytuj limit WIP"
@@ -236,7 +238,7 @@ function Bench() {
                 </div>
                 {user.taskCount && (
                   <div className={`user-task-count ${(user.taskCount >= (user.wipLimit || Infinity)) ? 'limit-reached' : ''}`}>
-                    Zadania: {user.taskCount}/{user.wipLimit || 'Unlimited'}
+                    Zadania: {user.taskCount}/{user.wipLimit || '∞'}
                   </div>
                 )}
               </div>

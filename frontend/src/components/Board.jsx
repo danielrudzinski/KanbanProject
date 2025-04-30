@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import Task from './Task';
 import EditableText from './EditableText';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import '../styles/components/Board.css';
 
 function Board() {
@@ -19,6 +20,7 @@ function Board() {
     updateRowName,
   } = useKanban();
   
+  const { t } = useTranslation();
   const { handleDragOver } = dragAndDrop;
 
   useEffect(() => {
@@ -35,13 +37,13 @@ function Board() {
     return (
       <div className="board-loading">
         <span className="loading-spinner"></span>
-        <span className="loading-text">Loading kanban board...</span>
+        <span className="loading-text">{t('board.loading')}</span>
       </div>
     );
   }
 
   if (error) {
-    return <div className="board-error">Error: {error}</div>;
+    return <div className="board-error">{t('board.error', { message: error })}</div>;
   }
 
   const getTasksByColumnAndRow = (columnId, rowId = null) => {
@@ -115,14 +117,83 @@ function Board() {
     }
   };
 
-  const safeDeleteRow = (rowId) => {
-    if (rows.length > 1) {
-      if (window.confirm('Czy na pewno chcesz usunąć ten wiersz?')) {
-        deleteRow(rowId);
-      }
-    } else {
-      toast.error('Nie można usunąć ostatniego wiersza.');
+  const handleDeleteRowClick = (rowId) => {
+    if (rows.length <= 1) {
+      toast.error(t('row.cannotDeleteLast') || 'Nie można usunąć ostatniego wiersza.');
+      return;
     }
+
+    const rowName = rows.find(r => r.id === rowId)?.name;
+    const toastId = `delete-row-${rowId}`;
+    
+    toast.info(
+      <div className="toast-confirm">
+        <p>{t('row.deleteConfirm', { name: rowName }) || `Czy na pewno chcesz usunąć wiersz "${rowName}"?`}</p>
+        <div className="toast-buttons">
+          <button 
+            onClick={() => {
+              deleteRow(rowId);
+              toast.dismiss(toastId);
+            }}
+            className="confirm-button"
+          >
+            {t('taskActions.yes') || 'Tak'}
+          </button>
+          <button 
+            onClick={() => toast.dismiss(toastId)}
+            className="cancel-button"
+          >
+            {t('taskActions.no') || 'Nie'}
+          </button>
+        </div>
+      </div>,
+      {
+        toastId,
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+        closeButton: true,
+        position: "top-center",
+        className: 'confirmation-toast'
+      }
+    );
+  };
+
+  const handleDeleteColumnClick = (columnId) => {
+    const columnName = columns.find(c => c.id === columnId)?.name;
+    const toastId = `delete-column-${columnId}`;
+    
+    toast.info(
+      <div className="toast-confirm">
+        <p>{t('column.deleteConfirm', { name: columnName }) || `Czy na pewno chcesz usunąć kolumnę "${columnName}"?`}</p>
+        <div className="toast-buttons">
+          <button 
+            onClick={() => {
+              deleteColumn(columnId);
+              toast.dismiss(toastId);
+            }}
+            className="confirm-button"
+          >
+            {t('taskActions.yes') || 'Tak'}
+          </button>
+          <button 
+            onClick={() => toast.dismiss(toastId)}
+            className="cancel-button"
+          >
+            {t('taskActions.no') || 'Nie'}
+          </button>
+        </div>
+      </div>,
+      {
+        toastId,
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+        closeButton: true,
+        position: "top-center",
+        className: 'confirmation-toast'
+      }
+    );
   };
 
   const renderRowHeader = (row) => {
@@ -167,8 +238,8 @@ function Board() {
           )}
           <button 
             className="delete-row-btn" 
-            title="Usuń wiersz"
-            onClick={() => safeDeleteRow(row.id)}
+            title={t('row.delete') || "Usuń wiersz"}
+            onClick={() => handleDeleteRowClick(row.id)}
           >
             ×
           </button>
@@ -223,12 +294,8 @@ function Board() {
           )}
           <button 
             className="delete-column-btn" 
-            title="Usuń kolumnę"
-            onClick={() => {
-              if (window.confirm('Czy na pewno chcesz usunąć tę kolumnę?')) {
-                deleteColumn(column.id);
-              }
-            }}
+            title={t('column.delete') || "Usuń kolumnę"}
+            onClick={() => handleDeleteColumnClick(column.id)}
           >
             ×
           </button>

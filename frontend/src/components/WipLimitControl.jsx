@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
+import { useTranslation } from 'react-i18next';
 import '../styles/components/Forms.css';
 
 function WipLimitControl({ onClose }) {
@@ -9,6 +10,7 @@ function WipLimitControl({ onClose }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('column'); // 'column' or 'row'
+  const { t } = useTranslation();
   
   const handleItemChange = (e) => {
     const itemId = e.target.value;
@@ -42,13 +44,16 @@ function WipLimitControl({ onClose }) {
     e.preventDefault();
     
     if (!selectedItem) {
-      setError(activeTab === 'column' ? 'Wybierz kolumnę!' : 'Wybierz wiersz!');
+      setError(activeTab === 'column' 
+        ? t('forms.wipLimit.error.selectRequired', { type: t('forms.wipLimit.columnTab').toLowerCase() }) 
+        : t('forms.wipLimit.error.selectRequired', { type: t('forms.wipLimit.rowTab').toLowerCase() })
+      );
       return;
     }
     
     const parsedLimit = Number(wipLimit);
     if (wipLimit.trim() === '' || isNaN(parsedLimit) || parsedLimit < 0) {
-      setError('Podaj prawidłowy limit WIP (liczba większa lub równa 0)');
+      setError(t('forms.wipLimit.error.invalidLimit'));
       return;
     }
     
@@ -67,7 +72,7 @@ function WipLimitControl({ onClose }) {
       
       if (onClose) onClose();
     } catch (err) {
-      setError(err.message || 'Wystąpił błąd podczas aktualizacji limitu WIP');
+      setError(err.message || t('notifications.errorOccurred', { message: '' }));
     } finally {
       setIsSubmitting(false);
     }
@@ -82,12 +87,12 @@ function WipLimitControl({ onClose }) {
     <div className="form-container">
       <form onSubmit={handleSubmit} role="form">
         <div className="form-header">
-          <h3>Ustaw limit WIP</h3>
+          <h3>{t('forms.wipLimit.title')}</h3>
           <button 
             type="button" 
             className="close-button" 
             onClick={onClose}
-            aria-label="Zamknij formularz"
+            aria-label={t('forms.wipLimit.close')}
           >
             ×
           </button>
@@ -100,7 +105,7 @@ function WipLimitControl({ onClose }) {
             onClick={() => switchTab('column')}
             disabled={columns.length === 0}
           >
-            Kolumny
+            {t('forms.wipLimit.columnTab')}
           </button>
           <button 
             type="button" 
@@ -108,7 +113,7 @@ function WipLimitControl({ onClose }) {
             onClick={() => switchTab('row')}
             disabled={rows.length === 0}
           >
-            Wiersze
+            {t('forms.wipLimit.rowTab')}
           </button>
         </div>
         
@@ -171,7 +176,7 @@ function WipLimitControl({ onClose }) {
             type="submit"
             disabled={isSubmitting || !selectedItem}
           >
-            {isSubmitting ? 'Aktualizowanie...' : 'Ustaw limit'}
+            {isSubmitting ? t('forms.wipLimit.submitting') : t('forms.wipLimit.submit')}
           </button>
           <button 
             type="button" 
@@ -179,7 +184,7 @@ function WipLimitControl({ onClose }) {
             onClick={onClose}
             disabled={isSubmitting}
           >
-            Anuluj
+            {t('forms.wipLimit.cancel')}
           </button>
         </div>
       </form>
