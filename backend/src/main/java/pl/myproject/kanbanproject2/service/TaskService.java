@@ -64,14 +64,6 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
 
-        if (task.getParentTask() != null) {
-            Task parent = task.getParentTask();
-            parent.getChildTasks().remove(task);
-            task.setParentTask(null);
-            taskRepository.save(parent);
-        }
-
-
         if (task.getChildTasks() != null && !task.getChildTasks().isEmpty()) {
             for (Task child : task.getChildTasks()) {
                 child.setParentTask(null);
@@ -79,10 +71,10 @@ public class TaskService {
             }
             task.getChildTasks().clear();
         }
-
-
+        
         taskRepository.delete(task);
     }
+
 
     public TaskDTO getTaskById(Integer id) {
         try {

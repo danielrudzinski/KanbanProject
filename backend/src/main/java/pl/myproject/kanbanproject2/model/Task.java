@@ -36,8 +36,14 @@ public class Task {
     @JoinColumn(name = "row_id", nullable = true)
     private Row row;
     @ManyToMany
+    @JoinTable(
+            name = "user_task",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     @JsonIgnoreProperties("tasks")
     private Set<User> users = new HashSet<>();
+
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubTask> subTasks = new ArrayList<>();
     @ManyToOne
@@ -45,7 +51,7 @@ public class Task {
     @JsonIgnoreProperties("childTasks")
     private Task parentTask;
 
-    @OneToMany(mappedBy = "parentTask")
+    @OneToMany(mappedBy = "parentTask", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonIgnoreProperties("parentTask")
     private Set<Task> childTasks = new HashSet<>();
 }
