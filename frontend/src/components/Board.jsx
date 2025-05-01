@@ -294,7 +294,7 @@ function Board() {
           )}
           <button 
             className="delete-column-btn" 
-            title={t('column.delete') || "Usuń kolumnę"}
+            title={t('column.delete')}
             onClick={() => handleDeleteColumnClick(column.id)}
           >
             ×

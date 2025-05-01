@@ -72,7 +72,7 @@ function Column({ column, tasks}) {
           <span className="task-count">{tasks.length}</span>
           <button 
             className="delete-column-btn" 
-            title={t('taskActions.delete')}
+            title={t('column.delete')}
             onClick={handleDeleteClick}
           >
             ×

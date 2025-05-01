@@ -4,6 +4,7 @@ import { addLabelToTask, removeLabelFromTask, getAllLabels } from '../services/a
 import '../styles/components/TaskLabels.css';
 import { useKanban } from '../context/KanbanContext';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 // Keep the PREDEFINED_LABELS array for default options
 const PREDEFINED_LABELS = [
@@ -29,6 +30,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
   const [labelColors, setLabelColors] = useState({});
   const { refreshTasks } = useKanban();
   const buttonRef = useRef(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchExistingLabels = async () => {
@@ -113,7 +115,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
       );
   
       if (labelExists) {
-        toast.warning('Ta etykieta została już dodana do zadania');
+        toast.warning(t('taskLabels.alreadyAddedWarning'));
         return;
       }
   
@@ -129,7 +131,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
       refreshTasks();
     } catch (error) {
       console.error('Error adding label:', error);
-      toast.error('Wystąpił błąd podczas dodawania etykiety');
+      toast.error(t('taskLabels.addErrorMessage'));
     }
   };
   
@@ -157,7 +159,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
       onLabelsChange(updatedLabels);
     } catch (error) {
       console.error('Error removing label:', error);
-      toast.error('Wystąpił błąd podczas usuwania etykiety');
+      toast.error(t('taskLabels.removeErrorMessage'));
     }
   };
 
@@ -239,7 +241,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
             toggleLabelPicker();
           }}
         >
-          + Etykieta
+          {t('taskLabels.addLabel')}
         </button>
       </div>
 
@@ -255,12 +257,11 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
           onClick={handlePickerClick}
         >
           <div className="label-picker-header">
-            Wybierz etykietę
+            {t('taskLabels.chooseLabelHeader')}
           </div>
           
-          {/* Predefined labels */}
           <div className="label-section">
-            <div className="section-title">Predefiniowane etykiety</div>
+            <div className="section-title">{t('taskLabels.predefinedLabels')}</div>
             {PREDEFINED_LABELS.map((label) => (
               <div
                 key={label.name}
@@ -279,10 +280,9 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
             ))}
           </div>
           
-          {/* Existing labels */}
           {existingLabels.length > 0 && (
             <div className="label-section">
-              <div className="section-title">Istniejące etykiety</div>
+              <div className="section-title">{t('taskLabels.existingLabels')}</div>
               {existingLabels
                 .filter(label => !PREDEFINED_LABELS.some(p => p.name === label))
                 .map((label) => (
@@ -309,7 +309,7 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
             onClick={showCustomLabelForm}
           >
             <span className="color-dot custom"></span>
-            Dodaj własną etykietę
+            {t('taskLabels.addCustomLabel')}
           </div>
         </div>,
         document.body
@@ -331,19 +331,19 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
           }}
           onClick={handleFormClick}
         >
-          <h3 className="form-title">Dodaj własną etykietę</h3>
+          <h3 className="form-title">{t('taskLabels.addCustomLabelTitle')}</h3>
           <div className="form-group">
-            <label>Nazwa etykiety:</label>
+            <label>{t('taskLabels.labelName')}</label>
             <input 
               type="text"
               value={customLabelName}
               onChange={(e) => setCustomLabelName(e.target.value)}
-              placeholder="Wpisz nazwę etykiety"
+              placeholder={t('taskLabels.labelNamePlaceholder')}
               autoFocus
             />
           </div>
           <div className="form-group">
-            <label>Kolor etykiety:</label>
+            <label>{t('taskLabels.labelColor')}</label>
             <input 
               type="color"
               value={customLabelColor}
@@ -356,13 +356,13 @@ const TaskLabels = ({ taskId, initialLabels = [], onLabelsChange }) => {
               disabled={!customLabelName.trim()}
               className={`add-button ${!customLabelName.trim() ? 'disabled' : ''}`}
             >
-              Dodaj
+              {t('taskLabels.add')}
             </button>
             <button
               onClick={() => setShowCustomForm(false)}
               className="cancel-button"
             >
-              Anuluj
+              {t('taskLabels.cancel')}
             </button>
           </div>
         </div>,

@@ -203,7 +203,7 @@ function Bench() {
                           e.stopPropagation();
                           saveWipLimit(user.id);
                         }}
-                        title="Zapisz limit WIP"
+                        title={t('bench.saveWipLimit')}
                       >
                         ✓
                       </button>
@@ -213,7 +213,7 @@ function Bench() {
                           e.stopPropagation();
                           cancelEditWipLimit(user.id);
                         }}
-                        title="Anuluj"
+                        title={t('bench.cancel')}
                       >
                         ✗
                       </button>
@@ -229,7 +229,7 @@ function Bench() {
                       <span>WIP Limit: {user.wipLimit ? user.wipLimit : '∞'}</span>
                       <button 
                         className="edit-wip-btn" 
-                        title="Edytuj limit WIP"
+                        title={t('bench.editWipLimit')}
                       >
                         ✎
                       </button>

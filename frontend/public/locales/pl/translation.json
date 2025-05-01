@@ -1,124 +1,229 @@
 {
-    "taskActions": {
-      "delete": "Usuń zadanie",
-      "showDetails": "Pokaż szczegóły",
-      "hideDetails": "Ukryj szczegóły",
-      "confirmDelete": "Czy chcesz usunąć to zadanie?",
-      "confirmDeleteAssignedUser": "Czy chcesz usunąć przypisanie tego użytkownika do tego zadania?",
-      "yes": "Tak",
-      "no": "Nie",
-      "editTitle": "Edytuj tytuł zadania",
-      "subtasks": "Podzadania",
-      "description": "Opis zadania",
-      "noDescription": "Brak opisu.",
-      "noSubtasks": "Brak podzadań.",
-      "incompleteSubtasks": "Nieukończone podzadania"
+  "taskActions": {
+    "delete": "Usuń zadanie",
+    "deleteSubTask": "Usuń podzadanie",
+    "showDetails": "Pokaż szczegóły",
+    "hideDetails": "Ukryj szczegóły",
+    "confirmDelete": "Czy na pewno chcesz usunąć to zadanie?",
+    "confirmDeleteSubTask": "Czy na pewno chcesz usunąć to podzadanie?",
+    "confirmDeleteAssignedUser": "Czy chcesz usunąć przypisanie tego użytkownika do tego zadania?",
+    "assigned": "Przypisani",
+    "assignUser": "Przypisz użytkownika",
+    "unassignUser": "Usuń przypisanie użytkownika",
+    "assign": "Przypisz",
+    "unassign": "Usuń przypisanie",
+    "yes": "Tak",
+    "no": "Nie",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "editTitle": "Edytuj tytuł zadania",
+    "subtasks": "Podzadania",
+    "description": "Opis zadania",
+    "noDescription": "Brak opisu.",
+    "noSubtasks": "Brak podzadań.",
+    "incompleteSubtasks": "Nieukończone podzadania",
+    "loading": "Ładowanie...",
+    "editTaskDescription": "Edytuj opis zadania",
+    "editSubTaskDescription": "Edytuj opis podzadania",
+    "shadowDescription": "Wprowadź opis zadania",
+    "expand": "Rozwiń",
+    "collapse": "Zwiń"
+  },
+  "board": {
+    "loading": "Ładowanie tablicy kanban...",
+    "error": "Błąd: {{message}}",
+    "addColumn": "Dodaj kolumnę",
+    "addRow": "Dodaj wiersz",
+    "title": "Tablica Kanban",
+    "subtitle": "Zarządzaj swoimi zadaniami efektywnie",
+    "labels": "Etykiety"
+  },
+  "notifications": {
+    "taskAdded": "Zadanie \"{{title}}\" zostało dodane",
+    "taskMoved": "Zadanie \"{{title}}\" zostało przeniesione do kolumny \"{{column}}\"",
+    "taskDeleted": "Zadanie zostało usunięte",
+    "errorOccurred": "Błąd: {{message}}",
+    "columnAdded": "Kolumna \"{{name}}\" została dodana",
+    "columnDeleted": "Kolumna \"{{name}}\" została usunięta",
+    "columnUpdated": "Nazwa kolumny została zaktualizowana",
+    "rowAdded": "Wiersz \"{{name}}\" został dodany",
+    "rowDeleted": "Wiersz został usunięty",
+    "rowUpdated": "Nazwa wiersza została zaktualizowana",
+    "wipLimitUpdated": "Limit WIP dla {{name}} został zaktualizowany do {{limit}}",
+    "lastRowWarning": "Nie można usunąć ostatniego wiersza.",
+    "taskUpdated": "Zodanie zostało zaktualizowane",
+    "noColumnError": "Nie ma żadnej kolumny. Dodaj najpierw kolumnę.",
+    "lastRowDeleted": "Ostatni wiersz \"{{name}}\" został usunięty",
+    "lastColumnDeleted": "Ostatnia kolumna \"{{name}}\" została usunięta",
+    "userWipLimitUpdated": "Limit WIP użytkownika został zaktualizowany do {{limit}}",
+    "rowWipLimitUpdated": "Limit WIP dla wiersza {{name}} został zaktualizowany do {{limit}}",
+    "taskMovedToColumnAndRow": "Zadanie \"{{title}}\" zostało przeniesione do kolumny \"{{column}}\" i wiersza \"{{row}}\"",
+    "taskMovedToRow": "Zadanie \"{{title}}\" zostało przeniesione do wiersza \"{{row}}\"",
+    "columnMoved": "Kolumna \"{{name}}\" została przesunięta",
+    "rowMoved": "Wiersz \"{{name}}\" został przesunięty"
+  },
+  "column": {
+    "deleteConfirm": "Czy na pewno chcesz usunąć tę kolumnę?",
+    "wipLimit": "Limit",
+    "wipExceeded": "przekroczony!",
+    "noLimit": "Bez limitu",
+    "taskCount": "Zadania",
+    "delete": "Usuń kolumnę"
+  },
+  "row": {
+    "deleteConfirm": "Czy na pewno chcesz usunąć ten wiersz?",
+    "delete": "Usuń wiersz",
+    "wipLimit": "Limit",
+    "wipExceeded": "przekroczony!",
+    "lastRowWarning": "Nie można usunąć ostatniego wiersza."
+  },
+  "header": {
+    "addTask": "Dodaj zadanie",
+    "wipLimit": "Limit WIP",
+    "addBoardItem": "Dodaj wiersz/kolumnę",
+    "users": "Użytkownicy",
+    "logout": "Wyloguj"
+  },
+  "forms": {
+    "wipLimit": {
+      "title": "Ustaw limit WIP",
+      "close": "Zamknij formularz",
+      "columnTab": "Kolumny",
+      "rowTab": "Wiersze",
+      "selectColumn": "Wybierz kolumnę",
+      "selectRow": "Wybierz wiersz",
+      "selectUser": "Wybierz użytkownika",
+      "limitLabel": "Limit WIP",
+      "noLimit": "0 = bez limitu",
+      "submit": "Ustaw limit",
+      "submitting": "Aktualizowanie...",
+      "cancel": "Anuluj",
+      "activeLimit": "Aktualny Limit:",
+      "error": {
+        "selectRequired": "Wybierz {{type}}!",
+        "invalidLimit": "Podaj prawidłowy limit WIP (liczba większa lub równa 0)"
+      }
     },
-    "board": {
-      "loading": "Ładowanie tablicy kanban...",
-      "error": "Błąd: {{message}}",
-      "addColumn": "Dodaj kolumnę",
-      "addRow": "Dodaj wiersz",
-      "title": "Tablica Kanban",
-      "subtitle": "Zarządzaj swoimi zadaniami efektywnie"
-    },
-    "notifications": {
-      "taskAdded": "Zadanie \"{{title}}\" zostało dodane",
-      "taskMoved": "Zadanie \"{{title}}\" zostało przeniesione do kolumny \"{{column}}\"",
-      "taskDeleted": "Zadanie zostało usunięte",
-      "errorOccurred": "Błąd: {{message}}",
-      "columnAdded": "Kolumna \"{{name}}\" została dodana",
-      "columnDeleted": "Kolumna \"{{name}}\" została usunięta",
-      "columnUpdated": "Nazwa kolumny została zaktualizowana",
-      "rowAdded": "Wiersz \"{{name}}\" został dodany",
-      "rowDeleted": "Wiersz został usunięty",
-      "rowUpdated": "Nazwa wiersza została zaktualizowana",
-      "wipLimitUpdated": "Limit WIP dla {{name}} został zaktualizowany do {{limit}}",
-      "lastRowWarning": "Nie można usunąć ostatniego wiersza.",
-      "taskUpdated": "Nazwa zadania została zaktualizowana",
-      "noColumnError": "Nie ma żadnej kolumny. Dodaj najpierw kolumnę.",
-      "lastRowDeleted": "Ostatni wiersz \"{{name}}\" został usunięty",
-      "lastColumnDeleted": "Ostatnia kolumna \"{{name}}\" została usunięta",
-      "userWipLimitUpdated": "Limit WIP użytkownika został zaktualizowany do {{limit}}",
-      "rowWipLimitUpdated": "Limit WIP dla wiersza {{name}} został zaktualizowany do {{limit}}",
-      "taskMovedToColumnAndRow": "Zadanie \"{{title}}\" zostało przeniesione do kolumny \"{{column}}\" i wiersza \"{{row}}\"",
-      "taskMovedToRow": "Zadanie \"{{title}}\" zostało przeniesione do wiersza \"{{row}}\"",
-      "columnMoved": "Kolumna \"{{name}}\" została przesunięta",
-      "rowMoved": "Wiersz \"{{name}}\" został przesunięty"
-    },
-    "column": {
-      "deleteConfirm": "Czy na pewno chcesz usunąć tę kolumnę?",
-      "wipLimit": "Limit",
-      "wipExceeded": "przekroczony!",
-      "noLimit": "Bez limitu",
-      "taskCount": "Zadania"
-    },
-    "row": {
-      "deleteConfirm": "Czy na pewno chcesz usunąć ten wiersz?",
-      "wipLimit": "Limit",
-      "wipExceeded": "przekroczony!",
-      "lastRowWarning": "Nie można usunąć ostatniego wiersza."
-    },
-    "header": {
-      "addTask": "Dodaj zadanie",
-      "wipLimit": "Limit WIP",
-      "addBoardItem": "Dodaj wiersz/kolumnę",
-      "users": "Użytkownicy",
-      "logout": "Wyloguj"
-    },
-    "forms": {
-      "wipLimit": {
-        "title": "Ustaw limit WIP",
-        "close": "Zamknij formularz",
-        "columnTab": "Kolumny",
-        "rowTab": "Wiersze",
-        "selectColumn": "Wybierz kolumnę",
-        "selectRow": "Wybierz wiersz",
-        "selectUser": "Wybierz użytkownika",
-        "limitLabel": "Limit WIP",
-        "noLimit": "0 = bez limitu",
-        "submit": "Ustaw limit",
-        "submitting": "Aktualizowanie...",
-        "cancel": "Anuluj",
-        "error": {
-          "selectRequired": "Wybierz {{type}}!",
-          "invalidLimit": "Podaj prawidłowy limit WIP (liczba większa lub równa 0)"
+    "addRowColumn": {
+      "title": "Dodaj nowy wiersz/kolumnę",
+      "close": "Zamknij formularz",
+      "tabs": {
+        "columns": "Kolumny",
+        "rows": "Wiersze"
+      },
+      "nameLabel": {
+        "column": "Nazwa kolumny:",
+        "row": "Nazwa wiersza:"
+      },
+      "placeholder": {
+        "column": "np. To Do",
+        "row": "np. Cechy, Funkcje, Projekty"
+      },
+      "submitting": "Dodawanie...",
+      "submit": {
+        "column": "Dodaj kolumnę",
+        "row": "Dodaj wiersz"
+      },
+      "error": {
+        "nameRequired": {
+          "column": "Nazwa kolumny jest wymagana!",
+          "row": "Nazwa wiersza jest wymagana!"
+        },
+        "addFailed": {
+          "column": "Wystąpił błąd podczas dodawania kolumny",
+          "row": "Wystąpił błąd podczas dodawania wiersza"
         }
       }
     },
-    "bench": {
-      "title": "Zespół",
-      "loading": "Ładowanie...",
-      "wipLimit": "Limit WIP",
-      "unlimited": "∞",
-      "tasks": "Zadania",
-      "editLimit": "Edytuj limit WIP",
-      "saveLimit": "Zapisz limit WIP",
-      "cancel": "Anuluj"
+    "addTaskForm": {
+      "title": "Dodaj nowe zadanie",
+      "titleLabel": "Tytuł zadania:",
+      "titlePlaceholder": "Wpisz tytuł zadania",
+      "titleRequired": "Tytuł zadania jest wymagany!",
+      "adding": "Dodawanie...",
+      "addError": "Wystąpił błąd podczas dodawania zadania"
     },
-    "auth": {
-      "login": "Logowanie",
-      "register": "Rejestracja",
+    "deleteUser": "Usuń użytkownika"
+  },
+  "bench": {
+    "title": "Zespół",
+    "loading": "Ładowanie...",
+    "wipLimit": "Limit WIP",
+    "unlimited": "∞",
+    "tasks": "Zadania",
+    "editWipLimit": "Edytuj limit WIP",
+    "saveWipLimit": "Zapisz limit WIP",
+    "cancel": "Anuluj"
+  },
+  "auth": {
+    "login": "Logowanie",
+    "register": "Rejestracja",
+    "email": "Email",
+    "password": "Hasło",
+    "username": "Nazwa użytkownika",
+    "signIn": "Zaloguj się",
+    "signingIn": "Logowanie...",
+    "registering": "Rejestrowanie...",
+    "verifying": "Weryfikacja...",
+    "verifyAccount": "Zweryfikuj konto",
+    "verificationCode": "Kod weryfikacyjny",
+    "enterCode": "Wprowadź kod weryfikacyjny wysłany na Twój email",
+    "noCode": "Nie otrzymałeś kodu?",
+    "resendCode": "Wyślij ponownie",
+    "pleaseWait": "Prosimy o cierpliwość! Pracujemy nad tym.",
+    "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
+    "loginSuccess": "Zalogowano pomyślnie!",
+    "loginFailed": "Błąd logowania:",
+    "registerSuccess": "Konto utworzone! Sprawdź swój email, aby je zweryfikować.",
+    "registerFailed": "Błąd rejestracji:",
+    "verifySuccess": "Konto zweryfikowane pomyślnie! Możesz się zalogować.",
+    "verifyFailed": "Błąd weryfikacji:",
+    "codeSent": "Kod weryfikacyjny został wysłany na Twój email."
+  },
+  "taskLabels": {
+    "addLabel": "+ Etykieta",
+    "chooseLabelHeader": "Wybierz etykietę",
+    "predefinedLabels": "Predefiniowane etykiety",
+    "existingLabels": "Istniejące etykiety",
+    "addCustomLabel": "Dodaj własną etykietę",
+    "addCustomLabelTitle": "Dodaj własną etykietę",
+    "labelName": "Nazwa etykiety:",
+    "labelNamePlaceholder": "Wpisz nazwę etykiety",
+    "labelColor": "Kolor etykiety:",
+    "add": "Dodaj",
+    "cancel": "Anuluj",
+    "alreadyAddedWarning": "Ta etykieta została już dodana do zadania",
+    "addErrorMessage": "Wystąpił błąd podczas dodawania etykiety",
+    "removeErrorMessage": "Wystąpił błąd podczas usuwania etykiety"
+  },
+  "usersManagement": {
+    "title": "Zarządzanie Użytkownikami",
+    "fields": {
+      "name": "Imię i nazwisko",
       "email": "Email",
       "password": "Hasło",
-      "username": "Nazwa użytkownika",
-      "signIn": "Zaloguj się",
-      "signingIn": "Logowanie...",
-      "registering": "Rejestrowanie...",
-      "verifying": "Weryfikacja...",
-      "verifyAccount": "Zweryfikuj konto",
-      "verificationCode": "Kod weryfikacyjny",
-      "enterCode": "Wprowadź kod weryfikacyjny wysłany na Twój email",
-      "noCode": "Nie otrzymałeś kodu?",
-      "resendCode": "Wyślij ponownie",
-      "pleaseWait": "Prosimy o cierpliwość! Pracujemy nad tym.",
-      "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie.",
-      "loginSuccess": "Zalogowano pomyślnie!",
-      "loginFailed": "Błąd logowania:",
-      "registerSuccess": "Konto utworzone! Sprawdź swój email, aby je zweryfikować.",
-      "registerFailed": "Błąd rejestracji:",
-      "verifySuccess": "Konto zweryfikowane pomyślnie! Możesz się zalogować.",
-      "verifyFailed": "Błąd weryfikacji:",
-      "codeSent": "Kod weryfikacyjny został wysłany na Twój email."
+      "avatar": "Avatar",
+      "id": "ID",
+      "actions": "Akcje"
+    },
+    "buttons": {
+      "add": "Dodaj Użytkownika",
+      "delete": "Usuń użytkownika",
+      "change": "Zmień",
+      "back": "Powrót do Tablicy Kanban"
+    },
+    "messages": {
+      "emptyFields": "Proszę wypełnić wszystkie pola!",
+      "invalidEmail": "Proszę podać poprawny adres email!",
+      "addError": "Wystąpił błąd podczas dodawania użytkownika",
+      "deleteConfirm": "Czy na pewno chcesz usunąć tego użytkownika?",
+      "deleteError": "Wystąpił błąd podczas usuwania użytkownika",
+      "fileTooLarge": "Plik jest zbyt duży. Maksymalny rozmiar to 10MB.",
+      "fileTypeError": "Dozwolone są tylko pliki JPG i PNG.",
+      "avatarUpdated": "Avatar został pomyślnie zaktualizowany",
+      "avatarError": "Wystąpił błąd podczas uploadu avatara:",
+      "loadError": "Wystąpił błąd podczas ładowania użytkowników"
     }
   }
+}

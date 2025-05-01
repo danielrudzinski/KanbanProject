@@ -121,7 +121,7 @@ function WipLimitControl({ onClose }) {
         
         <div className="form-group">
           <label htmlFor="item-select">
-            {activeTab === 'column' ? 'Wybierz kolumnę:' : 'Wybierz wiersz:'}
+            {activeTab === 'column' ? t('forms.wipLimit.selectColumn') + ':' : t('forms.wipLimit.selectRow') + ':'}
           </label>
           <select
             id="item-select"
@@ -130,20 +130,20 @@ function WipLimitControl({ onClose }) {
             disabled={isSubmitting}
           >
             <option value="">
-              {activeTab === 'column' ? 'Wybierz kolumnę' : 'Wybierz wiersz'}
+              {activeTab === 'column' ? t('forms.wipLimit.selectColumn') : t('forms.wipLimit.selectRow')}
             </option>
             {activeTab === 'column' ? (
               columns.map(column => (
                 <option key={column.id} value={column.id}>
                   {column.name} 
-                  {column.wipLimit > 0 ? ` (Aktualny limit: ${column.wipLimit})` : ' (Bez limitu)'}
+                  {column.wipLimit > 0 ? ` (${t('forms.wipLimit.activeLimit')} ${column.wipLimit})` : ' (∞)'}
                 </option>
               ))
             ) : (
               rows.map(row => (
                 <option key={row.id} value={row.id}>
                   {row.name} 
-                  {row.wipLimit > 0 ? ` (Aktualny limit: ${row.wipLimit})` : ' (Bez limitu)'}
+                  {row.wipLimit > 0 ? ` (${t('forms.wipLimit.activeLimit')} ${row.wipLimit})` : ' (∞)'}
                 </option>
               ))
             )}
@@ -152,7 +152,7 @@ function WipLimitControl({ onClose }) {
         
         <div className="form-group">
           <label htmlFor="wip-limit">
-            Limit WIP <span className="help-text">(0 = bez limitu)</span>
+            {t('forms.wipLimit.limitLabel')} <span className="help-text">(0 = ∞)</span>
           </label>
           <input
             id="wip-limit"

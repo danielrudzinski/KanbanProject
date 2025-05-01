@@ -490,9 +490,6 @@ export function KanbanProvider({ children }) {
   
   const handleDeleteTask = async (taskId) => {
     try {
-      const taskToDelete = tasks.find(task => task.id === taskId);
-      const taskTitle = taskToDelete ? taskToDelete.title : 'zadanie';
-      
       await deleteTask(taskId);
       setTasks(tasks.filter(task => task.id !== taskId));
       toast.success(t('notifications.taskDeleted'));
@@ -584,8 +581,6 @@ export function KanbanProvider({ children }) {
       if (columnIndex === -1 || targetIndex === -1) return;
       
       const movedColumn = columns[columnIndex];
-      const targetColumn = columns[targetIndex];
-      
       const newColumns = [...columns];
       newColumns.splice(columnIndex, 1);
       newColumns.splice(targetIndex, 0, movedColumn);

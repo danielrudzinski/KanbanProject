@@ -633,7 +633,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
             <button 
               className="assign-user-icon" 
               onClick={() => setShowAssignForm(!showAssignForm)}
-              title={t('bench.title')}
+              title={t('taskActions.assignUser')}
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -662,7 +662,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               <button 
                 onClick={startEditingTaskDescription}
                 className="edit-description-btn"
-                title={t('taskActions.editTitle')}
+                title={t('taskActions.editTaskDescription')}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -686,13 +686,13 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                   onClick={saveTaskDescription}
                   className="save-description-btn"
                 >
-                  {t('taskActions.yes')}
+                  {t('taskActions.save')}
                 </button>
                 <button 
                   onClick={cancelEditingTaskDescription}
                   className="cancel-edit-btn"
                 >
-                  {t('taskActions.no')}
+                  {t('taskActions.cancel')}
                 </button>
               </div>
             </div>
@@ -711,7 +711,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         {showAssignForm && (
           <div className="assign-user-dropdown">
             <div className="dropdown-header">
-              <h4>{t('bench.title')}</h4>
+              <h4>{t('taskActions.assign')}</h4>
               <button 
                 className="close-dropdown" 
                 onClick={() => setShowAssignForm(false)}
@@ -738,7 +738,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               disabled={!selectedUserId}
               className="assign-btn"
             >
-              {t('taskActions.yes')}
+              {t('taskActions.assign')}
             </button>
           </div>
         )}
@@ -752,7 +752,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               type="text"
               value={newSubtaskTitle}
               onChange={(e) => setNewSubtaskTitle(e.target.value)}
-              placeholder={t('taskActions.subtasks')}
+              placeholder={t('taskActions.shadowDescription')}
               className="subtask-input"
             />
             <button 
@@ -797,7 +797,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                       <button
                         className="delete-subtask-btn"
                         onClick={() => confirmdeleteSubTask(subtask.id)}
-                        title={t('taskActions.delete')}
+                        title={t('taskActions.deleteSubTask')}
                       >
                         ×
                       </button>
@@ -821,13 +821,13 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                               onClick={saveSubtaskDescription}
                               className="save-description-btn"
                             >
-                              {t('taskActions.yes')}
+                              {t('taskActions.save')}
                             </button>
                             <button 
                               onClick={cancelEditingDescription}
                               className="cancel-edit-btn"
                             >
-                              {t('taskActions.no')}
+                              {t('taskActions.cancel')}
                             </button>
                           </div>
                         </div>
@@ -838,7 +838,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                             <button 
                               onClick={startEditingSubTaskDescription}
                               className="edit-description-btn"
-                              title={t('taskActions.editTitle')}
+                              title={t('taskActions.editSubTaskDescription')}
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -869,8 +869,8 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
           onClick={canceldeleteSubTask}
           >
             <div className="delete-confirmation-dialog">
-              <h4>{t('taskActions.confirmDelete')}</h4>
-              <p>{t('taskActions.confirmDelete')} <strong>{subtaskToDelete.title}</strong>?</p>
+              <h4>{t('taskActions.confirmDeleteSubTask')}</h4>
+              <p>{t('taskActions.confirmDeleteSubTask')} <strong>{subtaskToDelete.title}</strong>?</p>
               <div className="confirmation-actions">
                 <button 
                   onClick={handledeleteSubTask}
@@ -917,7 +917,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         )}
         </div>
         <div className="task-labels-section">
-        <h4>Labels</h4>
+        <h4>{t('board.labels')}</h4>
         <TaskLabels
           taskId={task.id}
           initialLabels={taskLabels}
@@ -999,7 +999,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         {/* Assigned users section */}
         {assignedUsers.length > 0 && (
           <div className="assigned-users-bar">
-            <span>{t('bench.title')}:</span>
+            <span>{t('taskActions.assigned')}:</span>
             <div className="avatar-list">
               {assignedUsers.map(user => (
                 <div key={user.id} className="avatar-item" title={user.name}>
@@ -1007,7 +1007,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                   <button 
                     className="remove-user-btn"
                     onClick={() => confirmRemoveUser(user.id)}
-                    title={t('taskActions.delete')}
+                    title={t('forms.deleteUser')}
                   >
                     ×
                   </button>
