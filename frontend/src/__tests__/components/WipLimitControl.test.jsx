@@ -4,6 +4,12 @@ import '@testing-library/jest-dom';
 import WipLimitControl from '../../components/WipLimitControl';
 import KanbanContext from '../../context/KanbanContext';
 
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+      t: (key) => key
+    })
+  }));
+
 describe('WipLimitControl Component', () => {
     const mockUpdateWipLimit = jest.fn().mockResolvedValue({});
     const mockUpdateRowWipLimit = jest.fn().mockResolvedValue({});
@@ -38,15 +44,15 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        expect(screen.getByText('Ustaw limit WIP')).toBeInTheDocument();
-        const columnTab = screen.getByText('Kolumny');
-        const rowTab = screen.getByText('Wiersze');
+        expect(screen.getByText('forms.wipLimit.title')).toBeInTheDocument();
+        const columnTab = screen.getByText('forms.wipLimit.columnTab');
+        const rowTab = screen.getByText('forms.wipLimit.rowTab');
         expect(columnTab).toBeInTheDocument();
         expect(rowTab).toBeInTheDocument();
         expect(columnTab).toHaveClass('active');
         expect(rowTab).not.toHaveClass('active');
-        expect(screen.getByLabelText(/Wybierz kolumnę:/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/Limit WIP/i)).toBeInTheDocument();
+        expect(screen.getByText('forms.wipLimit.selectColumn:')).toBeInTheDocument();
+        expect(screen.getByText('forms.wipLimit.limitLabel')).toBeInTheDocument();
     });
 
     test('switches between column and row tabs correctly', () => {
@@ -56,19 +62,19 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const columnTab = screen.getByText('Kolumny');
-        const rowTab = screen.getByText('Wiersze');
+        const columnTab = screen.getByText('forms.wipLimit.columnTab');
+        const rowTab = screen.getByText('forms.wipLimit.rowTab');
         expect(columnTab).toHaveClass('active');
         
         fireEvent.click(rowTab);
         expect(rowTab).toHaveClass('active');
         expect(columnTab).not.toHaveClass('active');
-        expect(screen.getByLabelText(/Wybierz wiersz:/i)).toBeInTheDocument();
+        expect(screen.getByText('forms.wipLimit.selectRow')).toBeInTheDocument();
         
         fireEvent.click(columnTab);
         expect(columnTab).toHaveClass('active');
         expect(rowTab).not.toHaveClass('active');
-        expect(screen.getByLabelText(/Wybierz kolumnę:/i)).toBeInTheDocument();
+        expect(screen.getByText('forms.wipLimit.selectColumn')).toBeInTheDocument();
     });
 
     test('populates dropdown with correct column options', () => {
@@ -78,15 +84,15 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         expect(select).toBeInTheDocument();
         
-        expect(select.options.length).toBe(4);
-        expect(select.options[0].text).toBe('Wybierz kolumnę');
+        expect(select.options.length).toBe(4); 
+        expect(select.options[0].text).toBe('forms.wipLimit.selectColumn');
         expect(select.options[1].text).toContain('To Do');
-        expect(select.options[1].text).toContain('(Aktualny limit: 3)');
+        expect(select.options[1].text).toContain('(forms.wipLimit.activeLimit 3)');
         expect(select.options[3].text).toContain('Done');
-        expect(select.options[3].text).toContain('(Bez limitu)');
+        expect(select.options[3].text).toContain('∞');
     });
 
     test('populates dropdown with correct row options when row tab is active', () => {
@@ -96,17 +102,17 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.click(screen.getByText('Wiersze'));
+        fireEvent.click(screen.getByText('forms.wipLimit.rowTab'));
         
-        const select = screen.getByLabelText(/Wybierz wiersz:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectRow:');
         expect(select).toBeInTheDocument();
         
         expect(select.options.length).toBe(3);
-        expect(select.options[0].text).toBe('Wybierz wiersz');
+        expect(select.options[0].text).toBe('forms.wipLimit.selectRow');
         expect(select.options[1].text).toContain('Features');
-        expect(select.options[1].text).toContain('(Aktualny limit: 2)');
+        expect(select.options[1].text).toContain('(forms.wipLimit.activeLimit 2)');
         expect(select.options[2].text).toContain('Bugs');
-        expect(select.options[2].text).toContain('(Aktualny limit: 4)');
+        expect(select.options[2].text).toContain('(forms.wipLimit.activeLimit 4)');
     });
 
     test('sets current WIP limit when column is selected', () => {
@@ -116,10 +122,10 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col2' } });
         
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         expect(wipInput.value).toBe('5');
     }); 
 
@@ -136,7 +142,7 @@ describe('WipLimitControl Component', () => {
             fireEvent.submit(form);
         });
         
-        expect(screen.getByText('Wybierz kolumnę!')).toBeInTheDocument();
+        expect(screen.getByText('forms.wipLimit.selectColumn')).toBeInTheDocument();
         expect(mockUpdateWipLimit).not.toHaveBeenCalled();
     });
 
@@ -147,14 +153,14 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
         
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         fireEvent.change(wipInput, { target: { value: '10' } });
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Ustaw limit'));
+            fireEvent.click(screen.getByText('forms.wipLimit.submit'));
         });
         
         expect(mockUpdateWipLimit).toHaveBeenCalledWith('col1', 10);
@@ -168,16 +174,16 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.click(screen.getByText('Wiersze'));
+        fireEvent.click(screen.getByText('forms.wipLimit.rowTab'));
         
-        const select = screen.getByLabelText(/Wybierz wiersz:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectRow:');
         fireEvent.change(select, { target: { value: 'row1' } });
         
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         fireEvent.change(wipInput, { target: { value: '5' } });
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Ustaw limit'));
+            fireEvent.click(screen.getByText('forms.wipLimit.submit'));
         });
         
         expect(mockUpdateRowWipLimit).toHaveBeenCalledWith('row1', 5);
@@ -196,14 +202,14 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
         
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         fireEvent.change(wipInput, { target: { value: '10' } });
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Ustaw limit'));
+            fireEvent.click(screen.getByText('forms.wipLimit.submit'));
         });
         
         expect(screen.getByText('API Error')).toBeInTheDocument();
@@ -222,17 +228,17 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
         
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         fireEvent.change(wipInput, { target: { value: '10' } });
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Ustaw limit'));
+            fireEvent.click(screen.getByText('forms.wipLimit.submit'));
         });
         
-        expect(screen.getByText('Wystąpił błąd podczas aktualizacji limitu WIP')).toBeInTheDocument();
+        expect(screen.getByText('notifications.errorOccurred')).toBeInTheDocument();
     });
 
     test('disables form controls during submission', async () => {
@@ -247,18 +253,18 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
         
         act(() => {
-            fireEvent.click(screen.getByText('Ustaw limit'));
+            fireEvent.click(screen.getByText('forms.wipLimit.submit'));
         });
         
-        expect(screen.getByText('Aktualizowanie...')).toBeInTheDocument();
+        expect(screen.getByText('forms.wipLimit.submitting')).toBeInTheDocument();
         expect(select).toBeDisabled();
-        expect(screen.getByLabelText(/Limit WIP/i)).toBeDisabled();
-        expect(screen.getByText('Aktualizowanie...')).toBeDisabled();
-        expect(screen.getByText('Anuluj')).toBeDisabled();
+        expect(screen.getByLabelText(/forms\.wipLimit\.limitLabel/i)).toBeDisabled();
+        expect(screen.getByText('forms.wipLimit.submitting')).toBeDisabled();
+        expect(screen.getByText('forms.wipLimit.cancel')).toBeDisabled();
     });
 
     test('closes form when close button is clicked', () => {
@@ -268,7 +274,7 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.click(screen.getByLabelText('Zamknij formularz'));
+        fireEvent.click(screen.getByLabelText('forms.wipLimit.close'));
         expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -279,7 +285,7 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.click(screen.getByText('Anuluj'));
+        fireEvent.click(screen.getByText('forms.wipLimit.cancel'));
         expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -306,10 +312,10 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         
         fireEvent.change(select, { target: { value: 'col1' } });
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         expect(wipInput.value).toBe('3');
         
         fireEvent.change(select, { target: { value: '' } });
@@ -323,17 +329,17 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
         
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         fireEvent.change(wipInput, { target: { value: '' } });
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Ustaw limit'));
+            fireEvent.click(screen.getByText('forms.wipLimit.submit'));
         });
         
-        expect(screen.getByText('Podaj prawidłowy limit WIP (liczba większa lub równa 0)')).toBeInTheDocument();
+        expect(screen.getByText('forms.wipLimit.error.invalidLimit')).toBeInTheDocument();
         expect(mockUpdateWipLimit).not.toHaveBeenCalled();
     });
 
@@ -344,17 +350,17 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
         
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         fireEvent.change(wipInput, { target: { value: 'abc' } });
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Ustaw limit'));
+            fireEvent.click(screen.getByText('forms.wipLimit.submit'));
         });
         
-        expect(screen.getByText('Podaj prawidłowy limit WIP (liczba większa lub równa 0)')).toBeInTheDocument();
+        expect(screen.getByText('forms.wipLimit.error.invalidLimit')).toBeInTheDocument();
         expect(mockUpdateWipLimit).not.toHaveBeenCalled();
     });
 
@@ -365,14 +371,14 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
         
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         fireEvent.change(wipInput, { target: { value: '-5' } });
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Ustaw limit'));
+            fireEvent.click(screen.getByText('forms.wipLimit.submit'));
         });
         
         expect(mockUpdateWipLimit).not.toHaveBeenCalled();
@@ -385,9 +391,9 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         fireEvent.change(wipInput, { target: { value: '-5' } });
 
         await act(async () => {
@@ -395,7 +401,7 @@ describe('WipLimitControl Component', () => {
             fireEvent.submit(form);
         });
         
-        expect(screen.getByText('Podaj prawidłowy limit WIP (liczba większa lub równa 0)')).toBeInTheDocument();
+        expect(screen.getByText('forms.wipLimit.error.invalidLimit')).toBeInTheDocument();
         expect(mockUpdateWipLimit).not.toHaveBeenCalled();
     });
      
@@ -406,9 +412,9 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
 
         fireEvent.input(wipInput, { target: { value: -10 } });
         
@@ -427,7 +433,7 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const rowTab = screen.getByText('Wiersze');
+        const rowTab = screen.getByText('forms.wipLimit.rowTab');
         expect(rowTab).toBeDisabled();
     });
     
@@ -438,10 +444,10 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
         
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         
         const mockEvent = {
             target: {
@@ -464,32 +470,32 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.click(screen.getByText('Wiersze'));
+        fireEvent.click(screen.getByText('forms.wipLimit.rowTab'));
         
         await act(async () => {
             const form = screen.getByRole('form', { hidden: true });
             fireEvent.submit(form);
         });
         
-        expect(screen.getByText('Wybierz wiersz!')).toBeInTheDocument();
+        expect(screen.getByText('forms.wipLimit.selectRow')).toBeInTheDocument();
         expect(mockUpdateRowWipLimit).not.toHaveBeenCalled();
     });
 
-    test('displays "Bez limitu" for column with zero WIP limit', () => {
+    test('displays "∞" for column with zero WIP limit', () => {
         render(
             <KanbanContext.Provider value={mockContextValue}>
                 <WipLimitControl onClose={mockOnClose} />
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         const options = Array.from(select.options);
         const doneOption = options.find(option => option.text.includes('Done'));
         expect(doneOption).toBeInTheDocument();
-        expect(doneOption.text).toContain('(Bez limitu)');
+        expect(doneOption.text).toContain('∞');
     });
 
-    test('displays "Bez limitu" for row with zero WIP limit', () => {
+    test('displays "∞" for row with zero WIP limit', () => {
         const contextWithZeroWipRow = {
             ...mockContextValue,
             rows: [
@@ -504,14 +510,14 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.click(screen.getByText('Wiersze'));
+        fireEvent.click(screen.getByText('forms.wipLimit.rowTab'));
         
-        const select = screen.getByLabelText(/Wybierz wiersz:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectRow:');
         const options = Array.from(select.options);
         
         const zeroWipOption = options.find(option => option.text.includes('Zero WIP'));
         expect(zeroWipOption).toBeInTheDocument();
-        expect(zeroWipOption.text).toContain('(Bez limitu)');
+        expect(zeroWipOption.text).toContain('∞');
     });
 
     test('handles case when onClose prop is undefined', async () => {
@@ -521,13 +527,13 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         fireEvent.change(wipInput, { target: { value: '10' } });
 
         await act(async () => {
-            fireEvent.click(screen.getByText('Ustaw limit'));
+            fireEvent.click(screen.getByText('forms.wipLimit.submit'));
         });
         
         expect(mockUpdateWipLimit).toHaveBeenCalledWith('col1', 10);
@@ -548,7 +554,7 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'anything' } });
         expect(manipulatableRef.value).toBe('');
     });
@@ -567,9 +573,9 @@ describe('WipLimitControl Component', () => {
                 <WipLimitControl onClose={mockOnClose} />
             </KanbanContext.Provider>
         );
-
-        fireEvent.click(screen.getByText('Wiersze'));
-        const select = screen.getByLabelText(/Wybierz wiersz:/i);
+    
+        fireEvent.click(screen.getByText('forms.wipLimit.rowTab'));
+        const select = screen.getByLabelText('forms.wipLimit.selectRow:');
         fireEvent.change(select, { target: { value: 'anything' } });
         expect(manipulatableRef.value).toBe('');
     });
@@ -581,9 +587,9 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         
         const mockEvent = {
             target: {
@@ -605,9 +611,9 @@ describe('WipLimitControl Component', () => {
                 <WipLimitControl onClose={mockOnClose} />
             </KanbanContext.Provider>
         );
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         expect(wipInput.value).toBe('3');
         Object.defineProperty(select, 'value', { value: 'non-existent-column' });
         fireEvent.change(select); 
@@ -620,10 +626,10 @@ describe('WipLimitControl Component', () => {
                 <WipLimitControl onClose={mockOnClose} />
             </KanbanContext.Provider>
         );
-        const select = screen.getByLabelText(/Wybierz kolumnę:/i);
+        const select = screen.getByLabelText('forms.wipLimit.selectColumn:');
         fireEvent.change(select, { target: { value: 'col1' } });
         
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         fireEvent.input(wipInput, { target: { value: -5 } });
         expect(wipInput.value).toBe('0');
  
@@ -638,16 +644,16 @@ describe('WipLimitControl Component', () => {
           </KanbanContext.Provider>
         );
         
-        fireEvent.click(screen.getByText('Wiersze'));
-
-        const select = screen.getByLabelText(/Wybierz wiersz:/i);
+        fireEvent.click(screen.getByText('forms.wipLimit.rowTab'));
+    
+        const select = screen.getByLabelText('forms.wipLimit.selectRow:');
         fireEvent.change(select, { target: { value: 'row1' } });
-        const wipInput = screen.getByLabelText(/Limit WIP/i);
+        const wipInput = screen.getByLabelText(/forms\.wipLimit\.limitLabel/i);
         expect(wipInput.value).toBe('2');
         
         Object.defineProperty(select, 'value', { value: 'non-existent-row-id' });
         fireEvent.change(select);
-
+    
         expect(wipInput.value).toBe('2');
     });
 

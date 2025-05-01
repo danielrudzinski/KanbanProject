@@ -4,6 +4,12 @@ import '@testing-library/jest-dom';
 import Column from '../../components/Column';
 import KanbanContext from '../../context/KanbanContext';
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => key
+  })
+}));
+
 jest.mock('../../components/Task', () => {
   return function MockTask({ task }) {
     return <div data-testid={`task-${task.id}`} className="task">{task.title}</div>;
@@ -69,7 +75,7 @@ describe('Column Component', () => {
     expect(screen.getByTestId(`editable-column-${mockColumn.id}`)).toBeInTheDocument();
     expect(screen.getByText('☰')).toBeInTheDocument();
     expect(screen.getByText(mockTasks.length.toString())).toBeInTheDocument();
-    expect(screen.getByTitle('Usuń kolumnę')).toBeInTheDocument();
+    expect(screen.getByTitle('column.delete')).toBeInTheDocument();
     
     mockTasks.forEach(task => {
       expect(screen.getByTestId(`task-${task.id}`)).toBeInTheDocument();
@@ -83,7 +89,7 @@ describe('Column Component', () => {
       </KanbanContext.Provider>
     );
     
-    expect(screen.getByText(`Limit: ${mockColumn.wipLimit}`)).toBeInTheDocument();
+    expect(screen.getByText(`column.wipLimit: ${mockColumn.wipLimit}`)).toBeInTheDocument();
   });
   
   test('does not render WIP limit when column has wipLimit = 0', () => {
@@ -113,7 +119,7 @@ describe('Column Component', () => {
     
     const wipLimit = screen.getByText(/Limit:/, { exact: false });
     expect(wipLimit).toHaveClass('exceeded');
-    expect(screen.getByText('(przekroczony!)', { exact: false })).toBeInTheDocument();
+    expect(screen.getByText('column.wipExceeded', { exact: false })).toBeInTheDocument();
   });
   
   test('shows delete confirmation when delete button is clicked', () => {
@@ -123,12 +129,12 @@ describe('Column Component', () => {
       </KanbanContext.Provider>
     );
     
-    const deleteButton = screen.getByTitle('Usuń kolumnę');
+    const deleteButton = screen.getByTitle('column.delete');
     fireEvent.click(deleteButton);
     
-    expect(screen.getByText('Czy na pewno chcesz usunąć tę kolumnę?')).toBeInTheDocument();
-    expect(screen.getByText('Tak')).toBeInTheDocument();
-    expect(screen.getByText('Nie')).toBeInTheDocument();
+    expect(screen.getByText('column.deleteConfirm')).toBeInTheDocument();
+    expect(screen.getByText('taskActions.yes')).toBeInTheDocument();
+    expect(screen.getByText('taskActions.no')).toBeInTheDocument();
   });
   
   test('calls deleteColumn when confirm delete button is clicked', () => {
@@ -138,10 +144,10 @@ describe('Column Component', () => {
       </KanbanContext.Provider>
     );
     
-    const deleteButton = screen.getByTitle('Usuń kolumnę');
+    const deleteButton = screen.getByTitle('column.delete');
     fireEvent.click(deleteButton);
     
-    const confirmButton = screen.getByText('Tak');
+    const confirmButton = screen.getByText('taskActions.yes');
     fireEvent.click(confirmButton);
     
     expect(mockDeleteColumn).toHaveBeenCalledWith(mockColumn.id);
@@ -154,10 +160,10 @@ describe('Column Component', () => {
       </KanbanContext.Provider>
     );
     
-    const deleteButton = screen.getByTitle('Usuń kolumnę');
+    const deleteButton = screen.getByTitle('column.delete');
     fireEvent.click(deleteButton);
     
-    const cancelButton = screen.getByText('Nie');
+    const cancelButton = screen.getByText('taskActions.no');
     fireEvent.click(cancelButton);
     
     expect(screen.queryByText('Czy na pewno chcesz usunąć tę kolumnę?')).not.toBeInTheDocument();
@@ -272,4 +278,5 @@ describe('Column Component', () => {
     
     console.log = originalConsoleLog;
   });
+
 });

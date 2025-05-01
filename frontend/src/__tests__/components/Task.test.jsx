@@ -62,12 +62,12 @@ describe('Task Component', () => {
             );
         });
         
-        const deleteButton = screen.getByTitle('Usuń zadanie');
+        const deleteButton = screen.getByTitle('taskActions.delete');
         await act(async () => {
             fireEvent.click(deleteButton);
         });
         
-        expect(screen.getByText('Czy na pewno chcesz usunąć to zadanie?')).toBeInTheDocument();
+        expect(screen.getByText('taskActions.confirmDelete')).toBeInTheDocument();
     });
 
     test('calls deleteTask when confirming deletion', async () => {
@@ -79,12 +79,12 @@ describe('Task Component', () => {
             );
         });
     
-        const deleteButton = screen.getByTitle('Usuń zadanie');
+        const deleteButton = screen.getByTitle('taskActions.delete');
         await act(async () => {
             fireEvent.click(deleteButton);
         });
     
-        const confirmButton = screen.getByText('Tak');
+        const confirmButton = screen.getByText('taskActions.yes');
         await act(async () => {
             fireEvent.click(confirmButton);
         });
@@ -103,17 +103,17 @@ describe('Task Component', () => {
             );
         });
         
-        const deleteButton = screen.getByTitle('Usuń zadanie');
+        const deleteButton = screen.getByTitle('taskActions.delete');
         await act(async () => {
             fireEvent.click(deleteButton);
         });
         
-        const cancelButton = screen.getByText('Nie');
+        const cancelButton = screen.getByText('taskActions.no');
         await act(async () => {
             fireEvent.click(cancelButton);
         });
         
-        expect(screen.queryByText('Czy na pewno chcesz usunąć to zadanie?')).not.toBeInTheDocument();
+        expect(screen.queryByText('taskActions.confirmDelete')).not.toBeInTheDocument();
         expect(mockContextValue.deleteTask).not.toHaveBeenCalled();
     });
 
@@ -246,12 +246,12 @@ describe('Task Component', () => {
         await new Promise(resolve => setTimeout(resolve, 0));
       });
     
-      const deleteButton = screen.getByTitle('Usuń zadanie');
+      const deleteButton = screen.getByTitle('taskActions.delete');
       await act(async () => {
         fireEvent.click(deleteButton);
       });
     
-      expect(screen.getByText('Czy na pewno chcesz usunąć to zadanie?')).toBeInTheDocument();
+      expect(screen.getByText('taskActions.confirmDelete')).toBeInTheDocument();
     });
 
     test('correctly displays completed task with completion indicator', async () => {
@@ -362,7 +362,7 @@ describe('Task Component', () => {
           fireEvent.click(taskElement);
         });
         
-        expect(screen.getByTitle('Usuń zadanie')).toBeInTheDocument();
+        expect(screen.getByTitle('taskActions.delete')).toBeInTheDocument();
         await act(async () => {
           fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
         });

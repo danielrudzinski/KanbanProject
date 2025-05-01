@@ -4,6 +4,18 @@ import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
 import Header from '../../components/Header';
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => key
+  })
+}));
+
+jest.mock('../../components/LanguageSwitcher', () => {
+  return function MockLanguageSwitcher() {
+    return <div data-testid="mock-language-switcher"></div>;
+  };
+});
+
 jest.mock('../../components/AddTaskForm', () => {
   return function MockAddTaskForm({ onClose }) {
     return (
@@ -56,16 +68,16 @@ describe('Header Component', () => {
 
   test('renders header with logo and navigation links', () => {
     renderHeader();
-    expect(screen.getByText('Tablica Kanban')).toBeInTheDocument();
-    expect(screen.getByText('Dodaj zadanie')).toBeInTheDocument();
-    expect(screen.getByText('Limit WIP')).toBeInTheDocument();
-    expect(screen.getByText('Dodaj wiersz/kolumnę')).toBeInTheDocument();
-    expect(screen.getByText('Użytkownicy')).toBeInTheDocument();
+    expect(screen.getByText('board.title')).toBeInTheDocument();
+    expect(screen.getByText('header.addTask')).toBeInTheDocument();
+    expect(screen.getByText('header.wipLimit')).toBeInTheDocument();
+    expect(screen.getByText('header.addBoardItem')).toBeInTheDocument();
+    expect(screen.getByText('header.users')).toBeInTheDocument();
   });
 
   test('opens AddTaskForm when "Dodaj zadanie" is clicked', () => {
     renderHeader();
-    fireEvent.click(screen.getByText('Dodaj zadanie'));
+    fireEvent.click(screen.getByText('header.addTask'));
     expect(screen.getByTestId('mock-add-task-form')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Close'));    
     expect(screen.queryByTestId('mock-add-task-form')).not.toBeInTheDocument();
@@ -73,7 +85,7 @@ describe('Header Component', () => {
 
   test('opens WipLimitControl when "Limit WIP" is clicked', () => {
     renderHeader();
-    fireEvent.click(screen.getByText('Limit WIP'));
+    fireEvent.click(screen.getByText('header.wipLimit'));
     expect(screen.getByTestId('mock-wip-limit-control')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Close'));
     expect(screen.queryByTestId('mock-wip-limit-control')).not.toBeInTheDocument();
@@ -98,20 +110,20 @@ describe('Header Component', () => {
   test('has correct navigation links with proper attributes', () => {
     renderHeader();
     
-    const homeLink = screen.getByText('Tablica Kanban');
+    const homeLink = screen.getByText('board.title');
     expect(homeLink).toBeInTheDocument();
     expect(homeLink.closest('a')).toHaveAttribute('href', '/');
     
-    const usersLink = screen.getByText('Użytkownicy').closest('a');
+    const usersLink = screen.getByText('header.users').closest('a');
     expect(usersLink).toHaveAttribute('href', '/users');
   });
 
   test('can only have one form open at a time', () => {
     renderHeader();
     
-    fireEvent.click(screen.getByText('Dodaj zadanie'));
+    fireEvent.click(screen.getByText('header.addTask'));
     expect(screen.getByTestId('mock-add-task-form')).toBeInTheDocument();
-    fireEvent.click(screen.getByText('Limit WIP'));
+    fireEvent.click(screen.getByText('header.wipLimit'));
     expect(screen.queryByTestId('mock-add-task-form')).not.toBeInTheDocument();
     expect(screen.getByTestId('mock-wip-limit-control')).toBeInTheDocument();
   });
@@ -132,7 +144,7 @@ describe('Header Component', () => {
       </BrowserRouter>
     );
     
-    const addRowColumnButton = screen.getByText(/Dodaj wiersz\/kolumnę/i);
+    const addRowColumnButton = screen.getByText('header.addBoardItem');
     fireEvent.click(addRowColumnButton);
     expect(screen.getByTestId('mock-add-board-item-form')).toBeInTheDocument();
     

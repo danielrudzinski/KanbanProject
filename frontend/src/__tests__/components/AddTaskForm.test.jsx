@@ -4,6 +4,12 @@ import '@testing-library/jest-dom';
 import AddTaskForm from '../../components/AddTaskForm';
 import KanbanContext from '../../context/KanbanContext';
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => key
+  })
+}));
+
 describe('AddTaskForm Component', () => {
     const mockAddTask = jest.fn().mockResolvedValue({});
     const mockRefreshTasks = jest.fn().mockResolvedValue([]);
@@ -25,11 +31,11 @@ describe('AddTaskForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        expect(screen.getByText('Dodaj nowe zadanie')).toBeInTheDocument();
-        expect(screen.getByLabelText(/Tytuł zadania:/i)).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Wpisz tytuł zadania')).toBeInTheDocument();
-        expect(screen.getByText('Dodaj zadanie')).toBeInTheDocument();
-        expect(screen.getByText('Anuluj')).toBeInTheDocument();
+        expect(screen.getByText('forms.addTaskForm.title')).toBeInTheDocument();
+        expect(screen.getByLabelText('forms.addTaskForm.titleLabel')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('forms.addTaskForm.titlePlaceholder')).toBeInTheDocument();
+        expect(screen.getByText('header.addTask')).toBeInTheDocument();
+        expect(screen.getByText('taskActions.cancel')).toBeInTheDocument();
     });
 
     test('validates form input and shows error when title is empty', async () => {
@@ -40,10 +46,10 @@ describe('AddTaskForm Component', () => {
         );
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Dodaj zadanie'));
+            fireEvent.click(screen.getByText('header.addTask'));
         });
 
-        expect(screen.getByText('Tytuł zadania jest wymagany!')).toBeInTheDocument();
+        expect(screen.getByText('forms.addTaskForm.titleRequired')).toBeInTheDocument();
         expect(mockAddTask).not.toHaveBeenCalled();
     });
 
@@ -54,12 +60,12 @@ describe('AddTaskForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.change(screen.getByLabelText(/Tytuł zadania:/i), {
+        fireEvent.change(screen.getByLabelText('forms.addTaskForm.titleLabel'), {
             target: { value: 'New Task' }
         });
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Dodaj zadanie'));
+            fireEvent.click(screen.getByText('header.addTask'));
         });
         
         expect(mockAddTask).toHaveBeenCalledWith('New Task');
@@ -79,12 +85,12 @@ describe('AddTaskForm Component', () => {
             </KanbanContext.Provider>
         );
 
-        fireEvent.change(screen.getByLabelText(/Tytuł zadania:/i), {
+        fireEvent.change(screen.getByLabelText('forms.addTaskForm.titleLabel'), {
             target: { value: 'Error Task' }
         });
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Dodaj zadanie'));
+            fireEvent.click(screen.getByText('header.addTask'));
         });
         
         expect(screen.getByText('API Error')).toBeInTheDocument();
@@ -103,15 +109,15 @@ describe('AddTaskForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.change(screen.getByLabelText(/Tytuł zadania:/i), {
+        fireEvent.change(screen.getByLabelText('forms.addTaskForm.titleLabel'), {
             target: { value: 'Error Task' }
         });
 
         await act(async () => {
-            fireEvent.click(screen.getByText('Dodaj zadanie'));
+            fireEvent.click(screen.getByText('header.addTask'));
         });
         
-        expect(screen.getByText('Wystąpił błąd podczas dodawania zadania')).toBeInTheDocument();
+        expect(screen.getByText('forms.addTaskForm.addError')).toBeInTheDocument();
     });
 
     test('disables form controls during submission', async () => {
@@ -126,19 +132,19 @@ describe('AddTaskForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.change(screen.getByLabelText(/Tytuł zadania:/i), {
+        fireEvent.change(screen.getByLabelText('forms.addTaskForm.titleLabel'), {
             target: { value: 'Test Task' }
         });
         
         act(() => {
-            fireEvent.click(screen.getByText('Dodaj zadanie'));
+            fireEvent.click(screen.getByText('header.addTask'));
         });
         
-        expect(screen.getByText('Dodawanie...')).toBeInTheDocument();
+        expect(screen.getByText('forms.addTaskForm.adding')).toBeInTheDocument();
         
-        expect(screen.getByLabelText(/Tytuł zadania:/i)).toBeDisabled();
-        expect(screen.getByText('Dodawanie...')).toBeDisabled();
-        expect(screen.getByText('Anuluj')).toBeDisabled();
+        expect(screen.getByLabelText('forms.addTaskForm.titleLabel')).toBeDisabled();
+        expect(screen.getByText('forms.addTaskForm.adding')).toBeDisabled();
+        expect(screen.getByText('taskActions.cancel')).toBeDisabled();
     });
 
     test('closes form when cancel button is clicked', () => {
@@ -148,7 +154,7 @@ describe('AddTaskForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.click(screen.getByText('Anuluj'));
+        fireEvent.click(screen.getByText('taskActions.cancel'));
         expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -159,7 +165,7 @@ describe('AddTaskForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.click(screen.getByLabelText('Zamknij formularz'));
+        fireEvent.click(screen.getByLabelText('forms.addRowColumn.close'));
         expect(mockOnClose).toHaveBeenCalled();
     });
 });

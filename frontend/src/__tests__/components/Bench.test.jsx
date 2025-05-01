@@ -5,6 +5,23 @@ import Bench from '../../components/Bench';
 import { fetchUsers, getUserAvatar, updateUserWipLimit } from '../../services/api';
 import { KanbanProvider } from '../../context/KanbanContext';
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => {
+    return {
+      t: (key) => {
+        const translations = {
+          'bench.title': 'Zespół',
+          'bench.loading': 'Ładowanie...'
+        };
+        return translations[key] || key;
+      },
+      i18n: {
+        changeLanguage: () => new Promise(() => {})
+      }
+    };
+  }
+}));
+
 jest.mock('../../services/api', () => ({
   fetchUsers: jest.fn(),
   getUserAvatar: jest.fn(),
@@ -120,10 +137,10 @@ describe('Bench Component', () => {
     });
     
     expect(screen.getByText('WIP Limit: 5')).toBeInTheDocument();
-    expect(screen.getByText('WIP Limit: Unlimited')).toBeInTheDocument();
+    expect(screen.getByText('WIP Limit: ∞')).toBeInTheDocument();
   
     expect(screen.getByText('Zadania: 3/5')).toBeInTheDocument();
-    expect(screen.getByText('Zadania: 2/Unlimited')).toBeInTheDocument();
+    expect(screen.getByText('Zadania: 2/∞')).toBeInTheDocument();
     expect(screen.getByText('Zadania: 4/3')).toBeInTheDocument();
     
     const exceededTaskCount = screen.getByText('Zadania: 4/3');
@@ -140,7 +157,7 @@ describe('Bench Component', () => {
     const wipLimitDisplay = screen.getAllByText(/WIP Limit/)[0].closest('.wip-limit-display');
     fireEvent.click(wipLimitDisplay);
     
-    const input = screen.getByPlaceholderText('Unlimited');
+    const input = screen.getByPlaceholderText('∞');
     expect(input).toBeInTheDocument();
     expect(input.value).toBe('5'); 
     
@@ -150,7 +167,7 @@ describe('Bench Component', () => {
       return Promise.resolve({ success: true });
     });
     
-    const saveButton = screen.getByTitle('Zapisz limit WIP');
+    const saveButton = screen.getByTitle('bench.saveWipLimit');
     await act(async () => {
       fireEvent.click(saveButton);
     });
@@ -169,13 +186,13 @@ describe('Bench Component', () => {
     const wipLimitDisplay = screen.getAllByText(/WIP Limit/)[0].closest('.wip-limit-display');
     fireEvent.click(wipLimitDisplay);
     
-    const input = screen.getByPlaceholderText('Unlimited');
+    const input = screen.getByPlaceholderText('∞');
     fireEvent.change(input, { target: { value: '7' } });
 
-    const cancelButton = screen.getByTitle('Anuluj');
+    const cancelButton = screen.getByTitle('bench.cancel');
     fireEvent.click(cancelButton);
     
-    expect(screen.queryByPlaceholderText('Unlimited')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('∞')).not.toBeInTheDocument();
     expect(screen.getByText('WIP Limit: 5')).toBeInTheDocument();
     
     expect(updateUserWipLimit).not.toHaveBeenCalled();
@@ -194,7 +211,7 @@ describe('Bench Component', () => {
     const wipLimitDisplay = screen.getAllByText(/WIP Limit/)[0].closest('.wip-limit-display');
     fireEvent.click(wipLimitDisplay);
     
-    const saveButton = screen.getByTitle('Zapisz limit WIP');
+    const saveButton = screen.getByTitle('bench.saveWipLimit');
     await act(async () => {
       fireEvent.click(saveButton);
     });
@@ -272,10 +289,10 @@ describe('Bench Component', () => {
 
     const wipLimitDisplay = screen.getAllByText(/WIP Limit/)[0].closest('.wip-limit-display');
     fireEvent.click(wipLimitDisplay);
-    const input = screen.getByPlaceholderText('Unlimited');
+    const input = screen.getByPlaceholderText('∞');
     fireEvent.change(input, { target: { value: '' } });
     
-    const saveButton = screen.getByTitle('Zapisz limit WIP');
+    const saveButton = screen.getByTitle('bench.saveWipLimit');
     await act(async () => {
       fireEvent.click(saveButton);
     });

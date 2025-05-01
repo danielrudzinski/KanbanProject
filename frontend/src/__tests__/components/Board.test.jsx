@@ -202,24 +202,17 @@ describe('Board Component', () => {
   });
   
   test('shows delete confirmation dialog when deleting a column', () => {
-    const originalConfirm = window.confirm;
-    window.confirm = jest.fn().mockReturnValue(true);
-    
     render(
       <KanbanContext.Provider value={mockContextValue}>
         <Board />
       </KanbanContext.Provider>
     );
 
-    const deleteButtons = screen.getAllByTitle('Usuń kolumnę');
+    const deleteButtons = screen.getAllByTitle('column.delete');
     fireEvent.click(deleteButtons[0]);
     
-    expect(window.confirm).toHaveBeenCalledWith(
-      'Czy na pewno chcesz usunąć tę kolumnę?'
-    );
-    
-    expect(mockContextValue.deleteColumn).toHaveBeenCalledWith('col1');
-    window.confirm = originalConfirm;
+    expect(toast.info).toHaveBeenCalled();
+    expect(mockContextValue.deleteColumn).not.toHaveBeenCalled();
   });
         
   test('shows WIP limits correctly', () => {
@@ -296,10 +289,10 @@ describe('Board Component', () => {
       </KanbanContext.Provider>
     );
             
-    const deleteButton = screen.getByTitle('Usuń wiersz');
+    const deleteButton = screen.getByTitle('row.delete');
     fireEvent.click(deleteButton);
     
-    expect(toast.error).toHaveBeenCalledWith('Nie można usunąć ostatniego wiersza.');
+    expect(toast.error).toHaveBeenCalledWith('row.cannotDeleteLast');
     expect(mockContextValue.deleteRow).not.toHaveBeenCalled();
   });
         
@@ -315,7 +308,7 @@ describe('Board Component', () => {
       </KanbanContext.Provider>
     );
             
-    expect(screen.getByText('Loading kanban board...')).toBeInTheDocument();
+    expect(screen.getByText('board.loading')).toBeInTheDocument();
   });
         
   test('shows error state correctly', () => {
@@ -330,7 +323,7 @@ describe('Board Component', () => {
       </KanbanContext.Provider>
     );
             
-    expect(screen.getByText('Error: Failed to load board data')).toBeInTheDocument();
+    expect(screen.getByText('board.error')).toBeInTheDocument();
   });
 
   test('displays correct task counts for columns and rows', () => {
@@ -424,9 +417,6 @@ describe('Board Component', () => {
   });
         
   test('shows delete confirmation dialog when deleting a row', () => {
-    const originalConfirm = window.confirm;
-    window.confirm = jest.fn().mockReturnValue(true);
-    
     render(
       <KanbanContext.Provider value={mockContextValue}>
         <Board />
@@ -437,27 +427,9 @@ describe('Board Component', () => {
     const deleteButton = rowHeader.querySelector('.delete-row-btn');
     
     fireEvent.click(deleteButton);
-    expect(window.confirm).toHaveBeenCalledWith(
-      'Czy na pewno chcesz usunąć ten wiersz?'
-    );
     
-    expect(mockContextValue.deleteRow).toHaveBeenCalledWith('row1');
-    window.confirm = originalConfirm;
-  });
-  
-  test('shows error state correctly', () => {
-    const errorContext = {
-      ...mockContextValue,
-      error: 'Failed to load board data'
-    };
-    
-    render(
-      <KanbanContext.Provider value={errorContext}>
-        <Board />
-      </KanbanContext.Provider>
-    );
-    
-    expect(screen.getByText('Error: Failed to load board data')).toBeInTheDocument();
+    expect(toast.info).toHaveBeenCalled();
+    expect(mockContextValue.deleteRow).not.toHaveBeenCalled();
   });
 
   test('properly renders columns with their WIP limits', () => {

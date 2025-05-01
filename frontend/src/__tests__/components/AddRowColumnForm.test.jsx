@@ -4,6 +4,12 @@ import '@testing-library/jest-dom';
 import AddRowColumnForm from '../../components/AddRowColumnForm';
 import KanbanContext from '../../context/KanbanContext';
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => key
+  })
+}));
+
 describe('AddRowColumnForm Component', () => {
     const mockAddColumn = jest.fn().mockResolvedValue({});
     const mockAddRow = jest.fn().mockResolvedValue({});
@@ -25,17 +31,17 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        expect(screen.getByText('Dodaj nowy wiersz/kolumnę')).toBeInTheDocument();
-        const columnTab = screen.getByText('Kolumny');
-        const rowTab = screen.getByText('Wiersze');
+        expect(screen.getByText('forms.addRowColumn.title')).toBeInTheDocument();
+        const columnTab = screen.getByText('forms.addRowColumn.tabs.columns');
+        const rowTab = screen.getByText('forms.addRowColumn.tabs.rows');
         expect(columnTab).toBeInTheDocument();
         expect(rowTab).toBeInTheDocument();
         expect(columnTab).toHaveClass('active');
         expect(rowTab).not.toHaveClass('active');
-        expect(screen.getByLabelText(/Nazwa kolumny:/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/Limit WIP/i)).toBeInTheDocument();
-        expect(screen.getByText('Dodaj kolumnę')).toBeInTheDocument();
-        expect(screen.getByText('Anuluj')).toBeInTheDocument();
+        expect(screen.getByLabelText('forms.addRowColumn.nameLabel.column')).toBeInTheDocument();
+        expect(screen.getByLabelText(/forms\.wipLimit\.limitLabel/i)).toBeInTheDocument();
+        expect(screen.getByText('forms.addRowColumn.submit.column')).toBeInTheDocument();
+        expect(screen.getByText('forms.wipLimit.cancel')).toBeInTheDocument();
     });
 
     test('switches between column and row tabs correctly', () => {
@@ -45,16 +51,16 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        const columnTab = screen.getByText('Kolumny');
-        const rowTab = screen.getByText('Wiersze');
+        const columnTab = screen.getByText('forms.addRowColumn.tabs.columns');
+        const rowTab = screen.getByText('forms.addRowColumn.tabs.rows');
         expect(columnTab).toHaveClass('active');
         
         fireEvent.click(rowTab);
         expect(rowTab).toHaveClass('active');
         expect(columnTab).not.toHaveClass('active');
         
-        expect(screen.getByLabelText(/Nazwa wiersza:/i)).toBeInTheDocument();
-        expect(screen.getByText('Dodaj wiersz')).toBeInTheDocument();
+        expect(screen.getByLabelText('forms.addRowColumn.nameLabel.row')).toBeInTheDocument();
+        expect(screen.getByText('forms.addRowColumn.submit.row')).toBeInTheDocument();
     });
 
     test('validates form input and shows error when name is empty', async () => {
@@ -65,9 +71,9 @@ describe('AddRowColumnForm Component', () => {
         );
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Dodaj kolumnę'));
+            fireEvent.click(screen.getByText('forms.addRowColumn.submit.column'));
         });
-        expect(screen.getByText('Nazwa kolumny jest wymagana!')).toBeInTheDocument();
+        expect(screen.getByText('forms.addRowColumn.error.nameRequired.column')).toBeInTheDocument();
         expect(mockAddColumn).not.toHaveBeenCalled();
     });
 
@@ -78,11 +84,11 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.change(screen.getByLabelText(/Nazwa kolumny:/i), { target: { value: 'New Column' } });
-        fireEvent.change(screen.getByLabelText(/Limit WIP/i), { target: { value: '5' } });
+        fireEvent.change(screen.getByLabelText('forms.addRowColumn.nameLabel.column'), { target: { value: 'New Column' } });
+        fireEvent.change(screen.getByLabelText(/forms\.wipLimit\.limitLabel/i), { target: { value: '5' } });
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Dodaj kolumnę'));
+            fireEvent.click(screen.getByText('forms.addRowColumn.submit.column'));
         });
         expect(mockAddColumn).toHaveBeenCalledWith('New Column', '5');
         expect(mockOnClose).toHaveBeenCalled();
@@ -95,13 +101,13 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.click(screen.getByText('Wiersze'));
+        fireEvent.click(screen.getByText('forms.addRowColumn.tabs.rows'));
         
-        fireEvent.change(screen.getByLabelText(/Nazwa wiersza:/i), { target: { value: 'New Row' } });
-        fireEvent.change(screen.getByLabelText(/Limit WIP/i), { target: { value: '3' } });
-
+        fireEvent.change(screen.getByLabelText('forms.addRowColumn.nameLabel.row'), { target: { value: 'New Row' } });
+        fireEvent.change(screen.getByLabelText(/forms\.wipLimit\.limitLabel/i), { target: { value: '3' } });
+    
         await act(async () => {
-            fireEvent.click(screen.getByText('Dodaj wiersz'));
+            fireEvent.click(screen.getByText('forms.addRowColumn.submit.row'));
         });
         
         expect(mockAddRow).toHaveBeenCalledWith('New Row', 3);
@@ -115,7 +121,7 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.click(screen.getByText('Anuluj'));
+        fireEvent.click(screen.getByText('forms.wipLimit.cancel'));
         expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -131,10 +137,10 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.change(screen.getByLabelText(/Nazwa kolumny:/i), { target: { value: 'Error Column' } });
+        fireEvent.change(screen.getByLabelText('forms.addRowColumn.nameLabel.column'), { target: { value: 'Error Column' } });
         
         await act(async () => {
-            fireEvent.click(screen.getByText('Dodaj kolumnę'));
+            fireEvent.click(screen.getByText('forms.addRowColumn.submit.column'));
         });
 
         expect(screen.getByText('API Error')).toBeInTheDocument();
@@ -153,12 +159,12 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.change(screen.getByLabelText(/Nazwa kolumny:/i), { target: { value: 'Error Column' } });
+        fireEvent.change(screen.getByLabelText('forms.addRowColumn.nameLabel.column'), { target: { value: 'Error Column' } });
 
         await act(async () => {
-            fireEvent.click(screen.getByText('Dodaj kolumnę'));
+            fireEvent.click(screen.getByText('forms.addRowColumn.submit.column'));
         });
-        expect(screen.getByText('Wystąpił błąd podczas dodawania kolumny')).toBeInTheDocument();
+        expect(screen.getByText('forms.addRowColumn.error.addFailed.column')).toBeInTheDocument();
     });
 
     test('disables form controls during submission', async () => {
@@ -173,32 +179,32 @@ describe('AddRowColumnForm Component', () => {
             </KanbanContext.Provider>
         );
         
-        fireEvent.change(screen.getByLabelText(/Nazwa kolumny:/i), { target: { value: 'Test Column' } });
+        fireEvent.change(screen.getByLabelText('forms.addRowColumn.nameLabel.column'), { target: { value: 'Test Column' } });
         
         act(() => {
-            fireEvent.click(screen.getByText('Dodaj kolumnę'));
+            fireEvent.click(screen.getByText('forms.addRowColumn.submit.column'));
         });
         
-        expect(screen.getByText('Dodawanie...')).toBeInTheDocument();
-        expect(screen.getByLabelText(/Nazwa kolumny:/i)).toBeDisabled();
-        expect(screen.getByLabelText(/Limit WIP/i)).toBeDisabled();
-        expect(screen.getByText('Dodawanie...')).toBeDisabled();
-        expect(screen.getByText('Anuluj')).toBeDisabled();
+        expect(screen.getByText('forms.addRowColumn.submitting')).toBeInTheDocument();
+        expect(screen.getByLabelText('forms.addRowColumn.nameLabel.column')).toBeDisabled();
+        expect(screen.getByLabelText(/forms\.wipLimit\.limitLabel/i)).toBeDisabled();
+        expect(screen.getByText('forms.addRowColumn.submitting')).toBeDisabled();
+        expect(screen.getByText('forms.wipLimit.cancel')).toBeDisabled();
     });
 
     test('resets form fields when switching tabs', () => {
         render(
             <KanbanContext.Provider value={mockContextValue}>
-                <AddRowColumnForm onClose={mockOnClose} />
+                <AddRowColumnForm onClose={mockOnClose} /> 
             </KanbanContext.Provider>
         );
         
-        fireEvent.change(screen.getByLabelText(/Nazwa kolumny:/i), { target: { value: 'Test Column' } });
-        fireEvent.change(screen.getByLabelText(/Limit WIP/i), { target: { value: '5' } });
+        fireEvent.change(screen.getByLabelText('forms.addRowColumn.nameLabel.column'), { target: { value: 'Test Column' } });
+        fireEvent.change(screen.getByLabelText(/forms\.wipLimit\.limitLabel/i), { target: { value: '5' } });
         
-        fireEvent.click(screen.getByText('Wiersze'));
+        fireEvent.click(screen.getByText('forms.addRowColumn.tabs.rows'));
         
-        expect(screen.getByLabelText(/Nazwa wiersza:/i).value).toBe('');
-        expect(screen.getByLabelText(/Limit WIP/i).value).toBe('0');
+        expect(screen.getByLabelText('forms.addRowColumn.nameLabel.row').value).toBe('');
+        expect(screen.getByLabelText(/forms\.wipLimit\.limitLabel/i).value).toBe('0');
     });
 });

@@ -5,6 +5,12 @@ import Row from '../../components/Row';
 import KanbanContext from '../../context/KanbanContext';
 import { toast } from 'react-toastify';
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => key
+  })
+}));
+
 jest.mock('react-toastify', () => ({
   toast: {
     error: jest.fn(),
@@ -70,7 +76,7 @@ describe('Row Component', () => {
     
     expect(screen.getByTestId(`editable-row-${mockRow.id}`)).toBeInTheDocument();
     expect(screen.getByText('☰')).toBeInTheDocument();
-    expect(screen.getByTitle('Usuń wiersz')).toBeInTheDocument();
+    expect(screen.getByTitle('row.delete')).toBeInTheDocument();
     expect(screen.getByText(mockRow.taskCount.toString())).toBeInTheDocument();
     expect(screen.getByTestId('mock-children')).toBeInTheDocument();
   });
@@ -82,7 +88,7 @@ describe('Row Component', () => {
       </KanbanContext.Provider>
     );
     
-    const wipLimitElement = screen.getByText(`Limit: ${mockRow.wipLimit}`);
+    const wipLimitElement = screen.getByText(`row.wipLimit: ${mockRow.wipLimit}`);
     expect(wipLimitElement).toBeInTheDocument();
   });
   
@@ -95,7 +101,7 @@ describe('Row Component', () => {
       </KanbanContext.Provider>
     );
     
-    expect(screen.queryByText(/\(\d+\/\d+\)/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/row\.wipLimit/)).not.toBeInTheDocument();
   });
   
   test('shows exceeded WIP limit warning when tasks exceed limit', () => {
@@ -107,8 +113,9 @@ describe('Row Component', () => {
       </KanbanContext.Provider>
     );
     
-    const wipLimitElement = screen.getByText((content) => content.startsWith(`Limit: ${rowExceedingLimit.wipLimit}`)).closest('.wip-limit');
+    const wipLimitElement = screen.getByText((content) => content.startsWith(`row.wipLimit: ${rowExceedingLimit.wipLimit}`)).closest('.wip-limit');
     expect(wipLimitElement).toHaveClass('exceeded');
+    expect(screen.getByText((content) => content.includes('row.wipExceeded'))).toBeInTheDocument();
   }); 
   
   test('handles row drag start correctly', () => {
@@ -213,10 +220,10 @@ describe('Row Component', () => {
       </KanbanContext.Provider>
     );
     
-    const deleteButton = screen.getByTitle('Usuń wiersz');
+    const deleteButton = screen.getByTitle('row.delete');
     fireEvent.click(deleteButton);
     
-    const confirmButton = screen.getByText('Tak');
+    const confirmButton = screen.getByText('taskActions.yes');
     fireEvent.click(confirmButton);
     
     expect(mockDeleteRow).toHaveBeenCalledWith(mockRow.id);
@@ -229,9 +236,9 @@ describe('Row Component', () => {
       </KanbanContext.Provider>
     );
     
-    const deleteButton = screen.getByTitle('Usuń wiersz');
+    const deleteButton = screen.getByTitle('row.delete');
     fireEvent.click(deleteButton);
-    const cancelButton = screen.getByText('Nie');
+    const cancelButton = screen.getByText('taskActions.no');
     fireEvent.click(cancelButton);
     
     expect(mockDeleteRow).not.toHaveBeenCalled();
@@ -281,11 +288,11 @@ describe('Row Component', () => {
       </KanbanContext.Provider>
     );
     
-    const deleteButton = screen.getByTitle('Usuń wiersz');
+    const deleteButton = screen.getByTitle('row.delete');
     fireEvent.click(deleteButton);
     
-    expect(toast.warning).toHaveBeenCalledWith('Nie można usunąć ostatniego wiersza.');
-    expect(screen.queryByText('Czy na pewno chcesz usunąć ten wiersz?')).not.toBeInTheDocument();
+    expect(toast.warning).toHaveBeenCalledWith('row.lastRowWarning');
+    expect(screen.queryByText('row.deleteConfirm')).not.toBeInTheDocument();
     expect(mockDeleteRow).not.toHaveBeenCalled();
   });
 
@@ -302,9 +309,9 @@ describe('Row Component', () => {
       </KanbanContext.Provider>
     );
     
-    const wipLimitElement = screen.getByText(`Limit: ${rowWithinLimit.wipLimit}`);
+    const wipLimitElement = screen.getByText(`row.wipLimit: ${rowWithinLimit.wipLimit}`);
     expect(wipLimitElement).not.toHaveClass('exceeded');
-    expect(screen.queryByText('(przekroczony!)')).not.toBeInTheDocument();
+    expect(screen.queryByText('row.wipExceeded')).not.toBeInTheDocument();
   });
 
   test('handles the edge case where taskCount equals wipLimit', () => {
@@ -320,9 +327,9 @@ describe('Row Component', () => {
       </KanbanContext.Provider>
     );
     
-    const wipLimitElement = screen.getByText(`Limit: ${rowAtLimit.wipLimit}`);
+    const wipLimitElement = screen.getByText(`row.wipLimit: ${rowAtLimit.wipLimit}`);
     expect(wipLimitElement).not.toHaveClass('exceeded');
-    expect(screen.queryByText('(przekroczony!)')).not.toBeInTheDocument();
+    expect(screen.queryByText('row.wipExceeded')).not.toBeInTheDocument();
   });
 
   test('renders task count as 0 when taskCount is undefined', () => {
@@ -337,5 +344,4 @@ describe('Row Component', () => {
     
     expect(screen.getByText('0')).toBeInTheDocument();
   });
-
 });

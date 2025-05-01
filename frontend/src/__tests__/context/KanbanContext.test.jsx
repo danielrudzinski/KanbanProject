@@ -1285,7 +1285,7 @@ describe('KanbanContext Provider', () => {
     
     await waitFor(() => {
       expect(screen.getByTestId('error-message')).toHaveTextContent(
-        'Error: Nie ma żadnej kolumny. Dodaj najpierw kolumnę.'
+        'Error: notifications.noColumnError'
       );
     });
   });

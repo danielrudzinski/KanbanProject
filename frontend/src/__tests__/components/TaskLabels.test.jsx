@@ -20,6 +20,12 @@ jest.mock('react-toastify', () => ({
   }
 }));
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => key
+  })
+}));
+
 jest.mock('react-dom', () => {
   const original = jest.requireActual('react-dom');
   return {
@@ -74,7 +80,7 @@ describe('TaskLabels Component', () => {
       expect(screen.getByText(label)).toBeInTheDocument();
     });
     
-    expect(screen.getByText('+ Etykieta')).toBeInTheDocument();
+    expect(screen.getByText('taskLabels.addLabel')).toBeInTheDocument();
   });
   
   test('opens label picker when add button is clicked', async () => {
@@ -90,14 +96,14 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    const addButton = screen.getByText('+ Etykieta');
+    const addButton = screen.getByText('taskLabels.addLabel');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
     await waitFor(() => {
-      expect(screen.getByText('Wybierz etykietę')).toBeInTheDocument();
-      expect(screen.getByText('Predefiniowane etykiety')).toBeInTheDocument();
+      expect(screen.getByText('taskLabels.chooseLabelHeader')).toBeInTheDocument();
+      expect(screen.getByText('taskLabels.predefinedLabels')).toBeInTheDocument();
     });
   });
   
@@ -116,13 +122,13 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    const addButton = screen.getByText('+ Etykieta');
+    const addButton = screen.getByText('taskLabels.addLabel');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
     await waitFor(() => {
-      expect(screen.getByText('Wybierz etykietę')).toBeInTheDocument();
+      expect(screen.getByText('taskLabels.chooseLabelHeader')).toBeInTheDocument();
     });
     
     const highPriorityOption = screen.getByText('High Priority');
@@ -163,7 +169,7 @@ describe('TaskLabels Component', () => {
     });
   });
   
-  test('opens custom label form when "Dodaj własną etykietę" is clicked', async () => {
+  test('opens custom label form when "taskLabels.addCustomLabel" is clicked', async () => {
     await act(async () => {
       render(
         <KanbanContext.Provider value={mockContextValue}>
@@ -176,23 +182,23 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    const addButton = screen.getByText('+ Etykieta');
+    const addButton = screen.getByText('taskLabels.addLabel');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
     await waitFor(() => {
-      expect(screen.getByText('Wybierz etykietę')).toBeInTheDocument();
+      expect(screen.getByText('taskLabels.chooseLabelHeader')).toBeInTheDocument();
     });
     
-    const customLabelOption = screen.getByText('Dodaj własną etykietę');
+    const customLabelOption = screen.getByText('taskLabels.addCustomLabel');
     await act(async () => {
       fireEvent.click(customLabelOption);
     });
     
     await waitFor(() => {
-      expect(screen.getByPlaceholderText('Wpisz nazwę etykiety')).toBeInTheDocument();
-      expect(screen.getByText('Kolor etykiety:')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('taskLabels.labelNamePlaceholder')).toBeInTheDocument();
+      expect(screen.getByText('taskLabels.labelColor')).toBeInTheDocument();
     });
   });
   
@@ -211,24 +217,24 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    const addButton = screen.getByText('+ Etykieta');
+    const addButton = screen.getByText('taskLabels.addLabel');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
     await waitFor(() => {
-      const customLabelOption = screen.getByText('Dodaj własną etykietę');
+      const customLabelOption = screen.getByText('taskLabels.addCustomLabel');
       fireEvent.click(customLabelOption);
     });
     
     await waitFor(() => {
-      const nameInput = screen.getByPlaceholderText('Wpisz nazwę etykiety');
+      const nameInput = screen.getByPlaceholderText('taskLabels.labelNamePlaceholder');
       const colorInput = screen.getByDisplayValue('#888888');
       
       fireEvent.change(nameInput, { target: { value: 'Custom Label' } });
       fireEvent.change(colorInput, { target: { value: '#FF00FF' } });
       
-      const submitButton = screen.getByText('Dodaj');
+      const submitButton = screen.getByText('taskLabels.add');
       fireEvent.click(submitButton);
     });
     
@@ -254,24 +260,24 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    const addButton = screen.getByText('+ Etykieta');
+    const addButton = screen.getByText('taskLabels.addLabel');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
     await waitFor(() => {
-      const customLabelOption = screen.getByText('Dodaj własną etykietę');
+      const customLabelOption = screen.getByText('taskLabels.addCustomLabel');
       fireEvent.click(customLabelOption);
     });
     
     await waitFor(() => {
-      expect(screen.getByText('Dodaj własną etykietę')).toBeInTheDocument();
-      const cancelButton = screen.getByText('Anuluj');
+      expect(screen.getByText('taskLabels.addCustomLabelTitle')).toBeInTheDocument();
+      const cancelButton = screen.getByText('taskLabels.cancel');
       fireEvent.click(cancelButton);
     });
     
     await waitFor(() => {
-      expect(screen.queryByText('Dodaj własną etykietę')).not.toBeInTheDocument();
+      expect(screen.queryByText('taskLabels.addCustomLabelTitle')).not.toBeInTheDocument();
     });
   });
   
@@ -288,13 +294,13 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    const addButton = screen.getByText('+ Etykieta');
+    const addButton = screen.getByText('taskLabels.addLabel');
     await act(async () => {
       fireEvent.click(addButton);
     });
     
     await waitFor(() => {
-      expect(screen.getByText('Wybierz etykietę')).toBeInTheDocument();
+      expect(screen.getByText('taskLabels.chooseLabelHeader')).toBeInTheDocument();
     });
     
     await act(async () => {
@@ -302,7 +308,7 @@ describe('TaskLabels Component', () => {
     });
     
     await waitFor(() => {
-      expect(screen.queryByText('Wybierz etykietę')).not.toBeInTheDocument();
+      expect(screen.queryByText('taskLabels.chooseLabelHeader')).not.toBeInTheDocument();
     });
   });
   
@@ -342,7 +348,7 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    const addButton = screen.getByText('+ Etykieta');
+    const addButton = screen.getByText('taskLabels.addLabel');
     await act(async () => {
       fireEvent.click(addButton);
     });
@@ -353,7 +359,7 @@ describe('TaskLabels Component', () => {
     });
     
     await waitFor(() => {
-      expect(toast.warning).toHaveBeenCalledWith('Ta etykieta została już dodana do zadania');
+      expect(toast.warning).toHaveBeenCalledWith('taskLabels.alreadyAddedWarning');
       expect(addLabelToTask).not.toHaveBeenCalled();
     });
   });
@@ -374,7 +380,7 @@ describe('TaskLabels Component', () => {
       );
     });
     
-    const addButton = screen.getByText('+ Etykieta');
+    const addButton = screen.getByText('taskLabels.addLabel');
     await act(async () => {
       fireEvent.click(addButton);
     });
@@ -387,7 +393,7 @@ describe('TaskLabels Component', () => {
     await waitFor(() => {
       expect(addLabelToTask).toHaveBeenCalledWith(1, 'High Priority');
       expect(console.error).toHaveBeenCalled();
-      expect(toast.error).toHaveBeenCalledWith('Wystąpił błąd podczas dodawania etykiety');
+      expect(toast.error).toHaveBeenCalledWith('taskLabels.addErrorMessage');
     });
   });
   
@@ -415,8 +421,7 @@ describe('TaskLabels Component', () => {
     await waitFor(() => {
       expect(removeLabelFromTask).toHaveBeenCalledWith(1, 'Bug');
       expect(console.error).toHaveBeenCalled();
-      expect(toast.error).toHaveBeenCalledWith('Wystąpił błąd podczas usuwania etykiety');
+      expect(toast.error).toHaveBeenCalledWith('taskLabels.removeErrorMessage');
     });
   });
-
 });
