@@ -408,5 +408,15 @@ public class TaskService {
             taskRepository.save(task);
         }
     }
+    public List<String> getTaskColumnHistory(Integer taskId) {
+        try {
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+            return task.getColumnHistory();
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+    }
 
 }
