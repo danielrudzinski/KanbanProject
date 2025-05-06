@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.myproject.kanbanproject2.dto.TaskDTO;
@@ -13,6 +14,7 @@ import pl.myproject.kanbanproject2.model.User;
 import pl.myproject.kanbanproject2.repository.TaskRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -37,13 +39,13 @@ public class TaskService {
     }
 
     public Task addTask(Task task) {
-        // If position is not set, set it to the last position + 1
+
         if (task.getPosition() == null) {
             long count = taskRepository.count();
             task.setPosition((int) count + 1);
         }
 
-        // Initialize labels if null
+
         if (task.getLabels() == null) {
             task.setLabels(new HashSet<>());
         }
@@ -378,5 +380,23 @@ public class TaskService {
                 updateDependentTasksCompletion(childTask);
             }
         });
+    }
+
+
+
+    @Scheduled(fixedRate = 1800000) // wykonywane co 30 min
+    public void checkAllTasksDeadlines() {
+        List<Task> tasksWithDeadline = taskRepository.findAllByDeadlineIsNotNull();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Task task : tasksWithDeadline) {
+            boolean wasExpired = task.isExpired();
+            boolean isExpired = task.getDeadline().isBefore(now);
+
+            if (wasExpired != isExpired) {
+                task.setExpired(isExpired);
+                taskRepository.save(task);
+            }
+        }
     }
 }
