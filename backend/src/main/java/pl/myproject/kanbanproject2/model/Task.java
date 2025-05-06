@@ -33,6 +33,10 @@ public class Task {
     @jakarta.persistence.Column(name = "expired")
     private boolean expired;
     @ElementCollection
+    @CollectionTable(name = "task_column_history", joinColumns = @JoinColumn(name = "task_id"))
+    @jakarta.persistence.Column(name = "column_name")
+    private List<String> columnHistory = new ArrayList<>();
+    @ElementCollection
     @CollectionTable(name = "task_labels", joinColumns = @JoinColumn(name = "task_id"))
     @jakarta.persistence.Column(name = "label")
     private Set<String> labels;

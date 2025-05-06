@@ -15,10 +15,7 @@ import pl.myproject.kanbanproject2.repository.TaskRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -54,11 +51,10 @@ public class TaskService {
     }
 
     public List<TaskDTO> getAllTasks() {
-        List<TaskDTO> taskDTOS = taskRepository.findAll().stream()
+        return taskRepository.findAll().stream()
                 .map(taskMapper::apply)
                 .sorted(Comparator.comparing(TaskDTO::position))
                 .collect(Collectors.toList());
-        return taskDTOS;
     }
 
     public void deleteTask(Integer id) {
@@ -96,7 +92,11 @@ public class TaskService {
             if (task.getTitle() != null) {
                 existingTask.setTitle(task.getTitle());
             }
-            if (task.getColumn() != null) {
+            if (task.getColumn() != null &&
+                    (existingTask.getColumn() == null || !existingTask.getColumn().getId().equals(task.getColumn().getId()))) {
+                existingTask.setColumn(task.getColumn());
+                taskHistory(existingTask);
+            } else if (task.getColumn() != null) {
                 existingTask.setColumn(task.getColumn());
             }
             if (task.getUsers() != null) {
@@ -113,9 +113,6 @@ public class TaskService {
             }
             if (task.getDescription() != null) {
                 existingTask.setDescription(task.getDescription());
-            }
-            if (task.getPosition() != null) {
-                existingTask.setPosition(task.getPosition());
             }
 
             Task savedTask = taskRepository.save(existingTask);
@@ -382,8 +379,6 @@ public class TaskService {
         });
     }
 
-
-
     @Scheduled(fixedRate = 1800000) // wykonywane co 30 min
     public void checkAllTasksDeadlines() {
         List<Task> tasksWithDeadline = taskRepository.findAllByDeadlineIsNotNull();
@@ -399,4 +394,19 @@ public class TaskService {
             }
         }
     }
+
+    public void taskHistory(Task task) {
+        if (task.getColumn() != null) {
+            String columnName = task.getColumn().getName();
+
+            if (task.getColumnHistory() == null) {
+                task.setColumnHistory(new ArrayList<>());
+            }
+
+            task.getColumnHistory().add(columnName);
+
+            taskRepository.save(task);
+        }
+    }
+
 }
