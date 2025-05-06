@@ -28,7 +28,9 @@ public class Task {
     private Integer position;
     private boolean completed;
     private String description;
+    @jakarta.persistence.Column(name = "deadline")
     private LocalDateTime deadline;
+    @jakarta.persistence.Column(name = "expired")
     private boolean expired;
     @ElementCollection
     @CollectionTable(name = "task_labels", joinColumns = @JoinColumn(name = "task_id"))
