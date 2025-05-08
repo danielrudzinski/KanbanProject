@@ -20,7 +20,7 @@ COPY backend/src ./src/
 # Build and run the application
 COPY backend/mvnw ./
 COPY backend/.mvn ./.mvn/
-RUN chmod +x mvnw
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 RUN ./mvnw package -DskipTests
 EXPOSE 8080
 CMD ["java", "-jar", "target/KanbanProject2-0.0.1-SNAPSHOT.jar"]
