@@ -30,7 +30,9 @@
     "expand": "Expand",
     "collapse": "Collapse",
     "deadline": "Deadline",
-    "expired": "Expired!"
+    "expired": "Expired!",
+    "editDeadline": "Edit deadline",
+    "noDeadline": "No deadline"
   },
   "board": {
     "loading": "Loading kanban board...",

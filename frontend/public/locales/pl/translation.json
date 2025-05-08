@@ -30,7 +30,9 @@
     "expand": "Rozwiń",
     "collapse": "Zwiń",
     "deadline": "Deadline",
-    "expired": "Przedawniony!"
+    "expired": "Przedawniony!",
+    "editDeadline": "Edytuj termin",
+    "noDeadline": "Brak terminu"
   },
   "board": {
     "loading": "Ładowanie tablicy kanban...",

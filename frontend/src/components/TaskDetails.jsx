@@ -37,6 +37,9 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const [showParentSelector, setShowParentSelector] = useState(false);
   const [selectedParentId, setSelectedParentId] = useState('');
   const [childTasks, setChildTasks] = useState([]);
+  const [editingDeadline, setEditingDeadline] = useState(false);
+  const [deadlineValue, setDeadlineValue] = useState('');
+  const [originalDeadline, setOriginalDeadline] = useState('');
   const { t } = useTranslation();
 
   const panelRef = useRef(null);
@@ -551,6 +554,37 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     }
   };
 
+  const startEditingDeadline = () => {
+    const formattedDeadline = task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : '';
+    setOriginalDeadline(formattedDeadline);
+    setDeadlineValue(formattedDeadline);
+    setEditingDeadline(true);
+  };
+  
+  const saveDeadline = async () => {
+    try {
+      await updateTask(task.id, { deadline: deadlineValue });
+      
+      setOriginalDeadline(deadlineValue);
+      setEditingDeadline(false);
+      
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 3000);
+      
+      refreshTasks();
+    } catch (error) {
+      console.error('Error saving task deadline:', error);
+      toast.error(t('notifications.errorOccurred', { message: error.message }));
+    }
+  };
+  
+  const cancelEditingDeadline = () => {
+    setDeadlineValue(originalDeadline);
+    setEditingDeadline(false);
+  };
+
   if (loading) {
     return createPortal(
       <div className="task-details-overlay">
@@ -656,17 +690,54 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       <div className="task-details-main">
 
       {/* Deadline Section */}
-      {task.deadline && (
-        <div className="task-deadline-section">
-          <div className="deadline-header">
+      <div className="task-deadline-section">
+        <div className="deadline-header">
             <span className="deadline-icon">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </span>
           <h4>{t('taskActions.deadline')}:</h4>
+        {!editingDeadline && (
+          <button 
+          onClick={startEditingDeadline}
+          className="edit-description-btn"
+          title={t('taskActions.editDeadline')}
+        >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+          </button>
+        )}
+        </div>
+  
+      {editingDeadline ? (
+        <div className="deadline-edit-form">
+          <input 
+            type="datetime-local"
+            value={deadlineValue}
+            onChange={(e) => setDeadlineValue(e.target.value)}
+            className="deadline-input"
+          />
+          <div className="description-edit-actions">
+            <button 
+              onClick={saveDeadline}
+              className="save-description-btn"
+            >
+              {t('taskActions.save')}
+            </button>
+            <button 
+              onClick={cancelEditingDeadline}
+              className="cancel-edit-btn"
+            >
+              {t('taskActions.cancel')}
+            </button>
           </div>
-          <div className={`deadline-content ${new Date(task.deadline) < new Date() ? 'expired' : ''}`}>
+        </div>
+    ) : (
+      <div className={`deadline-content ${task.deadline && new Date(task.deadline) < new Date() ? 'expired' : ''}`}>
+        {task.deadline ? (
+          <>
             {new Date(task.deadline).toLocaleString(undefined, {
               year: 'numeric',
               month: 'long',
@@ -677,9 +748,13 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
             {new Date(task.deadline) < new Date() && (
               <span className="expired-tag">{t('taskActions.expired')}</span>
             )}
-            </div>
-          </div>
+          </>
+        ) : (
+          <p className="empty-deadline">{t('taskActions.noDeadline')}</p>
         )}
+      </div>
+    )}
+      </div>
         
           {/* Task Description Section */}
           <div className="task-description-section">

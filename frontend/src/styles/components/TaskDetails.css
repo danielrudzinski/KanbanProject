@@ -1224,3 +1224,10 @@ label {
   font-size: 12px;
   font-weight: 600;
 }
+
+.empty-deadline {
+  margin: 0;
+  font-size: 14px;
+  font-style: italic;
+  color: #76777c;
+}

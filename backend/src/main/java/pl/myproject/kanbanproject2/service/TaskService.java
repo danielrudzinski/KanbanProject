@@ -114,6 +114,9 @@ public class TaskService {
             if (task.getDescription() != null) {
                 existingTask.setDescription(task.getDescription());
             }
+            if (task.getDeadline() != null) {
+                existingTask.setDeadline(task.getDeadline());
+            }
 
             Task savedTask = taskRepository.save(existingTask);
             return taskMapper.apply(savedTask);
