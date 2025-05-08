@@ -179,7 +179,7 @@ export const fetchTask = async (taskId) => {
   }
 };
 
-export const addTask = async (title, columnId) => {
+export const addTask = async (title, columnId, deadline = null) => {
   try {
     const response = await fetch(API_ENDPOINTS.TASKS, {
       method: 'POST',
@@ -190,7 +190,8 @@ export const addTask = async (title, columnId) => {
         title,
         column: {
           id: columnId
-        }
+        },
+        deadline: deadline
       })
     });
     
@@ -924,6 +925,19 @@ export const canTaskBeCompleted = async (taskId) => {
     return await response.json();
   } catch (error) {
     console.error(`Error checking if task ${taskId} can be completed:`, error);
+    throw error;
+  }
+};
+
+export const getTaskColumnHistory = async (taskId) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}/column-history`);
+    if (!response.ok) {
+      throw new Error(`Error fetching task column history: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching column history for task ${taskId}:`, error);
     throw error;
   }
 };

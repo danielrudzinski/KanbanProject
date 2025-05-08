@@ -4,8 +4,10 @@ import { useTranslation } from 'react-i18next';
 import '../styles/components/Forms.css'; 
 
 function AddTaskForm({ onClose }) {
-  const { addTask, refreshTasks } = useKanban();
+  const { addTask, refreshTasks, columns } = useKanban();
   const [title, setTitle] = useState('');
+  const [deadline, setDeadline] = useState('');
+  const [selectedColumnId, setSelectedColumnId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const { t } = useTranslation();
@@ -22,10 +24,12 @@ function AddTaskForm({ onClose }) {
       setIsSubmitting(true);
       setError(null);
       
-      await addTask(title);
+      await addTask(title, selectedColumnId || null, deadline || null);
       await refreshTasks();
       
       setTitle('');
+      setDeadline('');
+      setSelectedColumnId('');
       if (onClose) onClose();
     } catch (err) {
       setError(err.message || t('forms.addTaskForm.addError'));
@@ -61,6 +65,37 @@ function AddTaskForm({ onClose }) {
             placeholder={t('forms.addTaskForm.titlePlaceholder')}
             disabled={isSubmitting}
           />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="task-column">{t('forms.addTaskForm.columnLabel')}</label>
+          <select
+            id="task-column"
+            value={selectedColumnId}
+            onChange={(e) => setSelectedColumnId(e.target.value)}
+            disabled={isSubmitting}
+          >
+            <option value="">{t('forms.addTaskForm.selectColumn')}</option>
+            {columns && columns.map(column => (
+              <option key={column.id} value={column.id}>
+                {column.name}
+              </option>
+            ))}
+          </select>
+          <small className="help-text">{t('forms.addTaskForm.columnHelp', 'Optional. Tasks without a column will appear in the backlog.')}</small>
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="task-deadline">{t('forms.addTaskForm.deadlineLabel', 'Deadline')}</label>
+          <input
+            id="task-deadline"
+            type="datetime-local"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+            disabled={isSubmitting}
+            className="deadline-input"
+          />
+          <small className="help-text">{t('forms.addTaskForm.deadlineHelp', 'Optional. Tasks will be marked as expired when the deadline passes.')}</small>
         </div>
         
         <div className="form-actions">

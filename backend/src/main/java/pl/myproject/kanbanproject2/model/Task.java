@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +28,14 @@ public class Task {
     private Integer position;
     private boolean completed;
     private String description;
+    @jakarta.persistence.Column(name = "deadline")
+    private LocalDateTime deadline;
+    @jakarta.persistence.Column(name = "expired")
+    private boolean expired = false;
+    @ElementCollection
+    @CollectionTable(name = "task_column_history", joinColumns = @JoinColumn(name = "task_id"))
+    @jakarta.persistence.Column(name = "column_name")
+    private List<String> columnHistory = new ArrayList<>();
     @ElementCollection
     @CollectionTable(name = "task_labels", joinColumns = @JoinColumn(name = "task_id"))
     @jakarta.persistence.Column(name = "label")
@@ -54,4 +65,7 @@ public class Task {
     @OneToMany(mappedBy = "parentTask", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonIgnoreProperties("parentTask")
     private Set<Task> childTasks = new HashSet<>();
+    public boolean isExpired() {
+        return expired;
+    }
 }

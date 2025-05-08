@@ -28,7 +28,9 @@
     "editSubTaskDescription": "Edytuj opis podzadania",
     "shadowDescription": "Wprowadź opis zadania",
     "expand": "Rozwiń",
-    "collapse": "Zwiń"
+    "collapse": "Zwiń",
+    "deadline": "Deadline",
+    "expired": "Przedawniony!"
   },
   "board": {
     "loading": "Ładowanie tablicy kanban...",
@@ -142,7 +144,12 @@
       "titlePlaceholder": "Wpisz tytuł zadania",
       "titleRequired": "Tytuł zadania jest wymagany!",
       "adding": "Dodawanie...",
-      "addError": "Wystąpił błąd podczas dodawania zadania"
+      "addError": "Wystąpił błąd podczas dodawania zadania",
+      "columnLabel": "Kolumna:",
+      "selectColumn": "Wybierz kolumnę",
+      "columnHelp": "Opcjonalne. Zadania bez kolumny pojawią się w backlogu.",
+      "deadlineLabel": "Termin:",
+      "deadlineHelp": "Opcjonalne. Zadania zostaną oznaczone jako przeterminowane po upływie terminu."
     },
     "deleteUser": "Usuń użytkownika"
   },

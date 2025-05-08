@@ -5,9 +5,10 @@ import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.model.Task;
 import pl.myproject.kanbanproject2.model.User;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class TaskMapper implements Function<Task, TaskDTO> {
@@ -32,21 +33,19 @@ public class TaskMapper implements Function<Task, TaskDTO> {
         if (task.getUsers() != null) {
             userIds = task.getUsers().stream()
                     .map(User::getId)
-                    .collect(java.util.stream.Collectors.toSet());
+                    .collect(Collectors.toSet());
         }
-
 
         Integer parentTaskId = null;
         if (task.getParentTask() != null) {
             parentTaskId = task.getParentTask().getId();
         }
 
-
         Set<Integer> childTaskIds = null;
         if (task.getChildTasks() != null && !task.getChildTasks().isEmpty()) {
             childTaskIds = task.getChildTasks().stream()
                     .map(Task::getId)
-                    .collect(java.util.stream.Collectors.toSet());
+                    .collect(Collectors.toSet());
         }
 
         Set<String> labels = task.getLabels();
@@ -62,7 +61,9 @@ public class TaskMapper implements Function<Task, TaskDTO> {
                 task.isCompleted(),
                 task.getDescription(),
                 parentTaskId,
-                childTaskIds
+                childTaskIds,
+                task.getDeadline(),
+                task.isExpired()
         );
     }
 }

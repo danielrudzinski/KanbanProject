@@ -1,5 +1,6 @@
 package pl.myproject.kanbanproject2.dto;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 public record TaskDTO(
@@ -13,5 +14,7 @@ public record TaskDTO(
         boolean completed,
         String description,
         Integer parentTaskId,
-        Set<Integer> childTaskIds
+        Set<Integer> childTaskIds,
+        LocalDateTime deadline,
+        boolean expired
 ) {}

@@ -1181,3 +1181,46 @@ label {
   border-radius: 4px;
   font-size: 13px;
 }
+
+.task-deadline-section {
+  padding: 18px 22px;
+  border-bottom: 1px solid #76777c;
+  background-color: rgba(134, 214, 255, 0.1);
+}
+
+.deadline-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.deadline-icon {
+  color: #0e1b36;
+}
+
+.deadline-content {
+  font-size: 16px;
+  font-weight: 500;
+  color: #0e1b36;
+  padding: 6px 12px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.deadline-content.expired {
+  color: #e53935;
+  background-color: rgba(229, 57, 53, 0.1);
+}
+
+.expired-tag {
+  background-color: #e53935;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}

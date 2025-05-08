@@ -115,4 +115,9 @@ public class TaskController {
     public ResponseEntity<Boolean> canTaskBeCompleted(@PathVariable Integer taskId) {
         return ResponseEntity.ok(taskService.canTaskBeCompleted(taskId));
     }
+    
+    @GetMapping("/{taskId}/column-history")
+    public ResponseEntity<List<String>> getTaskColumnHistory(@PathVariable Integer taskId) {
+        return ResponseEntity.ok(taskService.getTaskColumnHistory(taskId));
+    }
 }

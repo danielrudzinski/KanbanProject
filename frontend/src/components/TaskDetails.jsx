@@ -654,6 +654,33 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       </div>
           
       <div className="task-details-main">
+
+      {/* Deadline Section */}
+      {task.deadline && (
+        <div className="task-deadline-section">
+          <div className="deadline-header">
+            <span className="deadline-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </span>
+          <h4>{t('taskActions.deadline')}:</h4>
+          </div>
+          <div className={`deadline-content ${new Date(task.deadline) < new Date() ? 'expired' : ''}`}>
+            {new Date(task.deadline).toLocaleString(undefined, {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+            {new Date(task.deadline) < new Date() && (
+              <span className="expired-tag">{t('taskActions.expired')}</span>
+            )}
+            </div>
+          </div>
+        )}
+        
           {/* Task Description Section */}
           <div className="task-description-section">
           <div className="description-header">
