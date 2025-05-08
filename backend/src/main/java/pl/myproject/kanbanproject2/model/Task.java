@@ -31,7 +31,10 @@ public class Task {
     @jakarta.persistence.Column(name = "deadline")
     private LocalDateTime deadline;
     @jakarta.persistence.Column(name = "expired")
-    private boolean expired;
+    private boolean expired = false;
+    public boolean isExpired() {
+        return expired;
+    }
     @ElementCollection
     @CollectionTable(name = "task_column_history", joinColumns = @JoinColumn(name = "task_id"))
     @jakarta.persistence.Column(name = "column_name")

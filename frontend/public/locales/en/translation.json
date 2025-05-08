@@ -28,7 +28,9 @@
     "editSubTaskDescription": "Edit subtask description",
     "shadowDescription": "Enter task description",
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "deadline": "Deadline",
+    "expired": "Expired!"
   },
   "board": {
     "loading": "Loading kanban board...",
@@ -142,7 +144,12 @@
       "titlePlaceholder": "Enter task title",
       "titleRequired": "Task title is required!",
       "adding": "Adding...",
-      "addError": "An error occurred while adding the task"
+      "addError": "An error occurred while adding the task",
+      "columnLabel": "Column:",
+      "selectColumn": "Select a column",
+      "columnHelp": "Optional. Tasks without a column will appear in the backlog.",
+      "deadlineLabel": "Deadline:",
+      "deadlineHelp": "Optional. Tasks will be marked as expired when the deadline passes."
     },
     "deleteUser": "Delete user"
   },

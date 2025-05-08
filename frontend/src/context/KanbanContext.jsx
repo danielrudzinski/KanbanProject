@@ -151,7 +151,7 @@ export function KanbanProvider({ children }) {
     }
   };
 
-  const handleAddTask = async (title, rowId) => {
+  const handleAddTask = async (title, columnId, deadline = null) => {
     try {
       if (!columns || columns.length === 0) {
         const errorMessage = t('notifications.noColumnError');
@@ -161,11 +161,11 @@ export function KanbanProvider({ children }) {
         throw new Error(errorMessage);
       }
       
-      const firstColumn = columns[0];
-      const newTask = await addTask(title, firstColumn.id);
+      const targetColumnId = columnId || columns[0].id;
+      const newTask = await addTask(title, targetColumnId, deadline);
       
       if (rows.length > 0) {
-        const targetRowId = rowId || rows[0].id;
+        const targetRowId = rows[0].id;
         await updateTaskRow(newTask.id, targetRowId);
         
         const updatedTask = { ...newTask, rowId: targetRowId };
