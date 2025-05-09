@@ -68,7 +68,7 @@ describe('AddTaskForm Component', () => {
             fireEvent.click(screen.getByText('header.addTask'));
         });
         
-        expect(mockAddTask).toHaveBeenCalledWith('New Task');
+        expect(mockAddTask).toHaveBeenCalledWith('New Task', null, null);
         expect(mockRefreshTasks).toHaveBeenCalled();
         expect(mockOnClose).toHaveBeenCalled();
     });

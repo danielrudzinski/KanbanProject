@@ -206,7 +206,7 @@ describe('KanbanContext Provider', () => {
       fireEvent.click(screen.getByText('Add Task'));
     });
     
-    expect(api.addTask).toHaveBeenCalledWith('New Task', 'col1');
+    expect(api.addTask).toHaveBeenCalledWith('New Task', 'col1', null);
     expect(api.fetchTasks).toHaveBeenCalled();
   });
 

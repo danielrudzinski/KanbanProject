@@ -294,9 +294,9 @@ describe('API Services', () => {
         ok: true,
         json: async () => mockTask
       });
-
+    
       const result = await api.addTask('New Task', 'col1');
-
+    
       expect(fetch).toHaveBeenCalledWith('/tasks', {
         method: 'POST',
         headers: {
@@ -306,7 +306,8 @@ describe('API Services', () => {
           title: 'New Task',
           column: {
             id: 'col1'
-          }
+          },
+          deadline: null
         }),
       });
       expect(result).toEqual(mockTask);
