@@ -21,6 +21,6 @@ COPY backend/src ./src/
 COPY backend/mvnw ./
 COPY backend/.mvn ./.mvn/
 RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
-RUN ./mvnw package -DskipTests
+RUN ./mvnw package -Dmaven.test.skip=true
 EXPOSE 8080
 CMD ["java", "-jar", "target/KanbanProject2-0.0.1-SNAPSHOT.jar"]
