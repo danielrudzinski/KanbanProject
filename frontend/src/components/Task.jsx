@@ -30,6 +30,9 @@ function Task({ task, columnId }) {
   const descriptionBtnRef = useRef(null);
   const taskRef = useRef(null);
   const warningTimeoutRef = useRef(null);
+  const isDeadlineExpired = task.deadline && new Date(task.deadline) < new Date();
+  const isDeadlineUpcoming = task.deadline && !isDeadlineExpired && 
+    (new Date(task.deadline) - new Date()) < 24 * 60 * 60 * 1000;
 
   const { t } = useTranslation();
 
@@ -424,7 +427,10 @@ function Task({ task, columnId }) {
       <div
         ref={taskRef}
         id={`task-${task.id}`}
-        className={`task ${isDragOver ? 'user-drag-over' : ''} ${isParentTask ? 'parent-task' : ''}`}
+        className={`task ${isDragOver ? 'user-drag-over' : ''} 
+          ${isParentTask ? 'parent-task' : ''} 
+          ${isDeadlineExpired ? 'deadline-expired' : ''} 
+          ${isDeadlineUpcoming ? 'deadline-upcoming' : ''}`}
         draggable="true"
         onClick={handleTaskClick}
         onDragStart={onDragStartHandler}
@@ -461,6 +467,15 @@ function Task({ task, columnId }) {
             ×
           </button>
         </div>
+
+        {(isDeadlineExpired || isDeadlineUpcoming) && (
+          <div className={`deadline-indicator ${isDeadlineExpired ? 'expired' : 'upcoming'}`}>
+            <span className="deadline-icon">⏰</span>
+            <span className="deadline-text">
+              {isDeadlineExpired ? t('taskActions.expired') : t('taskActions.upcoming')}
+            </span>
+          </div>
+        )}
         
         {/* Footer with description dropdown button */}
         <div className="task-footer">

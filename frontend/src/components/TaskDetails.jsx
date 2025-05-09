@@ -41,6 +41,9 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const [deadlineValue, setDeadlineValue] = useState('');
   const [originalDeadline, setOriginalDeadline] = useState('');
   const [columnHistory, setColumnHistory] = useState([]);
+  const isDeadlineExpired = task.deadline && new Date(task.deadline) < new Date();
+  const isDeadlineUpcoming = task.deadline && !isDeadlineExpired && 
+    (new Date(task.deadline) - new Date()) < 24 * 60 * 60 * 1000;
   const { t } = useTranslation();
 
   const panelRef = useRef(null);
@@ -772,7 +775,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
           </div>
         </div>
     ) : (
-      <div className={`deadline-content ${task.deadline && new Date(task.deadline) < new Date() ? 'expired' : ''}`}>
+      <div className={`deadline-content ${isDeadlineExpired ? 'expired' : isDeadlineUpcoming ? 'upcoming' : ''}`}>
         {task.deadline ? (
           <>
             {new Date(task.deadline).toLocaleString(undefined, {
@@ -782,8 +785,11 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               hour: '2-digit',
               minute: '2-digit'
             })}
-            {new Date(task.deadline) < new Date() && (
+            {isDeadlineExpired && (
               <span className="expired-tag">{t('taskActions.expired')}</span>
+            )}
+            {isDeadlineUpcoming && (
+              <span className="upcoming-tag">{t('taskActions.upcoming')}</span>
             )}
           </>
         ) : (

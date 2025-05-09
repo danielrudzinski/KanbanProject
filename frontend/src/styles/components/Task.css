@@ -548,24 +548,21 @@
 }
 
 .task.dragging {
-  opacity: 0.8 !important; /* More visible while dragging */
+  opacity: 0.8 !important; 
   background-color: rgba(134, 214, 255, 0.2) !important;
   outline: 2px solid #86d6ff !important;
   box-shadow: 0 0 15px rgba(134, 214, 255, 0.3) !important;
 }
 
-/* Create a glow effect for arrows */
 #root .xarrow {
   filter: drop-shadow(0 0 3px rgba(134, 214, 255, 0.6));
   pointer-events: none !important;
 }
 
-/* For child relationships - blue strong arrows */
 #root .xarrow[data-type="child"] path {
   stroke-width: 3;
 }
 
-/* For parent relationships - darker dashed arrows */
 #root .xarrow[data-type="parent"] path {
   stroke-dasharray: 6, 3;
   animation: dash 1s linear infinite;
@@ -577,3 +574,54 @@
   }
 }
 
+.task.deadline-expired {
+  border-left: 3px solid #e53935; 
+}
+
+.task.deadline-upcoming {
+  border-left: 3px solid #f57c00; 
+}
+
+.deadline-indicator {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  width: fit-content;
+}
+
+.deadline-indicator.expired {
+  background-color: rgba(229, 57, 53, 0.1);
+  color: #e53935;
+}
+
+.deadline-indicator.upcoming {
+  background-color: rgba(245, 124, 0, 0.1);
+  color: #f57c00;
+}
+
+.deadline-icon {
+  margin-right: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .task.deadline-expired {
+    border-left-color: #ff5252;
+  }
+  
+  .task.deadline-upcoming {
+    border-left-color: #ffab40;
+  }
+  
+  .deadline-indicator.expired {
+    background-color: rgba(255, 82, 82, 0.2);
+    color: #ff5252;
+  }
+  
+  .deadline-indicator.upcoming {
+    background-color: rgba(255, 171, 64, 0.2);
+    color: #ffab40;
+  }
+}

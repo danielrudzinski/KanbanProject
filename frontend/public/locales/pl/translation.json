@@ -33,7 +33,8 @@
     "expired": "Przedawniony!",
     "editDeadline": "Edytuj termin",
     "noDeadline": "Brak terminu",
-    "columnHistory": "Historia kolumny"
+    "columnHistory": "Historia kolumny",
+    "upcoming": "Nadchodzące"
   },
   "board": {
     "loading": "Ładowanie tablicy kanban...",
