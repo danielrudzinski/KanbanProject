@@ -89,16 +89,28 @@ public class TaskService {
             Task existingTask = taskRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
+            Integer currentColumnId = null;
+            if (existingTask.getColumn() != null) {
+                currentColumnId = existingTask.getColumn().getId();
+            }
+
             if (task.getTitle() != null) {
                 existingTask.setTitle(task.getTitle());
             }
-            if (task.getColumn() != null &&
-                    (existingTask.getColumn() == null || !existingTask.getColumn().getId().equals(task.getColumn().getId()))) {
+
+            if (task.getColumn() != null) {
+
+                boolean columnChanged = existingTask.getColumn() == null ||
+                        !existingTask.getColumn().getId().equals(task.getColumn().getId());
+
                 existingTask.setColumn(task.getColumn());
-                taskHistory(existingTask);
-            } else if (task.getColumn() != null) {
-                existingTask.setColumn(task.getColumn());
+
+
+                if (columnChanged) {
+                    taskHistory(existingTask);
+                }
             }
+
             if (task.getUsers() != null) {
                 existingTask.setUsers(task.getUsers());
             }
@@ -124,7 +136,6 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
-
     public TaskDTO assignUserToTask(Integer taskId, Integer userId) {
         try {
             boolean isWithinLimit = userService.checkWipStatus(userId);
@@ -407,14 +418,16 @@ public class TaskService {
             }
 
             task.getColumnHistory().add(columnName);
-
-            taskRepository.save(task);
         }
     }
     public List<String> getTaskColumnHistory(Integer taskId) {
         try {
             Task task = taskRepository.findById(taskId)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+            
+            if (task.getColumnHistory() == null) {
+                return new ArrayList<>();
+            }
 
             return task.getColumnHistory();
         } catch (EntityNotFoundException e) {
