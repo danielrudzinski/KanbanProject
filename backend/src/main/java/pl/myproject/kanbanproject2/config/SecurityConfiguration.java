@@ -35,6 +35,18 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(
+                                "/", 
+                                "/index.html", 
+                                "/favicon.ico",
+                                "/manifest.json",
+                                "/robots.txt",
+                                "icon.svg",
+                                "kanban-logo.png",
+                                "/static/**",
+                                "/assets/**",
+                                "/locales/**"
+                            ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
