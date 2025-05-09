@@ -31,34 +31,10 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(
-                            "/", 
-                            "/index.html", 
-                            "/favicon.ico",
-                            "/manifest.json",
-                            "/robots.txt",
-                            "/*.png", 
-                            "/*.svg", 
-                            "/*.jpg", 
-                            "/*.jpeg", 
-                            "/*.gif", 
-                            "/*.webp",
-                            "/*.js", 
-                            "/*.css", 
-                            "/*.woff", 
-                            "/*.woff2", 
-                            "/*.ttf",
-                            "/static/**", 
-                            "/assets/**",
-                            "/locales/**",
-                            "/images/**",
-                            "/kanban-logo.png",
-                            "/icon.svg"
-                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -66,7 +42,7 @@ public class SecurityConfiguration {
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-    
+
         return http.build();
     }
 
@@ -74,19 +50,18 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-            "https://kanbanproject.pl", 
-            "http://localhost:5173",
-            "http://localhost:3000",
-            "http://localhost:8080",
-            "http://localhost:80",    
-            "http://127.0.0.1:8080", 
-            "http://app:8080"        
+                "https://kanbanproject.pl",
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "http://localhost:80",
+                "http://127.0.0.1:8080",
+                "http://app:8080"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
         configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
-    
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
