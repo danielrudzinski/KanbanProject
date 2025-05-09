@@ -1231,3 +1231,36 @@ label {
   font-style: italic;
   color: #76777c;
 }
+
+.column-history-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.column-history-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.column-history-item {
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.column-history-arrow {
+  color: #888;
+  margin: 0 5px;
+}
+
+.column-history-current {
+  font-weight: bold;
+  color: #4285f4;
+}
+
+.column-history-start {
+  font-style: italic;
+}

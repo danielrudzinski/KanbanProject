@@ -32,7 +32,8 @@
     "deadline": "Deadline",
     "expired": "Expired!",
     "editDeadline": "Edit deadline",
-    "noDeadline": "No deadline"
+    "noDeadline": "No deadline",
+    "columnHistory": "Column history"
   },
   "board": {
     "loading": "Loading kanban board...",

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { createPortal } from 'react-dom';
-import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask, assignParentTask, removeParentTask, getChildTasks, fetchTasks } from '../services/api';
+import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask, assignParentTask, removeParentTask, getChildTasks, fetchTasks, getTaskColumnHistory } from '../services/api';
 import '../styles/components/TaskDetails.css';
 import TaskLabels from './TaskLabels';
 import { toast } from 'react-toastify';
@@ -40,6 +40,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const [editingDeadline, setEditingDeadline] = useState(false);
   const [deadlineValue, setDeadlineValue] = useState('');
   const [originalDeadline, setOriginalDeadline] = useState('');
+  const [columnHistory, setColumnHistory] = useState([]);
   const { t } = useTranslation();
 
   const panelRef = useRef(null);
@@ -129,6 +130,14 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       } catch (error) {
         console.error('Error fetching child tasks:', error);
         setChildTasks([]);
+      }
+
+      try {
+        const historyData = await getTaskColumnHistory(task.id);
+        setColumnHistory(historyData || []);
+      } catch (error) {
+        console.error('Error fetching column history:', error);
+        setColumnHistory([]);
       }
       
       setAssignedUsers(assignedData);
@@ -688,7 +697,35 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       </div>
           
       <div className="task-details-main">
-
+      {/* Column History Section */}
+      <div className="column-history-section">
+  <div className="section-header">
+    <h4>{t('taskActions.columnHistory') || 'Column History'}</h4>
+  </div>
+  <div className="column-history-content">
+    {columnHistory && columnHistory.length > 0 ? (
+      <ul className="column-history-list">
+        {columnHistory.map((columnName, index) => (
+          <li key={index} className="column-history-item">
+            {index === 0 ? (
+              <span className="column-history-start">{columnName}</span>
+            ) : (
+              <>
+                <span className="column-history-arrow">→</span>
+                <span className={index === columnHistory.length - 1 ? "column-history-current" : ""}>
+                  {columnName}
+                </span>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No column history available</p>
+    )}
+  </div>
+</div>
+        
       {/* Deadline Section */}
       <div className="task-deadline-section">
         <div className="deadline-header">
@@ -808,7 +845,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
             </div>
           )}
         </div>
-  
         {/* User assignment dropdown */}
         {showAssignForm && (
           <div className="assign-user-dropdown">
