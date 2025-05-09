@@ -32,20 +32,8 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(
-                                "/", 
-                                "/index.html", 
-                                "/favicon.ico",
-                                "/manifest.json",
-                                "/robots.txt",
-                                "icon.svg",
-                                "kanban-logo.png",
-                                "/assets/**",
-                                "/locales/**"
-                            ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -60,18 +48,9 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-                "https://kanbanproject.pl",
-                "http://localhost:5173",
-                "http://localhost:3000",
-                "http://localhost:8080",
-                "http://localhost:80",
-                "http://127.0.0.1:8080",
-                "http://app:8080"
-        ));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(List.of("https://kanbanproject.pl", "http://localhost:5173", "http://localhost:3000","http://localhost:8080"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
