@@ -43,7 +43,6 @@ public class SecurityConfiguration {
                                 "/robots.txt",
                                 "icon.svg",
                                 "kanban-logo.png",
-                                "/static/**",
                                 "/assets/**",
                                 "/locales/**"
                             ).permitAll()
