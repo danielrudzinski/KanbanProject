@@ -10,6 +10,8 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import pl.myproject.kanbanproject2.chat.ChatMessage;
 import pl.myproject.kanbanproject2.chat.MessageType;
 
+import java.time.LocalDateTime;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -21,14 +23,24 @@ public class WebSocketEventListener {
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String username = (String) headerAccessor.getSessionAttributes().get("username");
+        String roomId = (String) headerAccessor.getSessionAttributes().get("roomId");
+
         if (username != null) {
-            log.info("user disconnected: {}", username);
+            log.info("User disconnected: {}", username);
             var chatMessage = ChatMessage.builder()
                     .type(MessageType.LEAVE)
                     .sender(username)
+                    .timestamp(LocalDateTime.now())
                     .build();
-            messagingTemplate.convertAndSend("/topic/public", chatMessage);
+
+            if (roomId != null && !roomId.isEmpty()) {
+                chatMessage.setRoomId(roomId);
+                messagingTemplate.convertAndSend("/topic/room." + roomId, chatMessage);
+                log.info("User {} left room: {}", username, roomId);
+            } else {
+
+                messagingTemplate.convertAndSend("/topic/public", chatMessage);
+            }
         }
     }
-
 }

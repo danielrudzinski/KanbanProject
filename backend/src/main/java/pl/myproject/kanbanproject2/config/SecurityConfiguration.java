@@ -35,11 +35,15 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/static/**").permitAll()
-                        .requestMatchers("/assets/**").permitAll()
-                        .requestMatchers("/images/**").permitAll()
-                        .requestMatchers("/locales/**").permitAll()
-                        .requestMatchers("/*.html", "/*.js", "/*.css", "/*.ico", "/*.json", "/*.png", "/*.svg", "/*.jpg", "/*.jpeg", "/*.gif", "/*.webp", "/*.woff", "/*.woff2", "/*.ttf").permitAll()
+                        .requestMatchers("/ws/**").permitAll() 
+                        .requestMatchers("/chat").permitAll()
+                        .requestMatchers("/static/**", "/assets/**", "/images/**", "/locales/**").permitAll()
+                        .requestMatchers(
+                                "/*.html", "/*.js", "/*.css", "/*.ico", "/*.json",
+                                "/*.png", "/*.svg", "/*.jpg", "/*.jpeg", "/*.gif",
+                                "/*.webp", "/*.woff", "/*.woff2", "/*.ttf"
+                        ).permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -65,6 +69,7 @@ public class SecurityConfiguration {
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+        configuration.setExposedHeaders(List.of("Authorization")); // Allow frontend to read the Authorization header
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
