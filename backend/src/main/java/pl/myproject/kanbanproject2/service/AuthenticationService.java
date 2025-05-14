@@ -58,7 +58,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!user.isEnabled()) {
-            throw new RuntimeException("Account not verified. Please verify your account.");
+            System.out.println("LOGIN: " + input.getEmail());
         }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -103,6 +103,7 @@ public class AuthenticationService {
         }
 
         String jwtToken = jwtService.generateToken(user);
+        System.out.println("Generated token: " + jwtToken);
         long expiresIn = jwtService.getExpirationTime();
 
         return new LoginResponse(jwtToken, expiresIn);

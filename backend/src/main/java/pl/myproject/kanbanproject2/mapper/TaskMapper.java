@@ -5,7 +5,9 @@ import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.model.Task;
 import pl.myproject.kanbanproject2.model.User;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,6 +52,12 @@ public class TaskMapper implements Function<Task, TaskDTO> {
 
         Set<String> labels = task.getLabels();
 
+        // Pobierz historię kolumn lub utwórz pustą listę jeśli jest null
+        List<String> columnHistory = task.getColumnHistory();
+        if (columnHistory == null) {
+            columnHistory = new ArrayList<>();
+        }
+
         return new TaskDTO(
                 task.getId(),
                 task.getTitle(),
@@ -63,7 +71,8 @@ public class TaskMapper implements Function<Task, TaskDTO> {
                 parentTaskId,
                 childTaskIds,
                 task.getDeadline(),
-                task.isExpired()
+                task.isExpired(),
+                columnHistory
         );
     }
 }

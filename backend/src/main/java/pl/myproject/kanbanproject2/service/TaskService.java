@@ -35,20 +35,31 @@ public class TaskService {
         this.userService = userService;
     }
 
+    @Transactional
     public Task addTask(Task task) {
-
         if (task.getPosition() == null) {
             long count = taskRepository.count();
             task.setPosition((int) count + 1);
         }
 
-
         if (task.getLabels() == null) {
             task.setLabels(new HashSet<>());
         }
 
+        if (task.getColumnHistory() == null) {
+            task.setColumnHistory(new ArrayList<>());
+        }
+
+        // Dodaj pierwszą kolumnę do historii
+        if (task.getColumn() != null) {
+            task.getColumnHistory().add(task.getColumn().getName());
+            System.out.println("Dodano kolumnę do historii: " + task.getColumn().getName());
+            System.out.println("Aktualna historia kolumn: " + task.getColumnHistory());
+        }
+
         return taskRepository.save(task);
     }
+
 
     public List<TaskDTO> getAllTasks() {
         return taskRepository.findAll().stream()
@@ -69,7 +80,7 @@ public class TaskService {
             }
             task.getChildTasks().clear();
         }
-        
+
         taskRepository.delete(task);
     }
 
@@ -84,33 +95,29 @@ public class TaskService {
         }
     }
 
+    @Transactional
     public TaskDTO patchTask(Integer id, Task task) {
         try {
             Task existingTask = taskRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
-            Integer currentColumnId = null;
-            if (existingTask.getColumn() != null) {
-                currentColumnId = existingTask.getColumn().getId();
+            // Sprawdź czy zmienia się kolumna
+            boolean columnChanged = false;
+            String newColumnName = null;
+
+            if (task.getColumn() != null) {
+                if (existingTask.getColumn() == null ||
+                        !existingTask.getColumn().getId().equals(task.getColumn().getId())) {
+                    columnChanged = true;
+                    newColumnName = task.getColumn().getName();
+                }
+                existingTask.setColumn(task.getColumn());
             }
 
+            // Aktualizacja pozostałych pól
             if (task.getTitle() != null) {
                 existingTask.setTitle(task.getTitle());
             }
-
-            if (task.getColumn() != null) {
-
-                boolean columnChanged = existingTask.getColumn() == null ||
-                        !existingTask.getColumn().getId().equals(task.getColumn().getId());
-
-                existingTask.setColumn(task.getColumn());
-
-
-                if (columnChanged) {
-                    taskHistory(existingTask);
-                }
-            }
-
             if (task.getUsers() != null) {
                 existingTask.setUsers(task.getUsers());
             }
@@ -130,12 +137,23 @@ public class TaskService {
                 existingTask.setDeadline(task.getDeadline());
             }
 
+            // Dodanie nowej kolumny do historii
+            if (columnChanged && newColumnName != null) {
+                if (existingTask.getColumnHistory() == null) {
+                    existingTask.setColumnHistory(new ArrayList<>());
+                }
+                existingTask.getColumnHistory().add(newColumnName);
+                System.out.println("Zaktualizowano historię kolumn dla zadania " + existingTask.getId());
+                System.out.println("Aktualna historia kolumn: " + existingTask.getColumnHistory());
+            }
+
             Task savedTask = taskRepository.save(existingTask);
             return taskMapper.apply(savedTask);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
+
     public TaskDTO assignUserToTask(Integer taskId, Integer userId) {
         try {
             boolean isWithinLimit = userService.checkWipStatus(userId);
@@ -254,6 +272,7 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error retrieving labels", e);
         }
     }
+
     public TaskDTO assignParentTask(Integer childTaskId, Integer parentTaskId) {
         try {
             Task childTask = taskRepository.findById(childTaskId)
@@ -409,28 +428,32 @@ public class TaskService {
         }
     }
 
-    public void taskHistory(Task task) {
-        if (task.getColumn() != null) {
-            String columnName = task.getColumn().getName();
-
-            if (task.getColumnHistory() == null) {
-                task.setColumnHistory(new ArrayList<>());
-            }
-
-            task.getColumnHistory().add(columnName);
+    // Metoda do aktualizacji historii kolumn - może być przydatna w przyszłości
+    public void updateTaskColumnHistory(Task task, String newColumnName) {
+        if (task.getColumnHistory() == null) {
+            task.setColumnHistory(new ArrayList<>());
         }
+        task.getColumnHistory().add(newColumnName);
+        taskRepository.save(task);
     }
+
     public List<String> getTaskColumnHistory(Integer taskId) {
         try {
             Task task = taskRepository.findById(taskId)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
-            
+
+            System.out.println("Pobieranie historii dla zadania ID: " + taskId);
             if (task.getColumnHistory() == null) {
+                System.out.println("Historia kolumn jest NULL");
                 return new ArrayList<>();
             }
 
-            return task.getColumnHistory();
+            System.out.println("Historia kolumn zawiera " + task.getColumnHistory().size() + " elementów");
+            System.out.println("Zawartość historii: " + task.getColumnHistory());
+
+            return new ArrayList<>(task.getColumnHistory());
         } catch (EntityNotFoundException e) {
+            System.out.println("Nie znaleziono zadania o ID: " + taskId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
