@@ -9,8 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.myproject.kanbanproject2.dto.TaskDTO;
 import pl.myproject.kanbanproject2.mapper.TaskMapper;
+import pl.myproject.kanbanproject2.model.Column;
 import pl.myproject.kanbanproject2.model.Task;
+import pl.myproject.kanbanproject2.model.TaskColumnHistory;
 import pl.myproject.kanbanproject2.model.User;
+import pl.myproject.kanbanproject2.repository.TaskColumnHistoryRepository;
 import pl.myproject.kanbanproject2.repository.TaskRepository;
 import pl.myproject.kanbanproject2.repository.UserRepository;
 
@@ -26,13 +29,16 @@ public class TaskService {
     private final UserRepository userRepository;
     private final TaskMapper taskMapper;
     private final UserService userService;
+    private final TaskColumnHistoryRepository taskColumnHistoryRepository;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository, TaskMapper taskMapper, UserService userService) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, TaskMapper taskMapper,
+                       UserService userService, TaskColumnHistoryRepository taskColumnHistoryRepository) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.taskMapper = taskMapper;
         this.userService = userService;
+        this.taskColumnHistoryRepository = taskColumnHistoryRepository;
     }
 
     public Task addTask(Task task) {
@@ -42,12 +48,18 @@ public class TaskService {
             task.setPosition((int) count + 1);
         }
 
-
         if (task.getLabels() == null) {
             task.setLabels(new HashSet<>());
         }
 
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+
+       
+        if (task.getColumn() != null) {
+            saveTaskColumnHistory(savedTask, task.getColumn());
+        }
+
+        return savedTask;
     }
 
     public List<TaskDTO> getAllTasks() {
@@ -61,7 +73,6 @@ public class TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
-
         if (task.getChildTasks() != null && !task.getChildTasks().isEmpty()) {
             for (Task child : task.getChildTasks()) {
                 child.setParentTask(null);
@@ -72,7 +83,6 @@ public class TaskService {
 
         taskRepository.delete(task);
     }
-
 
     public TaskDTO getTaskById(Integer id) {
         try {
@@ -90,8 +100,10 @@ public class TaskService {
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
             Integer currentColumnId = null;
+            Column currentColumn = null;
             if (existingTask.getColumn() != null) {
                 currentColumnId = existingTask.getColumn().getId();
+                currentColumn = existingTask.getColumn();
             }
 
             if (task.getTitle() != null) {
@@ -99,12 +111,20 @@ public class TaskService {
             }
 
             if (task.getColumn() != null) {
-
                 boolean columnChanged = existingTask.getColumn() == null ||
                         !existingTask.getColumn().getId().equals(task.getColumn().getId());
 
-                existingTask.setColumn(task.getColumn());
 
+                if (columnChanged) {
+                    if (currentColumn != null) {
+
+                        saveTaskColumnHistory(existingTask, currentColumn);
+                    }
+
+                    existingTask.setColumn(task.getColumn());
+
+                    saveTaskColumnHistory(existingTask, task.getColumn());
+                }
             }
 
             if (task.getUsers() != null) {
@@ -132,6 +152,23 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
+
+    private void saveTaskColumnHistory(Task task, Column column) {
+        TaskColumnHistory history = new TaskColumnHistory(task, column);
+        taskColumnHistoryRepository.save(history);
+    }
+
+    public List<TaskColumnHistory> getTaskColumnHistory(Integer taskId) {
+        try {
+            Task task = taskRepository.findById(taskId)
+                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
+
+            return taskColumnHistoryRepository.findByTaskOrderByChangedAtDesc(task);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+    }
+
     public TaskDTO assignUserToTask(Integer taskId, Integer userId) {
         try {
             boolean isWithinLimit = userService.checkWipStatus(userId);
@@ -325,7 +362,6 @@ public class TaskService {
         }
     }
 
-
     private boolean isTaskInHierarchy(Task potentialParent, Task task) {
         if (potentialParent.getId().equals(task.getId())) {
             return true;
@@ -334,7 +370,6 @@ public class TaskService {
         return task.getChildTasks().stream()
                 .anyMatch(childTask -> isTaskInHierarchy(potentialParent, childTask));
     }
-
 
     public boolean canTaskBeCompleted(Integer taskId) {
         try {
@@ -352,7 +387,6 @@ public class TaskService {
         }
     }
 
-
     public TaskDTO updateTaskCompletion(Integer taskId, boolean completed) {
         try {
             Task task = taskRepository.findById(taskId)
@@ -363,7 +397,6 @@ public class TaskService {
             }
 
             task.setCompleted(completed);
-
 
             if (!completed) {
                 updateDependentTasksCompletion(task);
@@ -377,7 +410,6 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
     }
-
 
     private void updateDependentTasksCompletion(Task parentTask) {
         parentTask.getChildTasks().forEach(childTask -> {
