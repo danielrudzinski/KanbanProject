@@ -30,10 +30,14 @@ public class TaskColumnHistory {
     @jakarta.persistence.Column(name = "changed_at", nullable = false)
     private LocalDateTime changedAt;
 
+    @jakarta.persistence.Column(name = "history_order", nullable = false)
+    private Integer historyOrder;
+
     public TaskColumnHistory(Task task, Column column) {
         this.task = task;
         this.column = column;
         this.columnName = column.getName();
         this.changedAt = LocalDateTime.now();
+        this.historyOrder = 0;
     }
 }

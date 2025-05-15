@@ -54,7 +54,7 @@ public class TaskService {
 
         Task savedTask = taskRepository.save(task);
 
-       
+
         if (task.getColumn() != null) {
             saveTaskColumnHistory(savedTask, task.getColumn());
         }
@@ -154,7 +154,17 @@ public class TaskService {
     }
 
     private void saveTaskColumnHistory(Task task, Column column) {
+
+        List<TaskColumnHistory> taskHistory = taskColumnHistoryRepository.findByTaskOrderByChangedAtDesc(task);
+        Integer nextHistoryOrder = 0;
+
+        if (!taskHistory.isEmpty()) {
+            TaskColumnHistory lastHistory = taskHistory.get(0);
+            nextHistoryOrder = (lastHistory.getHistoryOrder() != null ? lastHistory.getHistoryOrder() : 0) + 1;
+        }
+
         TaskColumnHistory history = new TaskColumnHistory(task, column);
+        history.setHistoryOrder(nextHistoryOrder);
         taskColumnHistoryRepository.save(history);
     }
 
