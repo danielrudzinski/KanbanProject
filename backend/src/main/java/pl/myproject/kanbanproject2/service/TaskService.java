@@ -69,7 +69,7 @@ public class TaskService {
             }
             task.getChildTasks().clear();
         }
-        
+
         taskRepository.delete(task);
     }
 
@@ -105,8 +105,7 @@ public class TaskService {
 
                 existingTask.setColumn(task.getColumn());
 
-
-                
+            }
 
             if (task.getUsers() != null) {
                 existingTask.setUsers(task.getUsers());
@@ -405,5 +404,4 @@ public class TaskService {
             }
         }
     }
-
 }
