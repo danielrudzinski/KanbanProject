@@ -106,10 +106,7 @@ public class TaskService {
                 existingTask.setColumn(task.getColumn());
 
 
-                if (columnChanged) {
-                    taskHistory(existingTask);
-                }
-            }
+                
 
             if (task.getUsers() != null) {
                 existingTask.setUsers(task.getUsers());
@@ -406,32 +403,6 @@ public class TaskService {
                 task.setExpired(isExpired);
                 taskRepository.save(task);
             }
-        }
-    }
-
-    public void taskHistory(Task task) {
-        if (task.getColumn() != null) {
-            String columnName = task.getColumn().getName();
-
-            if (task.getColumnHistory() == null) {
-                task.setColumnHistory(new ArrayList<>());
-            }
-
-            task.getColumnHistory().add(columnName);
-        }
-    }
-    public List<String> getTaskColumnHistory(Integer taskId) {
-        try {
-            Task task = taskRepository.findById(taskId)
-                    .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
-            
-            if (task.getColumnHistory() == null) {
-                return new ArrayList<>();
-            }
-
-            return task.getColumnHistory();
-        } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
 
