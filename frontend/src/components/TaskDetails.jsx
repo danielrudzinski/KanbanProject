@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { createPortal } from 'react-dom';
-import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask, assignParentTask, removeParentTask, getChildTasks, fetchTasks, getTaskColumnHistory } from '../services/api';
+import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask, assignParentTask, removeParentTask, getChildTasks, fetchTasks, getTaskColumnHistory, getTaskColumnTimeSpentSummary } from '../services/api';
 import '../styles/components/TaskDetails.css';
 import TaskLabels from './TaskLabels';
 import { toast } from 'react-toastify';
@@ -41,6 +41,10 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const [deadlineValue, setDeadlineValue] = useState('');
   const [originalDeadline, setOriginalDeadline] = useState('');
   const [columnHistory, setColumnHistory] = useState([]);
+  const [columnHistoryPage, setColumnHistoryPage] = useState(0);
+  const [columnTimeSpent, setColumnTimeSpent] = useState([]);
+  const [isLoadingTimeSpent, setIsLoadingTimeSpent] = useState(false);
+  const HISTORY_PAGE_SIZE = 4;
   const isDeadlineExpired = task.deadline && new Date(task.deadline) < new Date();
   const isDeadlineUpcoming = task.deadline && !isDeadlineExpired && 
     (new Date(task.deadline) - new Date()) < 24 * 60 * 60 * 1000;
@@ -138,6 +142,15 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       try {
         const historyData = await getTaskColumnHistory(task.id);
         setColumnHistory(historyData || []);
+      } catch (error) {
+        console.error('Error fetching column history:', error);
+        setColumnHistory([]);
+      }
+
+      try {
+        const historyData = await getTaskColumnHistory(task.id);
+        setColumnHistory(historyData || []);
+        loadColumnTimeSpent();
       } catch (error) {
         console.error('Error fetching column history:', error);
         setColumnHistory([]);
@@ -597,6 +610,18 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     setEditingDeadline(false);
   };
 
+  const loadColumnTimeSpent = async () => {
+    try {
+      setIsLoadingTimeSpent(true);
+      const timeSpentData = await getTaskColumnTimeSpentSummary(task.id);
+      setColumnTimeSpent(timeSpentData);
+    } catch (error) {
+      console.error('Error loading column time spent:', error);
+    } finally {
+      setIsLoadingTimeSpent(false);
+    }
+  };
+
   if (loading) {
     return createPortal(
       <div className="task-details-overlay">
@@ -702,32 +727,77 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       <div className="task-details-main">
       {/* Column History Section */}
       <div className="column-history-section">
-  <div className="section-header">
-    <h4>{t('taskActions.columnHistory') || 'Column History'}</h4>
-  </div>
-  <div className="column-history-content">
-    {columnHistory && columnHistory.length > 0 ? (
-      <ul className="column-history-list">
-        {columnHistory.map((columnName, index) => (
-          <li key={index} className="column-history-item">
-            {index === 0 ? (
-              <span className="column-history-start">{columnName}</span>
-            ) : (
-              <>
-                <span className="column-history-arrow">→</span>
-                <span className={index === columnHistory.length - 1 ? "column-history-current" : ""}>
-                  {columnName}
+        <div className="section-header">
+          <h4>{t('taskActions.columnHistory') || 'Column History'}</h4>
+        </div>
+        <div className="column-history-content">
+          {columnHistory && columnHistory.length > 0 ? (
+            <>
+              <ul className="column-history-list">
+                {columnHistory
+                  .slice(columnHistoryPage * HISTORY_PAGE_SIZE, (columnHistoryPage + 1) * HISTORY_PAGE_SIZE)
+                  .map((historyItem, index) => (
+                    <li key={historyItem.id} className="column-history-item">
+                      <div className="column-name">
+                        <span className={index === 0 && columnHistoryPage === 0 ? "column-history-start" : 
+                                        index === Math.min(HISTORY_PAGE_SIZE - 1, columnHistory.length - 1 - columnHistoryPage * HISTORY_PAGE_SIZE) ? 
+                                        "column-history-current" : ""}>
+                          {historyItem.columnName}
+                        </span>
+                        <span className="column-time">
+                          {new Date(historyItem.changedAt).toLocaleString()}
+                        </span>
+                      </div>
+                      {index < Math.min(HISTORY_PAGE_SIZE - 1, columnHistory.length - 1 - columnHistoryPage * HISTORY_PAGE_SIZE) && (
+                        <span className="column-history-arrow">←</span>
+                      )}
+                    </li>
+                  ))}
+              </ul>
+              <div className="history-pagination">
+                <button 
+                  className="history-nav-btn"
+                  disabled={columnHistoryPage === 0}
+                  onClick={() => setColumnHistoryPage(prev => Math.max(0, prev - 1))}
+                >
+                  &larr; Previous
+                </button>
+                <span className="history-page-info">
+                  {columnHistoryPage + 1} / {Math.ceil(columnHistory.length / HISTORY_PAGE_SIZE)}
                 </span>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p>No column history available</p>
-    )}
-  </div>
-</div>
+                <button 
+                  className="history-nav-btn"
+                  disabled={(columnHistoryPage + 1) * HISTORY_PAGE_SIZE >= columnHistory.length}
+                  onClick={() => setColumnHistoryPage(prev => 
+                    prev + 1 < Math.ceil(columnHistory.length / HISTORY_PAGE_SIZE) ? prev + 1 : prev
+                  )}
+                >
+                  Next &rarr;
+                </button>
+              </div>
+              <div className="column-time-stats">
+                <h5>Time Spent in Columns</h5>
+                {isLoadingTimeSpent ? (
+                  <p>Loading time statistics...</p>
+                ) : columnTimeSpent.length > 0 ? (
+                  <ul className="time-spent-list">
+                    {columnTimeSpent.map(column => (
+                      <li key={column.columnId} className="time-spent-item">
+                        <span className="column-name">{column.columnName}:</span>
+                        <span className="time-value">{column.formattedTime}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No time statistics available</p>
+                )}
+              </div>
+            </>
+          ) : (
+            <p>No column history available</p>
+          )}
+        </div>
+      </div>
         
       {/* Deadline Section */}
       <div className="task-deadline-section">
