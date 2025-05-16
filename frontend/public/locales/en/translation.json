@@ -236,5 +236,27 @@
       "avatarError": "An error occurred while uploading the avatar:",
       "loadError": "An error occurred while loading users"
     }
+  },
+  "chat": {
+    "title": "Chat",
+    "connected": "Connected to chat",
+    "disconnected": "Disconnected from chat",
+    "connectionError": "Error connecting to chat",
+    "send": "Send",
+    "typingMessage": "Type a message...",
+    "openChat": "Open chat",
+    "public": "Public",
+    "private": "Private",
+    "room": "Room",
+    "recipient": "Recipient",
+    "noRecipient": "Please enter a recipient",
+    "noRoom": "Please join a room first",
+    "selectRoom": "Select a room",
+    "joinedRoom": "Joined room: {{room}}",
+    "leftRoom": "Left the room",
+    "leaveRoom": "Leave",
+    "noMessages": "No messages yet",
+    "userJoined": "{{user}} joined the chat",
+    "userLeft": "{{user}} left the chat"
   }
 }

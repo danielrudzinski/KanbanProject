@@ -3,12 +3,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { setupApiInterceptors } from './services/apiInterceptor';
 import { KanbanProvider } from './context/KanbanContext';
+import { ChatProvider } from './context/ChatContext'
 import HomePage from './components/HomePage';
 import Board from './components/Board';
 import UsersManagement from './components/UsersManagement';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Bench from './components/Bench';
+import Chat from './components/Chat';
 import './styles/App.css';
 
 setupApiInterceptors();
@@ -30,6 +32,7 @@ const ProtectedRoute = ({ children }) => {
 function Dashboard() {
   return (
     <KanbanProvider>
+      <ChatProvider>
       <div className="app-container">
         <Header />
         <div className="content-container">
@@ -39,7 +42,9 @@ function Dashboard() {
           </div>
         </div>
         <Footer />
+        <Chat />
       </div>
+      </ChatProvider>
     </KanbanProvider>
   );
 }
@@ -63,13 +68,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <KanbanProvider>
+                <ChatProvider>
                   <div className="app-container">
                     <Header />
                     <div className="content-container">
                       <UsersManagement />
                     </div>
                     <Footer />
+                    <Chat />
                   </div>
+                </ChatProvider>
                 </KanbanProvider>
               </ProtectedRoute>
             } 

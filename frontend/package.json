@@ -16,6 +16,7 @@
     "test:e2e": "cypress run"
   },
   "dependencies": {
+    "@stomp/stompjs": "^7.1.1",
     "@testing-library/dom": "^10.4.0",
     "i18next": "^25.0.2",
     "i18next-browser-languagedetector": "^8.0.5",
@@ -25,7 +26,8 @@
     "react-i18next": "^15.5.1",
     "react-router-dom": "^7.3.0",
     "react-toastify": "^11.0.5",
-    "react-xarrows": "^2.0.2"
+    "react-xarrows": "^2.0.2",
+    "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.9",

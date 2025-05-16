@@ -236,5 +236,27 @@
       "avatarError": "Wystąpił błąd podczas uploadu avatara:",
       "loadError": "Wystąpił błąd podczas ładowania użytkowników"
     }
+  },
+  "chat": {
+    "title": "Czat",
+    "connected": "Połączono z czatem",
+    "disconnected": "Rozłączono z czatem",
+    "connectionError": "Błąd połączenia z czatem",
+    "send": "Wyślij",
+    "typingMessage": "Wpisz wiadomość...",
+    "openChat": "Otwórz czat",
+    "public": "Publiczny",
+    "private": "Prywatny",
+    "room": "Pokój",
+    "recipient": "Odbiorca",
+    "noRecipient": "Proszę podać odbiorcę",
+    "noRoom": "Proszę najpierw dołączyć do pokoju",
+    "selectRoom": "Wybierz pokój",
+    "joinedRoom": "Dołączono do pokoju: {{room}}",
+    "leftRoom": "Opuszczono pokój",
+    "leaveRoom": "Opuść",
+    "noMessages": "Brak wiadomości",
+    "userJoined": "{{user}} dołączył do czatu",
+    "userLeft": "{{user}} opuścił czat"
   }
 }
