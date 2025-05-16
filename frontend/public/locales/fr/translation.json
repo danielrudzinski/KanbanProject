@@ -1,0 +1,262 @@
+{
+    "taskActions": {
+      "delete": "Supprimer la tâche",
+      "deleteSubTask": "Supprimer la sous-tâche",
+      "showDetails": "Afficher les détails",
+      "hideDetails": "Masquer les détails",
+      "confirmDelete": "Voulez-vous supprimer cette tâche ?",
+      "confirmDeleteSubTask": "Voulez-vous supprimer cette sous-tâche ?",
+      "confirmDeleteAssignedUser": "Voulez-vous supprimer l'attribution de cet utilisateur à cette tâche ?",
+      "assigned": "Assignés",
+      "assignUser": "Assigner un utilisateur",
+      "unassignUser": "Désassigner un utilisateur",
+      "assign": "Assigner",
+      "unassign": "Désassigner",
+      "yes": "Oui",
+      "no": "Non",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "editTitle": "Modifier le titre de la tâche",
+      "subtasks": "Sous-tâches",
+      "description": "Description de la tâche",
+      "noDescription": "Aucune description disponible.",
+      "noSubtasks": "Aucune sous-tâche.",
+      "incompleteSubtasks": "Sous-tâches incomplètes",
+      "loading": "Chargement...",
+      "editTaskDescription": "Modifier la description de la tâche",
+      "editSubTaskDescription": "Modifier la description de la sous-tâche",
+      "shadowDescription": "Entrez la description de la tâche",
+      "expand": "Développer",
+      "collapse": "Réduire",
+      "deadline": "Date limite",
+      "expired": "Expirée !",
+      "editDeadline": "Modifier la date limite",
+      "noDeadline": "Pas de date limite",
+      "columnHistory": "Historique des colonnes",
+      "upcoming": "À venir"
+    },
+    "board": {
+      "loading": "Chargement du tableau kanban...",
+      "error": "Erreur : {{message}}",
+      "addColumn": "Ajouter une colonne",
+      "addRow": "Ajouter une ligne",
+      "title": "Tableau Kanban",
+      "subtitle": "Gérez vos tâches efficacement",
+      "labels": "Étiquettes"
+    },
+    "notifications": {
+      "taskAdded": "La tâche \"{{title}}\" a été ajoutée",
+      "taskMoved": "La tâche \"{{title}}\" a été déplacée vers la colonne \"{{column}}\"",
+      "taskDeleted": "Tâche supprimée avec succès",
+      "errorOccurred": "Erreur : {{message}}",
+      "columnAdded": "La colonne \"{{name}}\" a été ajoutée",
+      "columnDeleted": "La colonne \"{{name}}\" a été supprimée",
+      "columnUpdated": "Le nom de la colonne a été mis à jour",
+      "rowAdded": "La ligne \"{{name}}\" a été ajoutée",
+      "rowDeleted": "La ligne a été supprimée",
+      "rowUpdated": "Le nom de la ligne a été mis à jour",
+      "wipLimitUpdated": "La limite WIP pour {{name}} a été mise à jour à {{limit}}",
+      "lastRowWarning": "Impossible de supprimer la dernière ligne.",
+      "taskUpdated": "La tâche a été mise à jour",
+      "noColumnError": "Il n'y a pas de colonnes. Veuillez d'abord ajouter une colonne.",
+      "lastRowDeleted": "Dernière ligne \"{{name}}\" a été supprimée",
+      "lastColumnDeleted": "Dernière colonne \"{{name}}\" a été supprimée",
+      "userWipLimitUpdated": "La limite WIP de l'utilisateur a été mise à jour à {{limit}}",
+      "rowWipLimitUpdated": "La limite WIP pour la ligne {{name}} a été mise à jour à {{limit}}",
+      "taskMovedToColumnAndRow": "La tâche \"{{title}}\" a été déplacée vers la colonne \"{{column}}\" et la ligne \"{{row}}\"",
+      "taskMovedToRow": "La tâche \"{{title}}\" a été déplacée vers la ligne \"{{row}}\"",
+      "columnMoved": "La colonne \"{{name}}\" a été déplacée",
+      "rowMoved": "La ligne \"{{name}}\" a été déplacée"
+    },
+    "column": {
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette colonne ?",
+      "wipLimit": "Limite",
+      "wipExceeded": "dépassée !",
+      "noLimit": "Pas de limite",
+      "taskCount": "Tâches",
+      "delete": "Supprimer la colonne"
+    },
+    "row": {
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette ligne ?",
+      "delete": "Supprimer la ligne",
+      "wipLimit": "Limite",
+      "wipExceeded": "dépassée !",
+      "lastRowWarning": "Impossible de supprimer la dernière ligne."
+    },
+    "header": {
+      "addTask": "Ajouter une tâche",
+      "wipLimit": "Limite WIP",
+      "addBoardItem": "Ajouter ligne/colonne",
+      "users": "Utilisateurs",
+      "logout": "Déconnexion"
+    },
+    "forms": {
+      "wipLimit": {
+        "title": "Définir la limite WIP",
+        "close": "Fermer le formulaire",
+        "columnTab": "Colonnes",
+        "rowTab": "Lignes",
+        "selectColumn": "Sélectionner une colonne",
+        "selectRow": "Sélectionner une ligne",
+        "selectUser": "Sélectionner un utilisateur",
+        "limitLabel": "Limite WIP",
+        "noLimit": "0 = pas de limite",
+        "submit": "Définir la limite",
+        "submitting": "Mise à jour...",
+        "cancel": "Annuler",
+        "activeLimit": "Limite :",
+        "error": {
+          "selectRequired": "Veuillez sélectionner un {{type}} !",
+          "invalidLimit": "Veuillez entrer une limite WIP valide (nombre supérieur ou égal à 0)"
+        }
+      },
+      "addRowColumn": {
+        "title": "Ajouter une nouvelle ligne/colonne",
+        "close": "Fermer le formulaire",
+        "tabs": {
+          "columns": "Colonnes",
+          "rows": "Lignes"
+        },
+        "nameLabel": {
+          "column": "Nom de la colonne :",
+          "row": "Nom de la ligne :"
+        },
+        "placeholder": {
+          "column": "ex. À faire",
+          "row": "ex. Fonctionnalités, Fonctions, Projets"
+        },
+        "submitting": "Ajout en cours...",
+        "submit": {
+          "column": "Ajouter la colonne",
+          "row": "Ajouter la ligne"
+        },
+        "error": {
+          "nameRequired": {
+            "column": "Le nom de la colonne est requis !",
+            "row": "Le nom de la ligne est requis !"
+          },
+          "addFailed": {
+            "column": "Une erreur s'est produite lors de l'ajout de la colonne",
+            "row": "Une erreur s'est produite lors de l'ajout de la ligne"
+          }
+        }
+      },
+      "addTaskForm": {
+        "title": "Ajouter une nouvelle tâche",
+        "titleLabel": "Titre de la tâche :",
+        "titlePlaceholder": "Entrez le titre de la tâche",
+        "titleRequired": "Le titre de la tâche est requis !",
+        "adding": "Ajout en cours...",
+        "addError": "Une erreur s'est produite lors de l'ajout de la tâche",
+        "columnLabel": "Colonne :",
+        "selectColumn": "Sélectionnez une colonne",
+        "columnHelp": "Optionnel. Les tâches sans colonne apparaîtront dans le backlog.",
+        "deadlineLabel": "Date limite :",
+        "deadlineHelp": "Optionnel. Les tâches seront marquées comme expirées lorsque la date limite sera dépassée."
+      },
+      "deleteUser": "Supprimer l'utilisateur"
+    },
+    "bench": {
+      "title": "Équipe",
+      "loading": "Chargement...",
+      "wipLimit": "Limite WIP",
+      "unlimited": "∞",
+      "tasks": "Tâches",
+      "editWipLimit": "Modifier la limite WIP",
+      "saveWipLimit": "Enregistrer la limite WIP",
+      "cancel": "Annuler"
+    },
+    "auth": {
+      "login": "Connexion",
+      "register": "S'inscrire",
+      "email": "Email",
+      "password": "Mot de passe",
+      "username": "Nom d'utilisateur",
+      "signIn": "Se connecter",
+      "signingIn": "Connexion en cours...",
+      "registering": "Inscription en cours...",
+      "verifying": "Vérification en cours...",
+      "verifyAccount": "Vérifier le compte",
+      "verificationCode": "Code de vérification",
+      "enterCode": "Entrez le code de vérification envoyé à votre email",
+      "noCode": "Vous n'avez pas reçu de code ?",
+      "resendCode": "Renvoyer le code",
+      "pleaseWait": "Veuillez patienter ! Nous travaillons à résoudre ce problème.",
+      "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+      "loginSuccess": "Connexion réussie !",
+      "loginFailed": "Échec de la connexion :",
+      "registerSuccess": "Compte créé ! Veuillez vérifier votre email.",
+      "registerFailed": "Échec de l'inscription :",
+      "verifySuccess": "Compte vérifié avec succès ! Veuillez vous connecter.",
+      "verifyFailed": "Échec de la vérification :",
+      "codeSent": "Code de vérification envoyé à votre email."
+    },
+    "taskLabels": {
+      "addLabel": "+ Étiquette",
+      "chooseLabelHeader": "Choisir une étiquette",
+      "predefinedLabels": "Étiquettes prédéfinies",
+      "existingLabels": "Étiquettes existantes",
+      "addCustomLabel": "Ajouter une étiquette personnalisée",
+      "addCustomLabelTitle": "Ajouter une étiquette personnalisée",
+      "labelName": "Nom de l'étiquette :",
+      "labelNamePlaceholder": "Entrez le nom de l'étiquette",
+      "labelColor": "Couleur de l'étiquette :",
+      "add": "Ajouter",
+      "cancel": "Annuler",
+      "alreadyAddedWarning": "Cette étiquette a déjà été ajoutée à la tâche",
+      "addErrorMessage": "Une erreur s'est produite lors de l'ajout de l'étiquette",
+      "removeErrorMessage": "Une erreur s'est produite lors de la suppression de l'étiquette"
+    },
+    "usersManagement": {
+      "title": "Gestion des utilisateurs",
+      "fields": {
+        "name": "Nom complet",
+        "email": "Email",
+        "password": "Mot de passe",
+        "avatar": "Avatar",
+        "id": "ID",
+        "actions": "Actions"
+      },
+      "buttons": {
+        "add": "Ajouter un utilisateur",
+        "delete": "Supprimer l'utilisateur",
+        "change": "Modifier",
+        "back": "Retour au tableau Kanban"
+      },
+      "messages": {
+        "emptyFields": "Veuillez remplir tous les champs !",
+        "invalidEmail": "Veuillez fournir une adresse email valide !",
+        "addError": "Une erreur s'est produite lors de l'ajout de l'utilisateur",
+        "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
+        "deleteError": "Une erreur s'est produite lors de la suppression de l'utilisateur",
+        "fileTooLarge": "Le fichier est trop volumineux. La taille maximale est de 10 Mo.",
+        "fileTypeError": "Seuls les fichiers JPG et PNG sont autorisés.",
+        "avatarUpdated": "L'avatar a été mis à jour avec succès",
+        "avatarError": "Une erreur s'est produite lors du téléchargement de l'avatar :",
+        "loadError": "Une erreur s'est produite lors du chargement des utilisateurs"
+      }
+    },
+    "chat": {
+      "title": "Chat",
+      "connected": "Connecté au chat",
+      "disconnected": "Déconnecté du chat",
+      "connectionError": "Erreur de connexion au chat",
+      "send": "Envoyer",
+      "typingMessage": "Tapez un message...",
+      "openChat": "Ouvrir le chat",
+      "public": "Public",
+      "private": "Privé",
+      "room": "Salle",
+      "recipient": "Destinataire",
+      "noRecipient": "Veuillez entrer un destinataire",
+      "noRoom": "Veuillez d'abord rejoindre une salle",
+      "selectRoom": "Sélectionner une salle",
+      "joinedRoom": "A rejoint la salle : {{room}}",
+      "leftRoom": "A quitté la salle",
+      "leaveRoom": "Quitter",
+      "noMessages": "Pas encore de messages",
+      "userJoined": "{{user}} a rejoint le chat",
+      "userLeft": "{{user}} a quitté le chat"
+    }
+  }

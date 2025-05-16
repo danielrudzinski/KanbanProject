@@ -1,0 +1,262 @@
+{
+    "taskActions": {
+      "delete": "حذف المهمة",
+      "deleteSubTask": "حذف المهمة الفرعية",
+      "showDetails": "عرض التفاصيل",
+      "hideDetails": "إخفاء التفاصيل",
+      "confirmDelete": "هل تريد حذف هذه المهمة؟",
+      "confirmDeleteSubTask": "هل تريد حذف هذه المهمة الفرعية؟",
+      "confirmDeleteAssignedUser": "هل تريد حذف تعيين هذا المستخدم لهذه المهمة؟",
+      "assigned": "المعينون",
+      "assignUser": "تعيين مستخدم",
+      "unassignUser": "إلغاء تعيين المستخدم",
+      "assign": "تعيين",
+      "unassign": "إلغاء التعيين",
+      "yes": "نعم",
+      "no": "لا",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد",
+      "editTitle": "تعديل عنوان المهمة",
+      "subtasks": "المهام الفرعية",
+      "description": "وصف المهمة",
+      "noDescription": "لا يوجد وصف متاح.",
+      "noSubtasks": "لا توجد مهام فرعية.",
+      "incompleteSubtasks": "مهام فرعية غير مكتملة",
+      "loading": "جاري التحميل...",
+      "editTaskDescription": "تعديل وصف المهمة",
+      "editSubTaskDescription": "تعديل وصف المهمة الفرعية",
+      "shadowDescription": "أدخل وصف المهمة",
+      "expand": "توسيع",
+      "collapse": "طي",
+      "deadline": "الموعد النهائي",
+      "expired": "منتهي الصلاحية!",
+      "editDeadline": "تعديل الموعد النهائي",
+      "noDeadline": "لا يوجد موعد نهائي",
+      "columnHistory": "تاريخ العمود",
+      "upcoming": "قادم"
+    },
+    "board": {
+      "loading": "جاري تحميل لوحة كانبان...",
+      "error": "خطأ: {{message}}",
+      "addColumn": "إضافة عمود",
+      "addRow": "إضافة صف",
+      "title": "لوحة كانبان",
+      "subtitle": "إدارة مهامك بكفاءة",
+      "labels": "التصنيفات"
+    },
+    "notifications": {
+      "taskAdded": "تمت إضافة المهمة \"{{title}}\"",
+      "taskMoved": "تم نقل المهمة \"{{title}}\" إلى العمود \"{{column}}\"",
+      "taskDeleted": "تم حذف المهمة بنجاح",
+      "errorOccurred": "خطأ: {{message}}",
+      "columnAdded": "تمت إضافة العمود \"{{name}}\"",
+      "columnDeleted": "تم حذف العمود \"{{name}}\"",
+      "columnUpdated": "تم تحديث اسم العمود",
+      "rowAdded": "تمت إضافة الصف \"{{name}}\"",
+      "rowDeleted": "تم حذف الصف",
+      "rowUpdated": "تم تحديث اسم الصف",
+      "wipLimitUpdated": "تم تحديث حد العمل قيد التنفيذ لـ {{name}} إلى {{limit}}",
+      "lastRowWarning": "لا يمكن حذف الصف الأخير.",
+      "taskUpdated": "تم تحديث المهمة",
+      "noColumnError": "لا توجد أعمدة. الرجاء إضافة عمود أولاً.",
+      "lastRowDeleted": "تم حذف الصف الأخير \"{{name}}\"",
+      "lastColumnDeleted": "تم حذف العمود الأخير \"{{name}}\"",
+      "userWipLimitUpdated": "تم تحديث حد العمل قيد التنفيذ للمستخدم إلى {{limit}}",
+      "rowWipLimitUpdated": "تم تحديث حد العمل قيد التنفيذ للصف {{name}} إلى {{limit}}",
+      "taskMovedToColumnAndRow": "تم نقل المهمة \"{{title}}\" إلى العمود \"{{column}}\" والصف \"{{row}}\"",
+      "taskMovedToRow": "تم نقل المهمة \"{{title}}\" إلى الصف \"{{row}}\"",
+      "columnMoved": "تم نقل العمود \"{{name}}\"",
+      "rowMoved": "تم نقل الصف \"{{name}}\""
+    },
+    "column": {
+      "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا العمود؟",
+      "wipLimit": "الحد",
+      "wipExceeded": "تم تجاوزه!",
+      "noLimit": "لا حد",
+      "taskCount": "المهام",
+      "delete": "حذف العمود"
+    },
+    "row": {
+      "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا الصف؟",
+      "delete": "حذف الصف",
+      "wipLimit": "الحد",
+      "wipExceeded": "تم تجاوزه!",
+      "lastRowWarning": "لا يمكن حذف الصف الأخير."
+    },
+    "header": {
+      "addTask": "إضافة مهمة",
+      "wipLimit": "حد العمل قيد التنفيذ",
+      "addBoardItem": "إضافة صف/عمود",
+      "users": "المستخدمون",
+      "logout": "تسجيل الخروج"
+    },
+    "forms": {
+      "wipLimit": {
+        "title": "تعيين حد العمل قيد التنفيذ",
+        "close": "إغلاق النموذج",
+        "columnTab": "الأعمدة",
+        "rowTab": "الصفوف",
+        "selectColumn": "اختر العمود",
+        "selectRow": "اختر الصف",
+        "selectUser": "اختر المستخدم",
+        "limitLabel": "حد العمل قيد التنفيذ",
+        "noLimit": "0 = لا حد",
+        "submit": "تعيين الحد",
+        "submitting": "جاري التحديث...",
+        "cancel": "إلغاء",
+        "activeLimit": "الحد:",
+        "error": {
+          "selectRequired": "الرجاء اختيار {{type}}!",
+          "invalidLimit": "الرجاء إدخال حد عمل قيد التنفيذ صالح (رقم أكبر من أو يساوي 0)"
+        }
+      },
+      "addRowColumn": {
+        "title": "إضافة صف/عمود جديد",
+        "close": "إغلاق النموذج",
+        "tabs": {
+          "columns": "الأعمدة",
+          "rows": "الصفوف"
+        },
+        "nameLabel": {
+          "column": "اسم العمود:",
+          "row": "اسم الصف:"
+        },
+        "placeholder": {
+          "column": "مثال: قيد الإنجاز",
+          "row": "مثال: ميزات، وظائف، مشاريع"
+        },
+        "submitting": "جاري الإضافة...",
+        "submit": {
+          "column": "إضافة عمود",
+          "row": "إضافة صف"
+        },
+        "error": {
+          "nameRequired": {
+            "column": "اسم العمود مطلوب!",
+            "row": "اسم الصف مطلوب!"
+          },
+          "addFailed": {
+            "column": "حدث خطأ أثناء إضافة العمود",
+            "row": "حدث خطأ أثناء إضافة الصف"
+          }
+        }
+      },
+      "addTaskForm": {
+        "title": "إضافة مهمة جديدة",
+        "titleLabel": "عنوان المهمة:",
+        "titlePlaceholder": "أدخل عنوان المهمة",
+        "titleRequired": "عنوان المهمة مطلوب!",
+        "adding": "جاري الإضافة...",
+        "addError": "حدث خطأ أثناء إضافة المهمة",
+        "columnLabel": "العمود:",
+        "selectColumn": "اختر عمودًا",
+        "columnHelp": "اختياري. ستظهر المهام بدون عمود في قائمة المهام المتراكمة.",
+        "deadlineLabel": "الموعد النهائي:",
+        "deadlineHelp": "اختياري. سيتم تمييز المهام كمنتهية الصلاحية عند تجاوز الموعد النهائي."
+      },
+      "deleteUser": "حذف المستخدم"
+    },
+    "bench": {
+      "title": "الفريق",
+      "loading": "جاري التحميل...",
+      "wipLimit": "حد العمل قيد التنفيذ",
+      "unlimited": "∞",
+      "tasks": "المهام",
+      "editWipLimit": "تعديل حد العمل قيد التنفيذ",
+      "saveWipLimit": "حفظ حد العمل قيد التنفيذ",
+      "cancel": "إلغاء"
+    },
+    "auth": {
+      "login": "تسجيل الدخول",
+      "register": "التسجيل",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "username": "اسم المستخدم",
+      "signIn": "تسجيل الدخول",
+      "signingIn": "جاري تسجيل الدخول...",
+      "registering": "جاري التسجيل...",
+      "verifying": "جاري التحقق...",
+      "verifyAccount": "تحقق من الحساب",
+      "verificationCode": "رمز التحقق",
+      "enterCode": "أدخل رمز التحقق المرسل إلى بريدك الإلكتروني",
+      "noCode": "لم تستلم رمزًا؟",
+      "resendCode": "إعادة إرسال الرمز",
+      "pleaseWait": "يرجى الانتظار! نحن نعمل على معالجة هذا.",
+      "sessionExpired": "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.",
+      "loginSuccess": "تم تسجيل الدخول بنجاح!",
+      "loginFailed": "فشل تسجيل الدخول:",
+      "registerSuccess": "تم إنشاء الحساب! يرجى التحقق من بريدك الإلكتروني.",
+      "registerFailed": "فشل التسجيل:",
+      "verifySuccess": "تم التحقق من الحساب بنجاح! يرجى تسجيل الدخول.",
+      "verifyFailed": "فشل التحقق:",
+      "codeSent": "تم إرسال رمز التحقق إلى بريدك الإلكتروني."
+    },
+    "taskLabels": {
+      "addLabel": "+ تصنيف",
+      "chooseLabelHeader": "اختر تصنيفًا",
+      "predefinedLabels": "تصنيفات معدة مسبقًا",
+      "existingLabels": "تصنيفات موجودة",
+      "addCustomLabel": "إضافة تصنيف مخصص",
+      "addCustomLabelTitle": "إضافة تصنيف مخصص",
+      "labelName": "اسم التصنيف:",
+      "labelNamePlaceholder": "أدخل اسم التصنيف",
+      "labelColor": "لون التصنيف:",
+      "add": "إضافة",
+      "cancel": "إلغاء",
+      "alreadyAddedWarning": "تمت إضافة هذا التصنيف بالفعل إلى المهمة",
+      "addErrorMessage": "حدث خطأ أثناء إضافة التصنيف",
+      "removeErrorMessage": "حدث خطأ أثناء إزالة التصنيف"
+    },
+    "usersManagement": {
+      "title": "إدارة المستخدمين",
+      "fields": {
+        "name": "الاسم الكامل",
+        "email": "البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "avatar": "الصورة الرمزية",
+        "id": "المعرف",
+        "actions": "الإجراءات"
+      },
+      "buttons": {
+        "add": "إضافة مستخدم",
+        "delete": "حذف المستخدم",
+        "change": "تغيير",
+        "back": "العودة إلى لوحة كانبان"
+      },
+      "messages": {
+        "emptyFields": "يرجى ملء جميع الحقول!",
+        "invalidEmail": "يرجى تقديم عنوان بريد إلكتروني صالح!",
+        "addError": "حدث خطأ أثناء إضافة المستخدم",
+        "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا المستخدم؟",
+        "deleteError": "حدث خطأ أثناء حذف المستخدم",
+        "fileTooLarge": "الملف كبير جدًا. الحجم الأقصى هو 10 ميجابايت.",
+        "fileTypeError": "يُسمح فقط بملفات JPG و PNG.",
+        "avatarUpdated": "تم تحديث الصورة الرمزية بنجاح",
+        "avatarError": "حدث خطأ أثناء تحميل الصورة الرمزية:",
+        "loadError": "حدث خطأ أثناء تحميل المستخدمين"
+      }
+    },
+    "chat": {
+      "title": "الدردشة",
+      "connected": "متصل بالدردشة",
+      "disconnected": "تم قطع الاتصال بالدردشة",
+      "connectionError": "خطأ في الاتصال بالدردشة",
+      "send": "إرسال",
+      "typingMessage": "اكتب رسالة...",
+      "openChat": "فتح الدردشة",
+      "public": "عام",
+      "private": "خاص",
+      "room": "غرفة",
+      "recipient": "المستلم",
+      "noRecipient": "يرجى إدخال مستلم",
+      "noRoom": "يرجى الانضمام إلى غرفة أولاً",
+      "selectRoom": "اختر غرفة",
+      "joinedRoom": "انضم إلى الغرفة: {{room}}",
+      "leftRoom": "غادر الغرفة",
+      "leaveRoom": "مغادرة",
+      "noMessages": "لا توجد رسائل بعد",
+      "userJoined": "{{user}} انضم إلى الدردشة",
+      "userLeft": "{{user}} غادر الدردشة"
+    }
+  }

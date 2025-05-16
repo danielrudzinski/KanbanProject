@@ -1,20 +1,167 @@
 .language-switcher {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
+  position: relative;
+  display: inline-block;
+  margin-right: 15px;
+  z-index: 200;
+}
+
+.language-switcher-button {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: var(--gray-700);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  min-width: 100px;
+  justify-content: space-between;
+}
+
+.language-switcher-button:hover {
+  background-color: rgba(134, 214, 255, 0.2);
+  color: #86d6ff;
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+  margin-left: 8px;
+  transition: transform 0.2s;
+}
+
+.current-language {
+  font-weight: 500;
+}
+
+.language-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: auto;
+  min-width: 140px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 201;
+  display: grid;
+  grid-template-columns: 1fr;
+  animation: dropdownFadeIn 0.2s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.language-dropdown button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #eee;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  color: var(--gray-700);
+}
+
+.language-dropdown button:last-child {
+  border-bottom: none;
+}
+
+.language-dropdown button:hover {
+  background-color: rgba(134, 214, 255, 0.2);
+  color: #86d6ff;
+}
+
+.language-dropdown button.active {
+  background-color: rgba(134, 214, 255, 0.1);
+  font-weight: bold;
+  color: #86d6ff;
+}
+
+/* Add some CSS to support header layout */
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .language-switcher {
+    margin-right: 10px;
   }
   
-  .language-switcher button {
-    background: none;
-    border: 1px solid #ccc;
-    margin: 0 5px;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
+  .language-switcher-button {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    min-width: 80px;
   }
   
-  .language-switcher button.active {
-    background-color: #f0f0f0;
-    font-weight: bold;
+  .language-dropdown {
+    max-height: 250px;
+    width: 200px;
+    right: -20px;
   }
+  
+  /* For very small screens, make dropdown a grid */
+  @media (max-width: 480px) {
+    .language-dropdown {
+      width: 240px;
+      grid-template-columns: 1fr 1fr;
+      right: -50px;
+    }
+  }
+}
+
+/* Dark Mode Styles */
+@media (prefers-color-scheme: dark) {
+  .language-switcher-button {
+    color: var(--gray-300);
+  }
+  
+  .language-switcher-button:hover {
+    background-color: rgba(134, 214, 255, 0.15);
+    color: var(--primary);
+  }
+  
+  .language-dropdown {
+    background-color: var(--surface-dark);
+    border-color: var(--gray-800);
+  }
+  
+  .language-dropdown button {
+    color: var(--gray-300);
+    border-bottom-color: var(--gray-800);
+  }
+  
+  .language-dropdown button:hover {
+    background-color: rgba(134, 214, 255, 0.15);
+    color: var(--primary);
+  }
+  
+  .language-dropdown button.active {
+    background-color: rgba(134, 214, 255, 0.1);
+    color: var(--primary);
+  }
+}

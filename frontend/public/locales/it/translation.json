@@ -1,0 +1,262 @@
+{
+    "taskActions": {
+      "delete": "Elimina attività",
+      "deleteSubTask": "Elimina sottoattività",
+      "showDetails": "Mostra dettagli",
+      "hideDetails": "Nascondi dettagli",
+      "confirmDelete": "Vuoi eliminare questa attività?",
+      "confirmDeleteSubTask": "Vuoi eliminare questa sottoattività?",
+      "confirmDeleteAssignedUser": "Vuoi eliminare l'assegnazione di questo utente a questa attività?",
+      "assigned": "Assegnatari",
+      "assignUser": "Assegna utente",
+      "unassignUser": "Rimuovi utente",
+      "assign": "Assegna",
+      "unassign": "Rimuovi",
+      "yes": "Sì",
+      "no": "No",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "confirm": "Conferma",
+      "editTitle": "Modifica titolo attività",
+      "subtasks": "Sottoattività",
+      "description": "Descrizione attività",
+      "noDescription": "Nessuna descrizione disponibile.",
+      "noSubtasks": "Nessuna sottoattività.",
+      "incompleteSubtasks": "Sottoattività incomplete",
+      "loading": "Caricamento...",
+      "editTaskDescription": "Modifica descrizione attività",
+      "editSubTaskDescription": "Modifica descrizione sottoattività",
+      "shadowDescription": "Inserisci descrizione attività",
+      "expand": "Espandi",
+      "collapse": "Comprimi",
+      "deadline": "Scadenza",
+      "expired": "Scaduta!",
+      "editDeadline": "Modifica scadenza",
+      "noDeadline": "Nessuna scadenza",
+      "columnHistory": "Cronologia colonna",
+      "upcoming": "In arrivo"
+    },
+    "board": {
+      "loading": "Caricamento bacheca kanban...",
+      "error": "Errore: {{message}}",
+      "addColumn": "Aggiungi colonna",
+      "addRow": "Aggiungi riga",
+      "title": "Bacheca Kanban",
+      "subtitle": "Gestisci le tue attività in modo efficiente",
+      "labels": "Etichette"
+    },
+    "notifications": {
+      "taskAdded": "Attività \"{{title}}\" è stata aggiunta",
+      "taskMoved": "Attività \"{{title}}\" è stata spostata nella colonna \"{{column}}\"",
+      "taskDeleted": "Attività eliminata con successo",
+      "errorOccurred": "Errore: {{message}}",
+      "columnAdded": "Colonna \"{{name}}\" è stata aggiunta",
+      "columnDeleted": "Colonna \"{{name}}\" è stata eliminata",
+      "columnUpdated": "Il nome della colonna è stato aggiornato",
+      "rowAdded": "Riga \"{{name}}\" è stata aggiunta",
+      "rowDeleted": "Riga è stata eliminata",
+      "rowUpdated": "Il nome della riga è stato aggiornato",
+      "wipLimitUpdated": "Il limite WIP per {{name}} è stato aggiornato a {{limit}}",
+      "lastRowWarning": "Impossibile eliminare l'ultima riga.",
+      "taskUpdated": "L'attività è stata aggiornata",
+      "noColumnError": "Non ci sono colonne. Aggiungi prima una colonna.",
+      "lastRowDeleted": "L'ultima riga \"{{name}}\" è stata eliminata",
+      "lastColumnDeleted": "L'ultima colonna \"{{name}}\" è stata eliminata",
+      "userWipLimitUpdated": "Il limite WIP dell'utente è stato aggiornato a {{limit}}",
+      "rowWipLimitUpdated": "Il limite WIP per la riga {{name}} è stato aggiornato a {{limit}}",
+      "taskMovedToColumnAndRow": "Attività \"{{title}}\" è stata spostata nella colonna \"{{column}}\" e riga \"{{row}}\"",
+      "taskMovedToRow": "Attività \"{{title}}\" è stata spostata nella riga \"{{row}}\"",
+      "columnMoved": "Colonna \"{{name}}\" è stata spostata",
+      "rowMoved": "Riga \"{{name}}\" è stata spostata"
+    },
+    "column": {
+      "deleteConfirm": "Sei sicuro di voler eliminare questa colonna?",
+      "wipLimit": "Limite",
+      "wipExceeded": "superato!",
+      "noLimit": "Nessun limite",
+      "taskCount": "Attività",
+      "delete": "Elimina colonna"
+    },
+    "row": {
+      "deleteConfirm": "Sei sicuro di voler eliminare questa riga?",
+      "delete": "Elimina riga",
+      "wipLimit": "Limite",
+      "wipExceeded": "superato!",
+      "lastRowWarning": "Impossibile eliminare l'ultima riga."
+    },
+    "header": {
+      "addTask": "Aggiungi attività",
+      "wipLimit": "Limite WIP",
+      "addBoardItem": "Aggiungi riga/colonna",
+      "users": "Utenti",
+      "logout": "Esci"
+    },
+    "forms": {
+      "wipLimit": {
+        "title": "Imposta limite WIP",
+        "close": "Chiudi modulo",
+        "columnTab": "Colonne",
+        "rowTab": "Righe",
+        "selectColumn": "Seleziona colonna",
+        "selectRow": "Seleziona riga",
+        "selectUser": "Seleziona utente",
+        "limitLabel": "Limite WIP",
+        "noLimit": "0 = nessun limite",
+        "submit": "Imposta limite",
+        "submitting": "Aggiornamento...",
+        "cancel": "Annulla",
+        "activeLimit": "Limite:",
+        "error": {
+          "selectRequired": "Seleziona un {{type}}!",
+          "invalidLimit": "Inserisci un limite WIP valido (numero maggiore o uguale a 0)"
+        }
+      },
+      "addRowColumn": {
+        "title": "Aggiungi nuova riga/colonna",
+        "close": "Chiudi modulo",
+        "tabs": {
+          "columns": "Colonne",
+          "rows": "Righe"
+        },
+        "nameLabel": {
+          "column": "Nome colonna:",
+          "row": "Nome riga:"
+        },
+        "placeholder": {
+          "column": "es. Da fare",
+          "row": "es. Funzionalità, Funzioni, Progetti"
+        },
+        "submitting": "Aggiunta in corso...",
+        "submit": {
+          "column": "Aggiungi colonna",
+          "row": "Aggiungi riga"
+        },
+        "error": {
+          "nameRequired": {
+            "column": "Il nome della colonna è obbligatorio!",
+            "row": "Il nome della riga è obbligatorio!"
+          },
+          "addFailed": {
+            "column": "Si è verificato un errore durante l'aggiunta della colonna",
+            "row": "Si è verificato un errore durante l'aggiunta della riga"
+          }
+        }
+      },
+      "addTaskForm": {
+        "title": "Aggiungi nuova attività",
+        "titleLabel": "Titolo attività:",
+        "titlePlaceholder": "Inserisci titolo attività",
+        "titleRequired": "Il titolo dell'attività è obbligatorio!",
+        "adding": "Aggiunta in corso...",
+        "addError": "Si è verificato un errore durante l'aggiunta dell'attività",
+        "columnLabel": "Colonna:",
+        "selectColumn": "Seleziona una colonna",
+        "columnHelp": "Opzionale. Le attività senza colonna appariranno nel backlog.",
+        "deadlineLabel": "Scadenza:",
+        "deadlineHelp": "Opzionale. Le attività saranno contrassegnate come scadute quando la scadenza passa."
+      },
+      "deleteUser": "Elimina utente"
+    },
+    "bench": {
+      "title": "Team",
+      "loading": "Caricamento...",
+      "wipLimit": "Limite WIP",
+      "unlimited": "∞",
+      "tasks": "Attività",
+      "editWipLimit": "Modifica limite WIP",
+      "saveWipLimit": "Salva limite WIP",
+      "cancel": "Annulla"
+    },
+    "auth": {
+      "login": "Accedi",
+      "register": "Registrati",
+      "email": "Email",
+      "password": "Password",
+      "username": "Nome utente",
+      "signIn": "Accedi",
+      "signingIn": "Accesso in corso...",
+      "registering": "Registrazione in corso...",
+      "verifying": "Verifica in corso...",
+      "verifyAccount": "Verifica account",
+      "verificationCode": "Codice di verifica",
+      "enterCode": "Inserisci il codice di verifica inviato alla tua email",
+      "noCode": "Non hai ricevuto un codice?",
+      "resendCode": "Rinvia codice",
+      "pleaseWait": "Attendere prego! Stiamo lavorando per gestire questa situazione.",
+      "sessionExpired": "La tua sessione è scaduta. Accedi nuovamente.",
+      "loginSuccess": "Accesso effettuato con successo!",
+      "loginFailed": "Accesso fallito:",
+      "registerSuccess": "Account creato! Verifica la tua email.",
+      "registerFailed": "Registrazione fallita:",
+      "verifySuccess": "Account verificato con successo! Effettua l'accesso.",
+      "verifyFailed": "Verifica fallita:",
+      "codeSent": "Codice di verifica inviato alla tua email."
+    },
+    "taskLabels": {
+      "addLabel": "+ Etichetta",
+      "chooseLabelHeader": "Scegli un'etichetta",
+      "predefinedLabels": "Etichette predefinite",
+      "existingLabels": "Etichette esistenti",
+      "addCustomLabel": "Aggiungi etichetta personalizzata",
+      "addCustomLabelTitle": "Aggiungi etichetta personalizzata",
+      "labelName": "Nome etichetta:",
+      "labelNamePlaceholder": "Inserisci nome etichetta",
+      "labelColor": "Colore etichetta:",
+      "add": "Aggiungi",
+      "cancel": "Annulla",
+      "alreadyAddedWarning": "Questa etichetta è già stata aggiunta all'attività",
+      "addErrorMessage": "Si è verificato un errore durante l'aggiunta dell'etichetta",
+      "removeErrorMessage": "Si è verificato un errore durante la rimozione dell'etichetta"
+    },
+    "usersManagement": {
+      "title": "Gestione utenti",
+      "fields": {
+        "name": "Nome completo",
+        "email": "Email",
+        "password": "Password",
+        "avatar": "Avatar",
+        "id": "ID",
+        "actions": "Azioni"
+      },
+      "buttons": {
+        "add": "Aggiungi utente",
+        "delete": "Elimina utente",
+        "change": "Cambia",
+        "back": "Torna alla bacheca Kanban"
+      },
+      "messages": {
+        "emptyFields": "Compila tutti i campi!",
+        "invalidEmail": "Fornisci un indirizzo email valido!",
+        "addError": "Si è verificato un errore durante l'aggiunta dell'utente",
+        "deleteConfirm": "Sei sicuro di voler eliminare questo utente?",
+        "deleteError": "Si è verificato un errore durante l'eliminazione dell'utente",
+        "fileTooLarge": "Il file è troppo grande. La dimensione massima è 10MB.",
+        "fileTypeError": "Sono consentiti solo file JPG e PNG.",
+        "avatarUpdated": "Avatar aggiornato con successo",
+        "avatarError": "Si è verificato un errore durante il caricamento dell'avatar:",
+        "loadError": "Si è verificato un errore durante il caricamento degli utenti"
+      }
+    },
+    "chat": {
+      "title": "Chat",
+      "connected": "Connesso alla chat",
+      "disconnected": "Disconnesso dalla chat",
+      "connectionError": "Errore di connessione alla chat",
+      "send": "Invia",
+      "typingMessage": "Scrivi un messaggio...",
+      "openChat": "Apri chat",
+      "public": "Pubblico",
+      "private": "Privato",
+      "room": "Stanza",
+      "recipient": "Destinatario",
+      "noRecipient": "Inserisci un destinatario",
+      "noRoom": "Unisciti prima a una stanza",
+      "selectRoom": "Seleziona una stanza",
+      "joinedRoom": "Unito alla stanza: {{room}}",
+      "leftRoom": "Ha lasciato la stanza",
+      "leaveRoom": "Lascia",
+      "noMessages": "Ancora nessun messaggio",
+      "userJoined": "{{user}} si è unito alla chat",
+      "userLeft": "{{user}} ha lasciato la chat"
+    }
+  }

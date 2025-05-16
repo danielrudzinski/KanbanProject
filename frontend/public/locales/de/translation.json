@@ -1,0 +1,262 @@
+{
+  "taskActions": {
+    "delete": "Aufgabe löschen",
+    "deleteSubTask": "Unteraufgabe löschen",
+    "showDetails": "Details anzeigen",
+    "hideDetails": "Details ausblenden",
+    "confirmDelete": "Möchten Sie diese Aufgabe löschen?",
+    "confirmDeleteSubTask": "Möchten Sie diese Unteraufgabe löschen?",
+    "confirmDeleteAssignedUser": "Möchten Sie die Zuweisung dieses Benutzers zu dieser Aufgabe löschen?",
+    "assigned": "Zugewiesene Personen",
+    "assignUser": "Benutzer zuweisen",
+    "unassignUser": "Benutzer abmelden",
+    "assign": "Zuweisen",
+    "unassign": "Zuweisung aufheben",
+    "yes": "Ja",
+    "no": "Nein",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "editTitle": "Aufgabentitel bearbeiten",
+    "subtasks": "Unteraufgaben",
+    "description": "Aufgabenbeschreibung",
+    "noDescription": "Keine Beschreibung verfügbar.",
+    "noSubtasks": "Keine Unteraufgaben.",
+    "incompleteSubtasks": "Unvollständige Unteraufgaben",
+    "loading": "Wird geladen...",
+    "editTaskDescription": "Aufgabenbeschreibung bearbeiten",
+    "editSubTaskDescription": "Unteraufgabenbeschreibung bearbeiten",
+    "shadowDescription": "Aufgabenbeschreibung eingeben",
+    "expand": "Erweitern",
+    "collapse": "Einklappen",
+    "deadline": "Frist",
+    "expired": "Abgelaufen!",
+    "editDeadline": "Frist bearbeiten",
+    "noDeadline": "Keine Frist",
+    "columnHistory": "Spaltenverlauf",
+    "upcoming": "Bevorstehend"
+  },
+  "board": {
+    "loading": "Kanban-Board wird geladen...",
+    "error": "Fehler: {{message}}",
+    "addColumn": "Spalte hinzufügen",
+    "addRow": "Zeile hinzufügen",
+    "title": "Kanban Board",
+    "subtitle": "Verwalten Sie Ihre Aufgaben effizient",
+    "labels": "Labels"
+  },
+  "notifications": {
+    "taskAdded": "Aufgabe \"{{title}}\" wurde hinzugefügt",
+    "taskMoved": "Aufgabe \"{{title}}\" wurde in die Spalte \"{{column}}\" verschoben",
+    "taskDeleted": "Aufgabe erfolgreich gelöscht",
+    "errorOccurred": "Fehler: {{message}}",
+    "columnAdded": "Spalte \"{{name}}\" wurde hinzugefügt",
+    "columnDeleted": "Spalte \"{{name}}\" wurde gelöscht",
+    "columnUpdated": "Spaltenname wurde aktualisiert",
+    "rowAdded": "Zeile \"{{name}}\" wurde hinzugefügt",
+    "rowDeleted": "Zeile wurde gelöscht",
+    "rowUpdated": "Zeilenname wurde aktualisiert",
+    "wipLimitUpdated": "WIP-Limit für {{name}} wurde auf {{limit}} aktualisiert",
+    "lastRowWarning": "Die letzte Zeile kann nicht gelöscht werden.",
+    "taskUpdated": "Aufgabe wurde aktualisiert",
+    "noColumnError": "Es gibt keine Spalten. Bitte fügen Sie zuerst eine Spalte hinzu.",
+    "lastRowDeleted": "Letzte Zeile \"{{name}}\" wurde gelöscht",
+    "lastColumnDeleted": "Letzte Spalte \"{{name}}\" wurde gelöscht",
+    "userWipLimitUpdated": "WIP-Limit des Benutzers wurde auf {{limit}} aktualisiert",
+    "rowWipLimitUpdated": "WIP-Limit für Zeile {{name}} wurde auf {{limit}} aktualisiert",
+    "taskMovedToColumnAndRow": "Aufgabe \"{{title}}\" wurde in Spalte \"{{column}}\" und Zeile \"{{row}}\" verschoben",
+    "taskMovedToRow": "Aufgabe \"{{title}}\" wurde in Zeile \"{{row}}\" verschoben",
+    "columnMoved": "Spalte \"{{name}}\" wurde verschoben",
+    "rowMoved": "Zeile \"{{name}}\" wurde verschoben"
+  },
+  "column": {
+    "deleteConfirm": "Sind Sie sicher, dass Sie diese Spalte löschen möchten?",
+    "wipLimit": "Limit",
+    "wipExceeded": "überschritten!",
+    "noLimit": "Kein Limit",
+    "taskCount": "Aufgaben",
+    "delete": "Spalte löschen"
+  },
+  "row": {
+    "deleteConfirm": "Sind Sie sicher, dass Sie diese Zeile löschen möchten?",
+    "delete": "Zeile löschen",
+    "wipLimit": "Limit",
+    "wipExceeded": "überschritten!",
+    "lastRowWarning": "Die letzte Zeile kann nicht gelöscht werden."
+  },
+  "header": {
+    "addTask": "Aufgabe hinzufügen",
+    "wipLimit": "WIP-Limit",
+    "addBoardItem": "Zeile/Spalte hinzufügen",
+    "users": "Benutzer",
+    "logout": "Abmelden"
+  },
+  "forms": {
+    "wipLimit": {
+      "title": "WIP-Limit festlegen",
+      "close": "Formular schließen",
+      "columnTab": "Spalten",
+      "rowTab": "Zeilen",
+      "selectColumn": "Spalte auswählen",
+      "selectRow": "Zeile auswählen",
+      "selectUser": "Benutzer auswählen",
+      "limitLabel": "WIP-Limit",
+      "noLimit": "0 = kein Limit",
+      "submit": "Limit festlegen",
+      "submitting": "Wird aktualisiert...",
+      "cancel": "Abbrechen",
+      "activeLimit": "Limit:",
+      "error": {
+        "selectRequired": "Bitte wählen Sie {{type}} aus!",
+        "invalidLimit": "Bitte geben Sie ein gültiges WIP-Limit ein (Zahl größer oder gleich 0)"
+      }
+    },
+    "addRowColumn": {
+      "title": "Neue Zeile/Spalte hinzufügen",
+      "close": "Formular schließen",
+      "tabs": {
+        "columns": "Spalten",
+        "rows": "Zeilen"
+      },
+      "nameLabel": {
+        "column": "Spaltenname:",
+        "row": "Zeilenname:"
+      },
+      "placeholder": {
+        "column": "z.B. Zu erledigen",
+        "row": "z.B. Features, Funktionen, Projekte"
+      },
+      "submitting": "Wird hinzugefügt...",
+      "submit": {
+        "column": "Spalte hinzufügen",
+        "row": "Zeile hinzufügen"
+      },
+      "error": {
+        "nameRequired": {
+          "column": "Spaltenname ist erforderlich!",
+          "row": "Zeilenname ist erforderlich!"
+        },
+        "addFailed": {
+          "column": "Beim Hinzufügen der Spalte ist ein Fehler aufgetreten",
+          "row": "Beim Hinzufügen der Zeile ist ein Fehler aufgetreten"
+        }
+      }
+    },
+    "addTaskForm": {
+      "title": "Neue Aufgabe hinzufügen",
+      "titleLabel": "Aufgabentitel:",
+      "titlePlaceholder": "Aufgabentitel eingeben",
+      "titleRequired": "Aufgabentitel ist erforderlich!",
+      "adding": "Wird hinzugefügt...",
+      "addError": "Beim Hinzufügen der Aufgabe ist ein Fehler aufgetreten",
+      "columnLabel": "Spalte:",
+      "selectColumn": "Spalte auswählen",
+      "columnHelp": "Optional. Aufgaben ohne Spalte erscheinen im Backlog.",
+      "deadlineLabel": "Frist:",
+      "deadlineHelp": "Optional. Aufgaben werden als abgelaufen markiert, wenn die Frist überschritten ist."
+    },
+    "deleteUser": "Benutzer löschen"
+  },
+  "bench": {
+    "title": "Team",
+    "loading": "Wird geladen...",
+    "wipLimit": "WIP-Limit",
+    "unlimited": "∞",
+    "tasks": "Aufgaben",
+    "editWipLimit": "WIP-Limit bearbeiten",
+    "saveWipLimit": "WIP-Limit speichern",
+    "cancel": "Abbrechen"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "username": "Benutzername",
+    "signIn": "Anmelden",
+    "signingIn": "Anmeldung läuft...",
+    "registering": "Registrierung läuft...",
+    "verifying": "Überprüfung läuft...",
+    "verifyAccount": "Konto verifizieren",
+    "verificationCode": "Verifizierungscode",
+    "enterCode": "Geben Sie den an Ihre E-Mail gesendeten Verifizierungscode ein",
+    "noCode": "Keinen Code erhalten?",
+    "resendCode": "Code erneut senden",
+    "pleaseWait": "Bitte warten! Wir arbeiten an der Bearbeitung.",
+    "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+    "loginSuccess": "Erfolgreich angemeldet!",
+    "loginFailed": "Anmeldung fehlgeschlagen:",
+    "registerSuccess": "Konto erstellt! Bitte überprüfen Sie Ihre E-Mail.",
+    "registerFailed": "Registrierung fehlgeschlagen:",
+    "verifySuccess": "Konto erfolgreich verifiziert! Bitte melden Sie sich an.",
+    "verifyFailed": "Überprüfung fehlgeschlagen:",
+    "codeSent": "Verifizierungscode wurde an Ihre E-Mail gesendet."
+  },
+  "taskLabels": {
+    "addLabel": "+ Label",
+    "chooseLabelHeader": "Label auswählen",
+    "predefinedLabels": "Vordefinierte Labels",
+    "existingLabels": "Vorhandene Labels",
+    "addCustomLabel": "Benutzerdefiniertes Label hinzufügen",
+    "addCustomLabelTitle": "Benutzerdefiniertes Label hinzufügen",
+    "labelName": "Labelname:",
+    "labelNamePlaceholder": "Labelname eingeben",
+    "labelColor": "Labelfarbe:",
+    "add": "Hinzufügen",
+    "cancel": "Abbrechen",
+    "alreadyAddedWarning": "Dieses Label wurde der Aufgabe bereits hinzugefügt",
+    "addErrorMessage": "Beim Hinzufügen des Labels ist ein Fehler aufgetreten",
+    "removeErrorMessage": "Beim Entfernen des Labels ist ein Fehler aufgetreten"
+  },
+  "usersManagement": {
+    "title": "Benutzerverwaltung",
+    "fields": {
+      "name": "Vollständiger Name",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "avatar": "Avatar",
+      "id": "ID",
+      "actions": "Aktionen"
+    },
+    "buttons": {
+      "add": "Benutzer hinzufügen",
+      "delete": "Benutzer löschen",
+      "change": "Ändern",
+      "back": "Zurück zum Kanban-Board"
+    },
+    "messages": {
+      "emptyFields": "Bitte füllen Sie alle Felder aus!",
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse an!",
+      "addError": "Beim Hinzufügen des Benutzers ist ein Fehler aufgetreten",
+      "deleteConfirm": "Sind Sie sicher, dass Sie diesen Benutzer löschen möchten?",
+      "deleteError": "Beim Löschen des Benutzers ist ein Fehler aufgetreten",
+      "fileTooLarge": "Die Datei ist zu groß. Maximale Größe ist 10MB.",
+      "fileTypeError": "Nur JPG- und PNG-Dateien sind erlaubt.",
+      "avatarUpdated": "Avatar wurde erfolgreich aktualisiert",
+      "avatarError": "Beim Hochladen des Avatars ist ein Fehler aufgetreten:",
+      "loadError": "Beim Laden der Benutzer ist ein Fehler aufgetreten"
+    }
+  },
+  "chat": {
+    "title": "Chat",
+    "connected": "Mit Chat verbunden",
+    "disconnected": "Vom Chat getrennt",
+    "connectionError": "Fehler beim Verbinden mit dem Chat",
+    "send": "Senden",
+    "typingMessage": "Nachricht eingeben...",
+    "openChat": "Chat öffnen",
+    "public": "Öffentlich",
+    "private": "Privat",
+    "room": "Raum",
+    "recipient": "Empfänger",
+    "noRecipient": "Bitte geben Sie einen Empfänger ein",
+    "noRoom": "Bitte treten Sie zuerst einem Raum bei",
+    "selectRoom": "Raum auswählen",
+    "joinedRoom": "Raum beigetreten: {{room}}",
+    "leftRoom": "Raum verlassen",
+    "leaveRoom": "Verlassen",
+    "noMessages": "Noch keine Nachrichten",
+    "userJoined": "{{user}} ist dem Chat beigetreten",
+    "userLeft": "{{user}} hat den Chat verlassen"
+  }
+}

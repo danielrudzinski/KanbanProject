@@ -1,0 +1,262 @@
+{
+    "taskActions": {
+      "delete": "タスクを削除",
+      "deleteSubTask": "サブタスクを削除",
+      "showDetails": "詳細を表示",
+      "hideDetails": "詳細を非表示",
+      "confirmDelete": "このタスクを削除しますか？",
+      "confirmDeleteSubTask": "このサブタスクを削除しますか？",
+      "confirmDeleteAssignedUser": "このユーザーのタスク割り当てを削除しますか？",
+      "assigned": "担当者",
+      "assignUser": "ユーザーを割り当て",
+      "unassignUser": "ユーザーの割り当てを解除",
+      "assign": "割り当て",
+      "unassign": "割り当て解除",
+      "yes": "はい",
+      "no": "いいえ",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "confirm": "確認",
+      "editTitle": "タスクタイトルを編集",
+      "subtasks": "サブタスク",
+      "description": "タスクの説明",
+      "noDescription": "説明はありません。",
+      "noSubtasks": "サブタスクはありません。",
+      "incompleteSubtasks": "未完了のサブタスク",
+      "loading": "読み込み中...",
+      "editTaskDescription": "タスクの説明を編集",
+      "editSubTaskDescription": "サブタスクの説明を編集",
+      "shadowDescription": "タスクの説明を入力",
+      "expand": "展開",
+      "collapse": "折りたたむ",
+      "deadline": "期限",
+      "expired": "期限切れ！",
+      "editDeadline": "期限を編集",
+      "noDeadline": "期限なし",
+      "columnHistory": "カラム履歴",
+      "upcoming": "今後の予定"
+    },
+    "board": {
+      "loading": "かんばんボードを読み込み中...",
+      "error": "エラー: {{message}}",
+      "addColumn": "カラムを追加",
+      "addRow": "行を追加",
+      "title": "かんばんボード",
+      "subtitle": "タスクを効率的に管理",
+      "labels": "ラベル"
+    },
+    "notifications": {
+      "taskAdded": "タスク「{{title}}」が追加されました",
+      "taskMoved": "タスク「{{title}}」がカラム「{{column}}」に移動されました",
+      "taskDeleted": "タスクが正常に削除されました",
+      "errorOccurred": "エラー: {{message}}",
+      "columnAdded": "カラム「{{name}}」が追加されました",
+      "columnDeleted": "カラム「{{name}}」が削除されました",
+      "columnUpdated": "カラム名が更新されました",
+      "rowAdded": "行「{{name}}」が追加されました",
+      "rowDeleted": "行が削除されました",
+      "rowUpdated": "行名が更新されました",
+      "wipLimitUpdated": "{{name}}のWIP制限が{{limit}}に更新されました",
+      "lastRowWarning": "最後の行は削除できません。",
+      "taskUpdated": "タスクが更新されました",
+      "noColumnError": "カラムがありません。最初にカラムを追加してください。",
+      "lastRowDeleted": "最後の行「{{name}}」が削除されました",
+      "lastColumnDeleted": "最後のカラム「{{name}}」が削除されました",
+      "userWipLimitUpdated": "ユーザーのWIP制限が{{limit}}に更新されました",
+      "rowWipLimitUpdated": "行{{name}}のWIP制限が{{limit}}に更新されました",
+      "taskMovedToColumnAndRow": "タスク「{{title}}」がカラム「{{column}}」と行「{{row}}」に移動されました",
+      "taskMovedToRow": "タスク「{{title}}」が行「{{row}}」に移動されました",
+      "columnMoved": "カラム「{{name}}」が移動されました",
+      "rowMoved": "行「{{name}}」が移動されました"
+    },
+    "column": {
+      "deleteConfirm": "このカラムを削除してもよろしいですか？",
+      "wipLimit": "制限",
+      "wipExceeded": "超過！",
+      "noLimit": "制限なし",
+      "taskCount": "タスク",
+      "delete": "カラムを削除"
+    },
+    "row": {
+      "deleteConfirm": "この行を削除してもよろしいですか？",
+      "delete": "行を削除",
+      "wipLimit": "制限",
+      "wipExceeded": "超過！",
+      "lastRowWarning": "最後の行は削除できません。"
+    },
+    "header": {
+      "addTask": "タスクを追加",
+      "wipLimit": "WIP制限",
+      "addBoardItem": "行/カラムを追加",
+      "users": "ユーザー",
+      "logout": "ログアウト"
+    },
+    "forms": {
+      "wipLimit": {
+        "title": "WIP制限を設定",
+        "close": "フォームを閉じる",
+        "columnTab": "カラム",
+        "rowTab": "行",
+        "selectColumn": "カラムを選択",
+        "selectRow": "行を選択",
+        "selectUser": "ユーザーを選択",
+        "limitLabel": "WIP制限",
+        "noLimit": "0 = 制限なし",
+        "submit": "制限を設定",
+        "submitting": "更新中...",
+        "cancel": "キャンセル",
+        "activeLimit": "制限:",
+        "error": {
+          "selectRequired": "{{type}}を選択してください！",
+          "invalidLimit": "有効なWIP制限（0以上の数値）を入力してください"
+        }
+      },
+      "addRowColumn": {
+        "title": "新しい行/カラムを追加",
+        "close": "フォームを閉じる",
+        "tabs": {
+          "columns": "カラム",
+          "rows": "行"
+        },
+        "nameLabel": {
+          "column": "カラム名:",
+          "row": "行名:"
+        },
+        "placeholder": {
+          "column": "例: To Do（未着手）",
+          "row": "例: 機能、関数、プロジェクト"
+        },
+        "submitting": "追加中...",
+        "submit": {
+          "column": "カラムを追加",
+          "row": "行を追加"
+        },
+        "error": {
+          "nameRequired": {
+            "column": "カラム名は必須です！",
+            "row": "行名は必須です！"
+          },
+          "addFailed": {
+            "column": "カラムの追加中にエラーが発生しました",
+            "row": "行の追加中にエラーが発生しました"
+          }
+        }
+      },
+      "addTaskForm": {
+        "title": "新しいタスクを追加",
+        "titleLabel": "タスクタイトル:",
+        "titlePlaceholder": "タスクタイトルを入力",
+        "titleRequired": "タスクタイトルは必須です！",
+        "adding": "追加中...",
+        "addError": "タスクの追加中にエラーが発生しました",
+        "columnLabel": "カラム:",
+        "selectColumn": "カラムを選択",
+        "columnHelp": "任意。カラムのないタスクはバックログに表示されます。",
+        "deadlineLabel": "期限:",
+        "deadlineHelp": "任意。期限を過ぎるとタスクは期限切れとしてマークされます。"
+      },
+      "deleteUser": "ユーザーを削除"
+    },
+    "bench": {
+      "title": "チーム",
+      "loading": "読み込み中...",
+      "wipLimit": "WIP制限",
+      "unlimited": "∞",
+      "tasks": "タスク",
+      "editWipLimit": "WIP制限を編集",
+      "saveWipLimit": "WIP制限を保存",
+      "cancel": "キャンセル"
+    },
+    "auth": {
+      "login": "ログイン",
+      "register": "登録",
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "username": "ユーザー名",
+      "signIn": "サインイン",
+      "signingIn": "サインイン中...",
+      "registering": "登録中...",
+      "verifying": "確認中...",
+      "verifyAccount": "アカウントを確認",
+      "verificationCode": "確認コード",
+      "enterCode": "メールに送信された確認コードを入力してください",
+      "noCode": "コードを受け取っていませんか？",
+      "resendCode": "コードを再送信",
+      "pleaseWait": "お待ちください！処理中です。",
+      "sessionExpired": "セッションが期限切れになりました。再度サインインしてください。",
+      "loginSuccess": "サインインに成功しました！",
+      "loginFailed": "ログインに失敗しました:",
+      "registerSuccess": "アカウントが作成されました！メールを確認してください。",
+      "registerFailed": "登録に失敗しました:",
+      "verifySuccess": "アカウントが正常に確認されました！ログインしてください。",
+      "verifyFailed": "確認に失敗しました:",
+      "codeSent": "確認コードがメールに送信されました。"
+    },
+    "taskLabels": {
+      "addLabel": "+ ラベル",
+      "chooseLabelHeader": "ラベルを選択",
+      "predefinedLabels": "定義済みラベル",
+      "existingLabels": "既存のラベル",
+      "addCustomLabel": "カスタムラベルを追加",
+      "addCustomLabelTitle": "カスタムラベルを追加",
+      "labelName": "ラベル名:",
+      "labelNamePlaceholder": "ラベル名を入力",
+      "labelColor": "ラベルの色:",
+      "add": "追加",
+      "cancel": "キャンセル",
+      "alreadyAddedWarning": "このラベルはすでにタスクに追加されています",
+      "addErrorMessage": "ラベルの追加中にエラーが発生しました",
+      "removeErrorMessage": "ラベルの削除中にエラーが発生しました"
+    },
+    "usersManagement": {
+      "title": "ユーザー管理",
+      "fields": {
+        "name": "氏名",
+        "email": "メールアドレス",
+        "password": "パスワード",
+        "avatar": "アバター",
+        "id": "ID",
+        "actions": "アクション"
+      },
+      "buttons": {
+        "add": "ユーザーを追加",
+        "delete": "ユーザーを削除",
+        "change": "変更",
+        "back": "かんばんボードに戻る"
+      },
+      "messages": {
+        "emptyFields": "すべてのフィールドに入力してください！",
+        "invalidEmail": "有効なメールアドレスを入力してください！",
+        "addError": "ユーザーの追加中にエラーが発生しました",
+        "deleteConfirm": "このユーザーを削除してもよろしいですか？",
+        "deleteError": "ユーザーの削除中にエラーが発生しました",
+        "fileTooLarge": "ファイルが大きすぎます。最大サイズは10MBです。",
+        "fileTypeError": "JPGとPNGファイルのみ許可されています。",
+        "avatarUpdated": "アバターが正常に更新されました",
+        "avatarError": "アバターのアップロード中にエラーが発生しました:",
+        "loadError": "ユーザーの読み込み中にエラーが発生しました"
+      }
+    },
+    "chat": {
+      "title": "チャット",
+      "connected": "チャットに接続しました",
+      "disconnected": "チャットから切断されました",
+      "connectionError": "チャットへの接続エラー",
+      "send": "送信",
+      "typingMessage": "メッセージを入力...",
+      "openChat": "チャットを開く",
+      "public": "公開",
+      "private": "プライベート",
+      "room": "ルーム",
+      "recipient": "受信者",
+      "noRecipient": "受信者を入力してください",
+      "noRoom": "まずルームに参加してください",
+      "selectRoom": "ルームを選択",
+      "joinedRoom": "ルームに参加: {{room}}",
+      "leftRoom": "ルームを退出しました",
+      "leaveRoom": "退出",
+      "noMessages": "まだメッセージはありません",
+      "userJoined": "{{user}}がチャットに参加しました",
+      "userLeft": "{{user}}がチャットを退出しました"
+    }
+  }

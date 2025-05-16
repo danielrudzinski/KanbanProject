@@ -107,7 +107,7 @@ export function ChatProvider({ children }) {
       chatApiRef.current = new ChatApi(onMessageReceived, onError);
       await chatApiRef.current.connect(user.username);
       dispatch({ type: 'SET_CONNECTED', payload: true });
-      toast.info(t('chat.connected'));
+      //toast.info(t('chat.connected'));
     } catch (error) {
       onError(error);
     }
