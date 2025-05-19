@@ -8,7 +8,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.myproject.kanbanproject2.dto.TaskDTO;
+import pl.myproject.kanbanproject2.dto.TaskColumnHistoryDTO;
 import pl.myproject.kanbanproject2.mapper.TaskMapper;
+import pl.myproject.kanbanproject2.mapper.TaskColumnHistoryMapper;
 import pl.myproject.kanbanproject2.model.Column;
 import pl.myproject.kanbanproject2.model.Task;
 import pl.myproject.kanbanproject2.model.TaskColumnHistory;
@@ -30,15 +32,18 @@ public class TaskService {
     private final TaskMapper taskMapper;
     private final UserService userService;
     private final TaskColumnHistoryRepository taskColumnHistoryRepository;
+    private final TaskColumnHistoryMapper historyMapper;
 
     @Autowired
     public TaskService(TaskRepository taskRepository, UserRepository userRepository, TaskMapper taskMapper,
-                       UserService userService, TaskColumnHistoryRepository taskColumnHistoryRepository) {
+                       UserService userService, TaskColumnHistoryRepository taskColumnHistoryRepository,
+                       TaskColumnHistoryMapper historyMapper) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.taskMapper = taskMapper;
         this.userService = userService;
         this.taskColumnHistoryRepository = taskColumnHistoryRepository;
+        this.historyMapper = historyMapper;
     }
 
     public Task addTask(Task task) {
@@ -179,6 +184,13 @@ public class TaskService {
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
+    }
+
+    public List<TaskColumnHistoryDTO> getTaskColumnHistoryDTOs(Integer taskId) {
+        List<TaskColumnHistory> history = getTaskColumnHistory(taskId);
+        return history.stream()
+                .map(historyMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public TaskDTO assignUserToTask(Integer taskId, Integer userId) {
