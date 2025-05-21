@@ -77,7 +77,7 @@ public class TaskService {
     public void deleteTask(Integer id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
-    
+
         taskColumnHistoryRepository.deleteAll(taskColumnHistoryRepository.findByTaskOrderByChangedAtDesc(task));
 
         if (task.getChildTasks() != null && !task.getChildTasks().isEmpty()) {
@@ -87,7 +87,7 @@ public class TaskService {
             }
             task.getChildTasks().clear();
         }
-        
+
         taskRepository.delete(task);
     }
 
@@ -311,6 +311,7 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error retrieving labels", e);
         }
     }
+
     public TaskDTO assignParentTask(Integer childTaskId, Integer parentTaskId) {
         try {
             Task childTask = taskRepository.findById(childTaskId)
