@@ -108,13 +108,20 @@ docker-compose down
 cd backend
 ```
 
-2. Configure the database:
+2. Configure the database and secrets:
    - Update `src/main/resources/application.properties` with your PostgreSQL connection settings
-   Mainly these four lines (the first ones):
+   Mainly these lines:
       - spring.datasource.url= (leave this as it is, except SPRING_DATASOURCE_DB:kanban <- edit this with your db's name)
       - server.port= (leave as is)
       - spring.datasource.username= (your login username for postgresql)
       - spring.datasource.password= (your passowrd for postgresql)
+      - SPRING_MAIL_USERNAME = (your smtp mail login)
+      - SPRING_MAIL_PASSWORD = (your mail's password or more likely auth token)
+      - security.jwt.secret-key = (random jwt key, generate it online)
+
+  OR
+
+  Create .env file with these values in root folder AND /backend folder and leave application.properties as is.
 
 3. Build and run the backend:
 
@@ -170,9 +177,13 @@ The project is organized into two main directories:
    - /src/styles - CSS and styling
 
 ## 🧪 Testing
-The project uses JUnit and Mockito for unit and integration testing. Test coverage is monitored with JaCoCo.
+The project uses JUnit, Mockito, Jest, Eslint and Cypress for linting checks, unit, integration and e2e testing. Test coverage is monitored with JaCoCo.
 
-To run tests (from root folder):
+All tests are automatically run on pull requests and pushes to the main branch through GitHub Actions workflows. See the workflows directory for configuration details.
+
+### Running Backend Tests
+
+To run backend tests (from root folder):
 
 ``` bash
 cd backend
@@ -185,6 +196,20 @@ To generate a test coverage report:
 
 ```
 The coverage report will be available at site>jacoco>index.html
+
+### Running Frontend Tests
+
+To run frontend tests (from root folder):
+
+``` bash
+cd frontend
+npm test                  # Run Jest unit tests
+npm run test:coverage     # Generate Jest test coverage report
+npm run lint              # Run ESLint code quality checks
+npm run cypress           # Open Cypress test runner for E2E tests
+npm run cypress:headless  # Run Cypress tests in headless mode
+```
+The Jest coverage report will be available in the coverage directory.
 
 ## 👥 Contributing
 
