@@ -32,12 +32,23 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: POSTGRES_DB
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres:5432/${{ secrets.POSTGRES_DB }}
+              value: jdbc:postgresql://postgres:5432/$(POSTGRES_DB)
             - name: SPRING_DATASOURCE_USERNAME
-              value: ${{ secrets.POSTGRES_USER }}
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: POSTGRES_USER
             - name: SPRING_DATASOURCE_PASSWORD
-              value: ${{ secrets.POSTGRES_PASSWORD }}
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: POSTGRES_PASSWORD
           resources:
             requests:
               memory: "512Mi"
