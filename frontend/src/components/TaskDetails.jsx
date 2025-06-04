@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { createPortal } from 'react-dom';
-import { fetchUsers, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask, assignParentTask, removeParentTask, getChildTasks, fetchTasks, getTaskColumnHistory, getTaskColumnTimeSpentSummary } from '../services/api';
+import { fetchUsers, fetchColumns, assignUserToTask, fetchTask, removeUserFromTask, getUserAvatar, addSubTask, toggleSubTaskCompletion, deleteSubTask, updateSubTask, fetchSubTask, fetchSubTasksByTaskId, updateTask, assignParentTask, removeParentTask, getChildTasks, fetchTasks, getTaskColumnHistory, getTaskColumnTimeSpentSummary } from '../services/api';
 import '../styles/components/TaskDetails.css';
 import TaskLabels from './TaskLabels';
 import { toast } from 'react-toastify';
@@ -41,6 +41,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
   const [deadlineValue, setDeadlineValue] = useState('');
   const [originalDeadline, setOriginalDeadline] = useState('');
   const [columnHistory, setColumnHistory] = useState([]);
+  const [currentView, setCurrentView] = useState('main');
   const [columnHistoryPage, setColumnHistoryPage] = useState(0);
   const [columnTimeSpent, setColumnTimeSpent] = useState([]);
   const [isLoadingTimeSpent, setIsLoadingTimeSpent] = useState(false);
@@ -141,15 +142,34 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
 
       try {
         const historyData = await getTaskColumnHistory(task.id);
-        setColumnHistory(historyData || []);
-      } catch (error) {
-        console.error('Error fetching column history:', error);
-        setColumnHistory([]);
-      }
-
-      try {
-        const historyData = await getTaskColumnHistory(task.id);
-        setColumnHistory(historyData || []);
+        
+        if (historyData && historyData.length > 0) {
+          const allColumns = await fetchColumns().catch(() => []);
+          const columnNameMap = {};
+          if (allColumns && allColumns.length) {
+            allColumns.forEach(column => {
+              columnNameMap[column.id] = column.name;
+            });
+          }
+  
+          const enhancedHistory = historyData.map(item => ({
+            ...item,
+            columnName: item.columnName || columnNameMap[item.columnId] || item.column_name || `Column ${item.columnId}`
+          }));
+  
+          const uniqueHistory = enhancedHistory.filter((item, index, array) => {
+            return array.findIndex(other => 
+              Math.abs(new Date(other.changedAt) - new Date(item.changedAt)) < 1000 && 
+              other.columnId === item.columnId
+            ) === index;
+          });
+  
+          console.log('Enhanced history:', uniqueHistory);
+          setColumnHistory(uniqueHistory);
+        } else {
+          setColumnHistory([]);
+        }
+        
         loadColumnTimeSpent();
       } catch (error) {
         console.error('Error fetching column history:', error);
@@ -622,6 +642,28 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
     }
   };
 
+  const calculateDuration = (currentItem, nextItem) => {
+    if (!nextItem) return '';
+    
+    const start = new Date(currentItem.changedAt);
+    const end = new Date(nextItem.changedAt);
+    const diffMs = Math.max(0, end - start);
+    
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (days > 0) {
+      return `${days}d ${hours}h`;
+    } else if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else if (minutes > 0) {
+      return `${minutes}m`;
+    } else {
+      return '< 1m';
+    }
+  };
+
   if (loading) {
     return createPortal(
       <div className="task-details-overlay">
@@ -710,6 +752,15 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </button>
+            <button 
+              className={`history-timeline-btn ${currentView === 'history' ? 'active' : ''}`}
+              onClick={() => setCurrentView(currentView === 'main' ? 'history' : 'main')}
+              title="History & Timeline"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
             <button
               className="close-panel-btn"
               onClick={(event) => {
@@ -725,357 +776,518 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
       </div>
           
       <div className="task-details-main">
-      {/* Column History Section */}
-      <div className="column-history-section">
-        <div className="section-header">
-          <h4>{t('taskActions.columnHistory') || 'Column History'}</h4>
-        </div>
-        <div className="column-history-content">
-          {columnHistory && columnHistory.length > 0 ? (
-            <>
-              <ul className="column-history-list">
-                {columnHistory
-                  .slice(columnHistoryPage * HISTORY_PAGE_SIZE, (columnHistoryPage + 1) * HISTORY_PAGE_SIZE)
-                  .map((historyItem, index) => (
-                    <li key={historyItem.id} className="column-history-item">
-                      <div className="column-name">
-                        <span className={index === 0 && columnHistoryPage === 0 ? "column-history-start" : 
-                                        index === Math.min(HISTORY_PAGE_SIZE - 1, columnHistory.length - 1 - columnHistoryPage * HISTORY_PAGE_SIZE) ? 
-                                        "column-history-current" : ""}>
-                          {historyItem.columnName}
-                        </span>
-                        <span className="column-time">
-                          {new Date(historyItem.changedAt).toLocaleString()}
-                        </span>
-                      </div>
-                      {index < Math.min(HISTORY_PAGE_SIZE - 1, columnHistory.length - 1 - columnHistoryPage * HISTORY_PAGE_SIZE) && (
-                        <span className="column-history-arrow">←</span>
-                      )}
-                    </li>
-                  ))}
-              </ul>
-              <div className="history-pagination">
-                <button 
-                  className="history-nav-btn"
-                  disabled={columnHistoryPage === 0}
-                  onClick={() => setColumnHistoryPage(prev => Math.max(0, prev - 1))}
-                >
-                  &larr; Previous
-                </button>
-                <span className="history-page-info">
-                  {columnHistoryPage + 1} / {Math.ceil(columnHistory.length / HISTORY_PAGE_SIZE)}
-                </span>
-                <button 
-                  className="history-nav-btn"
-                  disabled={(columnHistoryPage + 1) * HISTORY_PAGE_SIZE >= columnHistory.length}
-                  onClick={() => setColumnHistoryPage(prev => 
-                    prev + 1 < Math.ceil(columnHistory.length / HISTORY_PAGE_SIZE) ? prev + 1 : prev
-                  )}
-                >
-                  Next &rarr;
-                </button>
-              </div>
-              <div className="column-time-stats">
-                <h5>Time Spent in Columns</h5>
-                {isLoadingTimeSpent ? (
-                  <p>Loading time statistics...</p>
-                ) : columnTimeSpent.length > 0 ? (
-                  <ul className="time-spent-list">
-                    {columnTimeSpent.map(column => (
-                      <li key={column.columnId} className="time-spent-item">
-                        <span className="column-name">{column.columnName}:</span>
-                        <span className="time-value">{column.formattedTime}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No time statistics available</p>
+        {currentView === 'main' ? (
+          <>
+            {/* Task Description Section */}
+            <div className="task-description-section">
+              <div className="description-header">
+                <h4>{t('taskActions.description')}:</h4>
+                {!editingTaskDescription && (
+                  <button 
+                    onClick={startEditingTaskDescription}
+                    className="edit-description-btn"
+                    title={t('taskActions.editTaskDescription')}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
                 )}
               </div>
-            </>
-          ) : (
-            <p>No column history available</p>
-          )}
-        </div>
-      </div>
-        
-      {/* Deadline Section */}
-      <div className="task-deadline-section">
-        <div className="deadline-header">
-            <span className="deadline-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </span>
-          <h4>{t('taskActions.deadline')}:</h4>
-        {!editingDeadline && (
-          <button 
-          onClick={startEditingDeadline}
-          className="edit-description-btn"
-          title={t('taskActions.editDeadline')}
-        >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-          </button>
-        )}
-        </div>
-  
-      {editingDeadline ? (
-        <div className="deadline-edit-form">
-          <input 
-            type="datetime-local"
-            value={deadlineValue}
-            onChange={(e) => setDeadlineValue(e.target.value)}
-            className="deadline-input"
-          />
-          <div className="description-edit-actions">
-            <button 
-              onClick={saveDeadline}
-              className="save-description-btn"
-            >
-              {t('taskActions.save')}
-            </button>
-            <button 
-              onClick={cancelEditingDeadline}
-              className="cancel-edit-btn"
-            >
-              {t('taskActions.cancel')}
-            </button>
-          </div>
-        </div>
-    ) : (
-      <div className={`deadline-content ${isDeadlineExpired ? 'expired' : isDeadlineUpcoming ? 'upcoming' : ''}`}>
-        {task.deadline ? (
-          <>
-            {new Date(task.deadline).toLocaleString(undefined, {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-            {isDeadlineExpired && (
-              <span className="expired-tag">{t('taskActions.expired')}</span>
-            )}
-            {isDeadlineUpcoming && (
-              <span className="upcoming-tag">{t('taskActions.upcoming')}</span>
-            )}
-          </>
-        ) : (
-          <p className="empty-deadline">{t('taskActions.noDeadline')}</p>
-        )}
-      </div>
-    )}
-      </div>
-        
-          {/* Task Description Section */}
-          <div className="task-description-section">
-          <div className="description-header">
-            <h4>{t('taskActions.description')}:</h4>
-            {!editingTaskDescription && (
-              <button 
-                onClick={startEditingTaskDescription}
-                className="edit-description-btn"
-                title={t('taskActions.editTaskDescription')}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </button>
-            )}
-          </div>
-          
-          {editingTaskDescription ? (
-            <div className="description-edit-form">
-              <textarea 
-                ref={taskDescriptionInputRef}
-                value={taskDescription} 
-                onChange={(e) => setTaskDescription(e.target.value)}
-                placeholder={t('taskActions.description')}
-                className="description-textarea"
-                rows={4}
-              ></textarea>
-              <div className="description-edit-actions">
-                <button 
-                  onClick={saveTaskDescription}
-                  className="save-description-btn"
-                >
-                  {t('taskActions.save')}
-                </button>
-                <button 
-                  onClick={cancelEditingTaskDescription}
-                  className="cancel-edit-btn"
-                >
-                  {t('taskActions.cancel')}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="description-display">
-              {taskDescription ? (
-                <p className="description-content">{taskDescription}</p>
+              
+              {editingTaskDescription ? (
+                <div className="description-edit-form">
+                  <textarea 
+                    ref={taskDescriptionInputRef}
+                    value={taskDescription} 
+                    onChange={(e) => setTaskDescription(e.target.value)}
+                    placeholder={t('taskActions.description')}
+                    className="description-textarea"
+                    rows={4}
+                  ></textarea>
+                  <div className="description-edit-actions">
+                    <button 
+                      onClick={saveTaskDescription}
+                      className="save-description-btn"
+                    >
+                      {t('taskActions.save')}
+                    </button>
+                    <button 
+                      onClick={cancelEditingTaskDescription}
+                      className="cancel-edit-btn"
+                    >
+                      {t('taskActions.cancel')}
+                    </button>
+                  </div>
+                </div>
               ) : (
-                <p className="empty-description">{t('taskActions.noDescription')}</p>
+                <div className="description-display">
+                  {taskDescription ? (
+                    <p className="description-content">{taskDescription}</p>
+                  ) : (
+                    <p className="empty-description">{t('taskActions.noDescription')}</p>
+                  )}
+                </div>
               )}
             </div>
-          )}
-        </div>
-        {/* User assignment dropdown */}
-        {showAssignForm && (
-          <div className="assign-user-dropdown">
-            <div className="dropdown-header">
-              <h4>{t('taskActions.assign')}</h4>
-              <button 
-                className="close-dropdown" 
-                onClick={() => setShowAssignForm(false)}
-              >
-                ×
-              </button>
-            </div>
-            <select 
-              value={selectedUserId}
-              onChange={(e) => setSelectedUserId(e.target.value)}
-            >
-              <option value="">{t('forms.wipLimit.selectUser')}</option>
-              {users
-                .filter(user => !assignedUsers.some(assignedUser => assignedUser.id === user.id))
-                .map(user => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
-                  </option>
-                ))
-              }
-            </select>
-            <button 
-              onClick={handleAssignUser} 
-              disabled={!selectedUserId}
-              className="assign-btn"
-            >
-              {t('taskActions.assign')}
-            </button>
-          </div>
-        )}
-  
-        {/* Subtasks Section */}
-        <div className="subtasks-section">
-          <h4>{t('taskActions.subtasks')}</h4>
-          
-          <div className="add-subtask-form">
-            <input
-              type="text"
-              value={newSubtaskTitle}
-              onChange={(e) => setNewSubtaskTitle(e.target.value)}
-              placeholder={t('taskActions.shadowDescription')}
-              className="subtask-input"
-            />
-            <button 
-              onClick={handleaddSubTask}
-              disabled={!newSubtaskTitle.trim()}
-              className="add-subtask-btn"
-            >
-              {t('header.addTask')}
-            </button>
-          </div>
-          
-          {subtasks.length > 0 ? (
-            <div className="subtasks-list">
-              {subtasks.map(subtask => (
-                <div key={subtask.id} className={`subtask-item ${expandedSubtaskId === subtask.id ? 'expanded' : ''}`}>
-                  <div className="subtask-header">
-                    <input
-                      type="checkbox"
-                      checked={subtask.completed}
-                      onChange={() => handleToggleSubtask(subtask.id)}
-                      id={`subtask-${subtask.id}`}
-                      className="subtask-checkbox"
-                    />
-                    <label 
-                      htmlFor={`subtask-${subtask.id}`}
-                      className={subtask.completed ? 'completed' : ''}
-                    >
-                      {subtask.title}
-                    </label>
-                    
-                    <div className="subtask-actions">
-                      <button
-                        className="description-toggle-btn dark-bg-with-text"
-                        onClick={() => toggleSubtaskExpansion(subtask.id)}
-                        title={expandedSubtaskId === subtask.id ? t('taskActions.hideDetails') : t('taskActions.showDetails')}
-                      >
-                        <span className={expandedSubtaskId === subtask.id ? "arrow-icon rotated" : "arrow-icon"}>
-                          ▼
-                        </span>
-                        <span className="button-text">{expandedSubtaskId === subtask.id ? t('taskActions.hideDetails') : t('taskActions.showDetails')}</span>
-                      </button>
-                      <button
-                        className="delete-subtask-btn"
-                        onClick={() => confirmdeleteSubTask(subtask.id)}
-                        title={t('taskActions.deleteSubTask')}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {expandedSubtaskId === subtask.id && (
-                    <div className="subtask-description-container">
-                      {editingDescription ? (
-                        <div className="description-edit-form">
-                          <textarea 
-                            ref={descriptionInputRef}
-                            value={subtaskDescription} 
-                            onChange={(e) => setSubtaskDescription(e.target.value)}
-                            placeholder={t('taskActions.description')}
-                            className="description-textarea"
-                            rows={4}
-                          ></textarea>
-                          <div className="description-edit-actions">
-                            <button 
-                              onClick={saveSubtaskDescription}
-                              className="save-description-btn"
-                            >
-                              {t('taskActions.save')}
-                            </button>
-                            <button 
-                              onClick={cancelEditingDescription}
-                              className="cancel-edit-btn"
-                            >
-                              {t('taskActions.cancel')}
-                            </button>
-                          </div>
+
+            {/* User assignment dropdown */}
+            {showAssignForm && (
+              <div className="assign-user-dropdown">
+                <div className="dropdown-header">
+                  <h4>{t('taskActions.assign')}</h4>
+                  <button 
+                    className="close-dropdown" 
+                    onClick={() => setShowAssignForm(false)}
+                  >
+                    ×
+                  </button>
+                </div>
+                <select 
+                  value={selectedUserId}
+                  onChange={(e) => setSelectedUserId(e.target.value)}
+                >
+                  <option value="">{t('forms.wipLimit.selectUser')}</option>
+                  {users
+                    .filter(user => !assignedUsers.some(assignedUser => assignedUser.id === user.id))
+                    .map(user => (
+                      <option key={user.id} value={user.id}>
+                        {user.name}
+                      </option>
+                    ))
+                  }
+                </select>
+                <button 
+                  onClick={handleAssignUser} 
+                  disabled={!selectedUserId}
+                  className="assign-btn"
+                >
+                  {t('taskActions.assign')}
+                </button>
+              </div>
+            )}
+
+            {/* Subtasks Section */}
+            <div className="subtasks-section">
+              <h4>{t('taskActions.subtasks')}</h4>
+              
+              <div className="add-subtask-form">
+                <input
+                  type="text"
+                  value={newSubtaskTitle}
+                  onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                  placeholder={t('taskActions.shadowDescription')}
+                  className="subtask-input"
+                />
+                <button 
+                  onClick={handleaddSubTask}
+                  disabled={!newSubtaskTitle.trim()}
+                  className="add-subtask-btn"
+                >
+                  {t('header.addTask')}
+                </button>
+              </div>
+              
+              {subtasks.length > 0 ? (
+                <div className="subtasks-list">
+                  {subtasks.map(subtask => (
+                    <div key={subtask.id} className={`subtask-item ${expandedSubtaskId === subtask.id ? 'expanded' : ''}`}>
+                      <div className="subtask-header">
+                        <input
+                          type="checkbox"
+                          checked={subtask.completed}
+                          onChange={() => handleToggleSubtask(subtask.id)}
+                          id={`subtask-${subtask.id}`}
+                          className="subtask-checkbox"
+                        />
+                        <label 
+                          htmlFor={`subtask-${subtask.id}`}
+                          className={subtask.completed ? 'completed' : ''}
+                        >
+                          {subtask.title}
+                        </label>
+                        
+                        <div className="subtask-actions">
+                          <button
+                            className="description-toggle-btn dark-bg-with-text"
+                            onClick={() => toggleSubtaskExpansion(subtask.id)}
+                            title={expandedSubtaskId === subtask.id ? t('taskActions.hideDetails') : t('taskActions.showDetails')}
+                          >
+                            <span className={expandedSubtaskId === subtask.id ? "arrow-icon rotated" : "arrow-icon"}>
+                              ▼
+                            </span>
+                            <span className="button-text">{expandedSubtaskId === subtask.id ? t('taskActions.hideDetails') : t('taskActions.showDetails')}</span>
+                          </button>
+                          <button
+                            className="delete-subtask-btn"
+                            onClick={() => confirmdeleteSubTask(subtask.id)}
+                            title={t('taskActions.deleteSubTask')}
+                          >
+                            ×
+                          </button>
                         </div>
-                      ) : (
-                        <div className="description-display">
-                          <div className="description-header">
-                            <h5>{t('taskActions.description')}:</h5>
-                            <button 
-                              onClick={startEditingSubTaskDescription}
-                              className="edit-description-btn"
-                              title={t('taskActions.editSubTaskDescription')}
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                              </svg>
-                            </button>
-                          </div>
-                          {subtaskDescription ? (
-                            <p className="description-content">{subtaskDescription}</p>
+                      </div>
+                      
+                      {expandedSubtaskId === subtask.id && (
+                        <div className="subtask-description-container">
+                          {editingDescription ? (
+                            <div className="description-edit-form">
+                              <textarea 
+                                ref={descriptionInputRef}
+                                value={subtaskDescription} 
+                                onChange={(e) => setSubtaskDescription(e.target.value)}
+                                placeholder={t('taskActions.description')}
+                                className="description-textarea"
+                                rows={4}
+                              ></textarea>
+                              <div className="description-edit-actions">
+                                <button 
+                                  onClick={saveSubtaskDescription}
+                                  className="save-description-btn"
+                                >
+                                  {t('taskActions.save')}
+                                </button>
+                                <button 
+                                  onClick={cancelEditingDescription}
+                                  className="cancel-edit-btn"
+                                >
+                                  {t('taskActions.cancel')}
+                                </button>
+                              </div>
+                            </div>
                           ) : (
-                            <p className="empty-description">{t('taskActions.noDescription')}</p>
+                            <div className="description-display">
+                              <div className="description-header">
+                                <h5>{t('taskActions.description')}:</h5>
+                                <button 
+                                  onClick={startEditingSubTaskDescription}
+                                  className="edit-description-btn"
+                                  title={t('taskActions.editSubTaskDescription')}
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                  </svg>
+                                </button>
+                              </div>
+                              {subtaskDescription ? (
+                                <p className="description-content">{subtaskDescription}</p>
+                              ) : (
+                                <p className="empty-description">{t('taskActions.noDescription')}</p>
+                              )}
+                            </div>
                           )}
                         </div>
                       )}
                     </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="no-subtasks">{t('taskActions.noSubtasks')}</p>
+              )}
+            </div>
+
+            {/* Parent Task section */}
+            <div className="task-parent-section">
+              <h4>Parent Task</h4>
+        
+              {parentTask ? (
+                <div className="current-parent-task">
+                  <p>Current: <strong>{parentTask.title}</strong></p>
+                  <button 
+                    onClick={handleRemoveParent}
+                    className="remove-parent-btn"
+                    title={t('taskActions.delete')}
+                  >
+                    Remove link
+                  </button>
+                </div>
+             ) : (
+                <p className="no-parent">No parent task</p>
+              )}
+        
+              <button
+                className="assign-parent-btn"
+                onClick={handleShowParentSelector}
+              >
+                {parentTask ? 'Change parent task' : 'Assign parent task'}
+              </button>
+        
+              {showParentSelector && (
+                <div className="parent-selector">
+                  <select 
+                    value={selectedParentId}
+                    onChange={(e) => setSelectedParentId(e.target.value)}
+                  >
+                    <option value="">{t('forms.wipLimit.selectUser')}</option>
+                    {availableTasks.map(availableTask => (
+                      <option key={availableTask.id} value={availableTask.id}>
+                      {availableTask.title}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="parent-selector-actions">
+                    <button 
+                      onClick={handleAssignParent} 
+                      disabled={!selectedParentId}
+                      className="confirm-parent-btn"
+                    >
+                      {t('taskActions.yes')}
+                    </button>
+                    <button 
+                      onClick={() => setShowParentSelector(false)}
+                      className="cancel-parent-btn"
+                    >
+                      {t('taskActions.no')}
+                    </button>
+                  </div>
+                </div>
+              )}
+        
+              {childTasks.length > 0 && (
+                <div className="child-tasks-section">
+                  <h5>Child Tasks:</h5>
+                  <ul className="child-tasks-list">
+                    {childTasks.map(childTask => (
+                      <li key={childTask.id} className="child-task-item">
+                        {childTask.title}
+                      </li>
+                   ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          /* History & Timeline View */
+          <div className="history-timeline-view">
+            {/* Deadline Section */}
+            <div className="task-deadline-section">
+              <div className="deadline-header">
+                <span className="deadline-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </span>
+                <h4>{t('taskActions.deadline')}:</h4>
+                {!editingDeadline && (
+                  <button 
+                    onClick={startEditingDeadline}
+                    className="edit-description-btn"
+                    title={t('taskActions.editDeadline')}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+
+              {editingDeadline ? (
+                <div className="deadline-edit-form">
+                  <input 
+                    type="datetime-local"
+                    value={deadlineValue}
+                    onChange={(e) => setDeadlineValue(e.target.value)}
+                    className="deadline-input"
+                  />
+                  <div className="description-edit-actions">
+                    <button 
+                      onClick={saveDeadline}
+                      className="save-description-btn"
+                    >
+                      {t('taskActions.save')}
+                    </button>
+                    <button 
+                      onClick={cancelEditingDeadline}
+                      className="cancel-edit-btn"
+                    >
+                      {t('taskActions.cancel')}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className={`deadline-content ${isDeadlineExpired ? 'expired' : isDeadlineUpcoming ? 'upcoming' : ''}`}>
+                  {task.deadline ? (
+                    <>
+                      {new Date(task.deadline).toLocaleString(undefined, {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                      {isDeadlineExpired && (
+                        <span className="expired-tag">{t('taskActions.expired')}</span>
+                      )}
+                      {isDeadlineUpcoming && (
+                        <span className="upcoming-tag">{t('taskActions.upcoming')}</span>
+                      )}
+                    </>
+                  ) : (
+                    <p className="empty-deadline">{t('taskActions.noDeadline')}</p>
                   )}
                 </div>
-              ))}
+              )}
             </div>
-          ) : (
-            <p className="no-subtasks">{t('taskActions.noSubtasks')}</p>
-          )}
-        </div>
-  
+
+            {/* Column History Section */}
+            <div className="column-history-section">
+              <div className="section-header">
+                <h4>{t('taskActions.columnHistory') || 'Column History'}</h4>
+              </div>
+              <div className="column-history-content">
+                {columnHistory && columnHistory.length > 0 ? (
+                  <>
+                    {/* Timeline Visualization */}
+                    <div className="timeline-container">
+                      <div className="timeline-line"></div>
+                      {columnHistory
+                        .slice(columnHistoryPage * HISTORY_PAGE_SIZE, (columnHistoryPage + 1) * HISTORY_PAGE_SIZE)
+                        .map((historyItem, index) => {
+                          const globalIndex = columnHistoryPage * HISTORY_PAGE_SIZE + index;
+                          const isStart = globalIndex === 0; 
+                          const isCurrent = globalIndex === columnHistory.length - 1;
+                          
+                          return (
+                            <div key={historyItem.id} className={`timeline-item ${isStart ? 'timeline-start' : ''} ${isCurrent ? 'timeline-current' : ''}`}>
+                              <div className="timeline-marker">
+                                <div className="timeline-dot"></div>
+                                {!isCurrent && <div className="timeline-connector"></div>}
+                              </div>
+                              <div className="timeline-content">
+                              <div className="timeline-column-name">
+                                {historyItem.columnName || 'Unknown Column'}
+                                {isCurrent && <span className="current-badge">Start</span>}
+                                {isStart && <span className="start-badge">Current</span>}
+                              </div>
+                                <div className="timeline-date">
+                                  {new Date(historyItem.changedAt).toLocaleDateString()} at{' '}
+                                  {new Date(historyItem.changedAt).toLocaleTimeString([], { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                  })}
+                                </div>
+                                {!isCurrent && (
+                                  <div className="timeline-duration">
+                                    Duration: {calculateDuration(historyItem, columnHistory[globalIndex + 1])}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="history-progress">
+                      <div className="progress-bar">
+                        <div 
+                          className="progress-fill" 
+                          style={{ 
+                            width: `${((columnHistoryPage + 1) / Math.ceil(columnHistory.length / HISTORY_PAGE_SIZE)) * 100}%` 
+                          }}
+                        ></div>
+                      </div>
+                      <div className="progress-text">
+                        Showing {columnHistoryPage * HISTORY_PAGE_SIZE + 1} - {Math.min((columnHistoryPage + 1) * HISTORY_PAGE_SIZE, columnHistory.length)} of {columnHistory.length} moves
+                      </div>
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="history-navigation">
+                      <button 
+                        className="nav-btn nav-btn-prev"
+                        disabled={columnHistoryPage === 0}
+                        onClick={() => setColumnHistoryPage(prev => Math.max(0, prev - 1))}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                        </svg>
+                        Previous
+                      </button>
+                      
+                      <div className="page-indicators">
+                        {Array.from({ length: Math.ceil(columnHistory.length / HISTORY_PAGE_SIZE) }, (_, i) => (
+                          <button
+                            key={i}
+                            className={`page-dot ${i === columnHistoryPage ? 'active' : ''}`}
+                            onClick={() => setColumnHistoryPage(i)}
+                            title={`Page ${i + 1}`}
+                          />
+                        ))}
+                      </div>
+
+                      <button 
+                        className="nav-btn nav-btn-next"
+                        disabled={(columnHistoryPage + 1) * HISTORY_PAGE_SIZE >= columnHistory.length}
+                        onClick={() => setColumnHistoryPage(prev => 
+                          prev + 1 < Math.ceil(columnHistory.length / HISTORY_PAGE_SIZE) ? prev + 1 : prev
+                        )}
+                      >
+                        Next
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Time Statistics with Charts */}
+                    <div className="column-time-stats">
+                      <h5>Time Spent Analysis</h5>
+                      {isLoadingTimeSpent ? (
+                        <div className="loading-stats">
+                          <div className="loading-spinner"></div>
+                          <span>Loading time statistics...</span>
+                        </div>
+                      ) : columnTimeSpent.length > 0 ? (
+                        <div className="time-stats-container">
+                          {columnTimeSpent.map((column, index) => {
+                            const maxTime = Math.max(...columnTimeSpent.map(c => c.totalTimeMs));
+                            const percentage = (column.totalTimeMs / maxTime) * 100;
+                            
+                            return (
+                              <div key={column.columnId} className="time-stat-item">
+                                <div className="stat-header">
+                                  <span className="stat-column-name">{column.columnName}</span>
+                                  <span className="stat-time">{column.formattedTime}</span>
+                                </div>
+                                <div className="stat-bar-container">
+                                  <div 
+                                    className="stat-bar" 
+                                    style={{ 
+                                      width: `${percentage}%`,
+                                      animationDelay: `${index * 0.1}s`
+                                    }}
+                                  ></div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="no-stats">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                          </svg>
+                          <p>No time statistics available</p>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="no-history">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.2,16.2L11,13V7H12.5V12.2L17,14.9L16.2,16.2Z"/>
+                    </svg>
+                    <p>No column history available</p>
+                    <span>This task hasn't moved between columns yet</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Delete subtask confirmation dialog */}
         {showDeleteConfirmation && subtaskToDelete && (
           <div 
@@ -1139,77 +1351,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
         />
         </div>
 
-        {/* Parent Task section */}
-        <div className="task-parent-section">
-          <h4>Parent Task</h4>
-    
-        {parentTask ? (
-          <div className="current-parent-task">
-            <p>Current: <strong>{parentTask.title}</strong></p>
-            <button 
-              onClick={handleRemoveParent}
-              className="remove-parent-btn"
-              title={t('taskActions.delete')}
-            >
-              Remove link
-            </button>
-          </div>
-       ) : (
-          <p className="no-parent">No parent task</p>
-        )}
-    
-        <button
-          className="assign-parent-btn"
-          onClick={handleShowParentSelector}
-        >
-          {parentTask ? 'Change parent task' : 'Assign parent task'}
-        </button>
-    
-        {showParentSelector && (
-          <div className="parent-selector">
-            <select 
-              value={selectedParentId}
-              onChange={(e) => setSelectedParentId(e.target.value)}
-            >
-              <option value="">{t('forms.wipLimit.selectUser')}</option>
-              {availableTasks.map(availableTask => (
-                <option key={availableTask.id} value={availableTask.id}>
-                {availableTask.title}
-                </option>
-              ))}
-            </select>
-            <div className="parent-selector-actions">
-              <button 
-                onClick={handleAssignParent} 
-                disabled={!selectedParentId}
-                className="confirm-parent-btn"
-              >
-                {t('taskActions.yes')}
-              </button>
-              <button 
-                onClick={() => setShowParentSelector(false)}
-                className="cancel-parent-btn"
-              >
-                {t('taskActions.no')}
-              </button>
-            </div>
-          </div>
-        )}
-    
-        {childTasks.length > 0 && (
-          <div className="child-tasks-section">
-            <h5>Child Tasks:</h5>
-            <ul className="child-tasks-list">
-              {childTasks.map(childTask => (
-                <li key={childTask.id} className="child-task-item">
-                  {childTask.title}
-                </li>
-             ))}
-            </ul>
-          </div>
-        )}
-      </div>
-
         {/* Assigned users section */}
         {assignedUsers.length > 0 && (
           <div className="assigned-users-bar">
@@ -1230,7 +1371,7 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
             </div>
           </div>
         )}
-  
+
         {success && (
           <div className="success-message">
             {t('notifications.taskUpdated')}

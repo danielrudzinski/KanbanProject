@@ -1,144 +1,147 @@
 .row {
   display: flex;
   flex-direction: column;
-  background-color: #e2e2e2;
-  border-radius: 6px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 4px rgba(14, 27, 54, 0.1);
+  background-color: var(--surface-light);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .row-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  background-color: rgba(209, 253, 255, 0.3);
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  font-weight: bold;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--primary-transparent);
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
+  font-weight: 600;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 .task-count {
-  background-color: #86d6ff;
-  color: #0e1b36;
-  border-radius: 50%;
+  background-color: var(--primary);
+  color: var(--text-dark);
+  border-radius: var(--radius-full);
   width: 24px;
   height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .delete-row-btn {
   border: none;
   background: none;
-  color: #76777c;
-  font-size: 18px;
+  color: var(--gray-500);
+  font-size: var(--text-lg);
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0 var(--spacing-xs);
   font-weight: bold;
+  transition: color var(--transition-fast);
 }
 
 .delete-row-btn:hover {
-  color: #d1fdff;
+  color: var(--primary-light);
 }
 
 .wip-limit {
-  font-size: 12px;
-  color: #76777c;
+  font-size: var(--text-xs);
+  color: var(--gray-500);
 }
 
 .wip-limit.exceeded {
-  color: #0e1b36;
+  color: var(--text-dark);
   font-weight: bold;
 }
 
 .delete-confirmation {
-  background-color: #e2e2e2;
-  border: 1px solid #d1fdff;
-  border-radius: 4px;
-  padding: 12px;
-  margin: 8px;
+  background-color: var(--surface-light);
+  border: var(--border-thin) solid var(--primary-light);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-md);
+  margin: var(--spacing-sm);
   text-align: center;
 }
 
 .confirmation-buttons {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-top: 8px;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
 }
 
 .confirmation-buttons button {
-  padding: 4px 12px;
+  padding: var(--spacing-xs) var(--spacing-md);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
 .confirmation-buttons button:first-child {
-  background-color: #0e1b36;
-  color: #e2e2e2;
+  background-color: var(--text-dark);
+  color: var(--surface-light);
 }
 
 .confirmation-buttons button:last-child {
-  background-color: #d1fdff;
-  color: #0e1b36;
+  background-color: var(--primary-light);
+  color: var(--text-dark);
 }
 
 .row-content {
   display: flex;
   flex-wrap: wrap;
-  padding: 8px;
-  gap: 8px;
+  padding: var(--spacing-sm);
+  gap: var(--spacing-sm);
 }
 
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
   .row {
-    background-color: #0e1b36;
+    background-color: var(--surface-dark);
   }
   
   .row-header {
-    background-color: rgba(209, 253, 255, 0.2);
-    color: #e2e2e2;
+    background-color: rgba(134, 214, 255, 0.1);
+    color: var(--text-light);
   }
   
   .task-count {
-    background-color: #86d6ff;
-    color: #0e1b36;
+    background-color: var(--primary);
+    color: var(--text-dark);
   }
   
   .delete-row-btn {
-    color: #76777c;
+    color: var(--gray-500);
   }
   
   .delete-row-btn:hover {
-    color: #d1fdff;
+    color: var(--primary-light);
   }
   
   .wip-limit.exceeded {
-    color: #d1fdff;
+    color: var(--primary-light);
   }
   
   .delete-confirmation {
-    background-color: #0e1b36;
-    border-color: #d1fdff;
+    background-color: var(--surface-dark);
+    border-color: var(--primary-light);
   }
   
   .confirmation-buttons button:first-child {
-    background-color: #e2e2e2;
-    color: #0e1b36;
+    background-color: var(--surface-light);
+    color: var(--text-dark);
   }
   
   .confirmation-buttons button:last-child {
-    background-color: #86d6ff;
-    color: #0e1b36;
+    background-color: var(--primary);
+    color: var(--text-dark);
   }
 }

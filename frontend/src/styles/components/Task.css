@@ -1,39 +1,41 @@
 /* ====== TASK CARD BASICS ====== */
 .task {
-  background-color: #e2e2e2;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(14, 27, 54, 0.1);
-  padding: 1rem 1rem 0.75rem;
-  margin-bottom: 1.5rem;
+  background-color: var(--surface-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
   width: fit-content;
-  min-width: 120px; 
+  min-width: 0px; 
   max-width: 100%; 
   cursor: pointer;
   position: relative;
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
+  transform-origin: center;
+  will-change: transform, box-shadow;
   word-break: break-word;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  border-left: 3px solid #86d6ff;
-  animation: taskAppear 0.3s ease-out;
+  border-left: var(--border-thick) solid var(--task-border-left);
+  animation: taskAppear var(--duration-normal) ease-out;
 }
 
 .task:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(14, 27, 54, 0.1);
-  background-color: #d1fdff;
+  box-shadow: var(--shadow-md);
+  background-color: var(--primary-light);
 }
 
 .task.dragging {
   opacity: 0.4;
   transform: rotate(1deg) scale(1.02);
-  box-shadow: 0 10px 15px rgba(14, 27, 54, 0.1);
+  box-shadow: var(--shadow-lg);
 }
 
 .task.user-drag-over {
-  background-color: rgba(134, 214, 255, 0.2);
-  border: 2px dashed #86d6ff;
+  background-color: var(--primary-transparent);
+  border: var(--border-medium) dashed var(--primary);
   box-shadow: 0 0 8px rgba(134, 214, 255, 0.3);
   transform: scale(1.03);
 }
@@ -46,16 +48,16 @@
   right: 0;
   height: 100%;
   width: 30%;
-  background: linear-gradient(to left, #e2e2e2 0%, transparent 100%);
+  background: linear-gradient(to left, var(--surface-light) 0%, transparent 100%);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--duration-normal) ease;
   pointer-events: none;
-  border-radius: 0 0.5rem 0.5rem 0;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
 }
 
 .task:hover::before {
   opacity: 0.6;
-  background: linear-gradient(to left, #d1fdff 0%, transparent 100%);
+  background: linear-gradient(to left, var(--primary-light) 0%, transparent 100%);
 }
 
 /* ====== TASK CONTENT ====== */
@@ -63,13 +65,15 @@
   display: flex;
   align-items: center;
   width: 100%;
-  color: #0e1b36;
+  color: var(--text-dark);
   justify-content: flex-start;
+  font-size: var(--text-sm);
+  line-height: 1.3;
 }
 
 .task-title {
   flex: 0 1 auto;
-  margin-right: 8px;
+  margin-right: var(--spacing-xs);
   max-width: 100%;
 }
 
@@ -77,29 +81,29 @@
 .task .delete-btn {
   background: none;
   border: none;
-  color: #76777c;
-  font-size: 1rem;
+  color: var(--gray-500);
+  font-size: var(--text-base);
   cursor: pointer;
-  padding: 0.25rem;
+  padding: var(--spacing-xs);
   line-height: 1;
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  border-radius: 9999px;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  border-radius: var(--radius-full);
   width: 1.5rem;
   height: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
   z-index: 5;
   visibility: visible;
   opacity: 1;
 }
 
 .task .delete-btn:hover {
-  color: #86d6ff;
-  background-color: rgba(134, 214, 255, 0.1);
+  color: var(--primary);
+  background-color: var(--primary-transparent);
 }
 
 /* ====== TASK INFO SECTION ====== */
@@ -108,7 +112,7 @@
   align-items: center;
   margin-left: auto;
   margin-right: 18px;
-  gap: 8px;
+  gap: var(--spacing-sm);
   flex-shrink: 0;
 }
 
@@ -125,21 +129,21 @@
 .task-avatar img {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   object-fit: cover;
-  border: 1px solid #d1fdff;
+  border: var(--border-thin) solid var(--primary-light);
 }
 
 .avatar-count {
   position: absolute;
   bottom: -5px;
   right: -5px;
-  background-color: #86d6ff;
-  color: #0e1b36;
+  background-color: var(--primary);
+  color: var(--text-dark);
   font-size: 10px;
   height: 16px;
   width: 16px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,7 +163,7 @@
   align-items: center;
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background-color: transparent;
   padding: 0;
 }
@@ -167,19 +171,52 @@
 .label-dot {
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   margin: 0;
 }
 
 .task-label-count {
   font-size: 9px;
-  background-color: #e2e2e2;
-  color: #0e1b36;
-  border-radius: 8px;
+  background-color: var(--surface-light);
+  color: var(--text-dark);
+  border-radius: var(--radius-sm);
   padding: 1px 3px;
   margin-top: 2px;
   width: fit-content;
   text-align: center;
+}
+
+/* ====== DEADLINE INDICATORS ====== */
+.task.deadline-expired {
+  border-left: var(--border-thick) solid var(--task-border-expired);
+}
+
+.task.deadline-upcoming {
+  border-left: var(--border-thick) solid var(--task-border-upcoming);
+}
+
+.deadline-indicator {
+  display: flex;
+  align-items: center;
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  width: fit-content;
+}
+
+.deadline-indicator.expired {
+  background-color: rgba(229, 57, 53, 0.1);
+  color: var(--task-border-expired);
+}
+
+.deadline-indicator.upcoming {
+  background-color: rgba(245, 124, 0, 0.1);
+  color: var(--task-border-upcoming);
+}
+
+.deadline-icon {
+  margin-right: var(--spacing-xs);
 }
 
 /* ====== TASK FOOTER ====== */
@@ -188,35 +225,35 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: var(--spacing-sm);
   z-index: 10;
 }
 
 .description-dropdown-btn {
-  background-color: #e2e2e2;
-  border: 1px solid #ccc;
-  border-radius: 0 0 8px 8px;
-  padding: 2px 12px;
-  font-size: 12px;
+  background-color: var(--surface-light);
+  border: var(--border-thin) solid var(--gray-300);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  padding: 2px var(--spacing-md);
+  font-size: var(--text-xs);
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
   white-space: nowrap;
 }
 
 .description-dropdown-btn:hover {
-  background-color: #d1fdff;
+  background-color: var(--primary-light);
 }
 
 /* ====== WARNING MESSAGES ====== */
 .assignment-error {
   position: absolute;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
+  background-color: rgba(248, 215, 218, 1);
+  border: var(--border-thin) solid rgba(245, 198, 203, 1);
   color: #721c24;
-  padding: 5px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 5px var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
   z-index: 100;
   top: -30px;
   left: 0;
@@ -224,8 +261,8 @@
   margin: 0 auto;
   max-width: 250px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  animation: fadeInDown 0.3s ease-in-out;
+  box-shadow: var(--shadow-sm);
+  animation: fadeInDown var(--duration-normal) ease-in-out;
 }
 
 .subtask-warning {
@@ -234,45 +271,17 @@
   left: 0;
   right: 0;
   background-color: rgba(255, 248, 220, 0.95);
-  border: 1px solid #ffd700;
-  border-radius: 0.5rem; 
-  padding: 0.5rem 0.75rem;
-  font-size: 0.75rem;
-  box-shadow: 0 1px 2px rgba(14, 27, 54, 0.1);
+  border: var(--border-thin) solid #ffd700;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm) var(--spacing-sm);
+  font-size: var(--text-xs);
+  box-shadow: var(--shadow-sm);
   z-index: 5;
   transform: translateY(100%);
   width: calc(100% - 6px);
   margin-left: 3px;
   display: flex;
   align-items: center;
-}
-
-.warning-icon {
-  margin-right: 4px;
-  font-size: 0.75rem; 
-}
-
-.warning-message {
-  flex: 1;
-  font-weight: 500;
-  color: #825500;
-  line-height: 1.2;
-}
-
-.warning-close-btn {
-  background: none;
-  border: none;
-  color: #825500;
-  cursor: pointer;
-  font-size: 0.75rem; 
-  width: 6px;
-  height: 6px;
-  padding: 0;
-  margin-left: 4px;
-}
-
-.warning-close-btn:hover {
-  color: #000;
 }
 
 /* ====== DELETE MODAL ====== */
@@ -285,45 +294,45 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(14, 27, 54, 0.5);
-  z-index: 1000;
-  animation: fadeIn 0.2s ease-out;
+  background-color: rgba(14, 27, 54, var(--backdrop-opacity));
+  z-index: var(--z-modal);
+  animation: fadeIn var(--duration-fast) ease-out;
 }
 
 .delete-modal {
-  background-color: #e2e2e2;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 10px rgba(14, 27, 54, 0.2);
-  padding: 1.25rem;
+  background-color: var(--surface-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: var(--spacing-xl);
   width: 300px;
   text-align: center;
-  animation: modalAppear 0.3s ease-out;
+  animation: modalAppear var(--duration-normal) ease-out;
 }
 
 .delete-modal p {
-  color: #0e1b36;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+  color: var(--text-dark);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--text-sm);
 }
 
 .confirmation-buttons {
   display: flex;
   justify-content: center;
-  gap: 0.75rem;
+  gap: var(--spacing-sm);
 }
 
 .confirm-delete-btn, .cancel-delete-btn {
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
   font-weight: 500;
   cursor: pointer;
   border: none;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .confirm-delete-btn {
-  background-color: #ef4444;
+  background-color: var(--wip-exceeded);
   color: white;
 }
 
@@ -333,28 +342,28 @@
 }
 
 .cancel-delete-btn {
-  background-color: #d1fdff;
-  color: #0e1b36;
+  background-color: var(--primary-light);
+  color: var(--text-dark);
 }
 
 .cancel-delete-btn:hover {
-  background-color: #86d6ff;
+  background-color: var(--primary);
   transform: translateY(-1px);
 }
 
 /* ====== DESCRIPTION POPOVER ====== */
 .description-popover {
   position: absolute;
-  z-index: 1000;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  padding: 12px;
+  z-index: var(--z-modal);
+  background-color: var(--white);
+  border: var(--border-thin) solid var(--gray-300);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-md);
   overflow-y: auto;
   pointer-events: auto;
-  opacity: 0; /* Start hidden */
-  transition: opacity 0.2s ease;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
 }
 
 .description-popover-arrow {
@@ -364,12 +373,12 @@
   top: -8px;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-bottom: 8px solid white;
+  border-bottom: 8px solid var(--white);
   transform: translateX(-50%);
 }
 
 .popover-section {
-  margin-bottom: 15px;
+  margin-bottom: var(--spacing-md);
 }
 
 .popover-section:last-child {
@@ -377,12 +386,12 @@
 }
 
 .popover-section-title {
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 600;
-  margin: 0 0 8px 0;
-  color: #0e1b36;
-  border-bottom: 1px solid #d1fdff;
-  padding-bottom: 4px;
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-dark);
+  border-bottom: var(--border-thin) solid var(--primary-light);
+  padding-bottom: var(--spacing-xs);
 }
 
 .subtasks-preview-list {
@@ -394,8 +403,8 @@
 .subtask-preview-item {
   display: flex;
   align-items: center;
-  padding: 6px 0;
-  border-bottom: 1px dashed rgba(118, 119, 124, 0.3);
+  padding: var(--spacing-xs) 0;
+  border-bottom: var(--border-thin) dashed rgba(118, 119, 124, 0.3);
 }
 
 .subtask-preview-item:last-child {
@@ -404,7 +413,7 @@
 
 .subtask-preview-item.completed .subtask-title {
   text-decoration: line-through;
-  color: #76777c;
+  color: var(--gray-500);
 }
 
 .subtask-checkbox {
@@ -413,24 +422,24 @@
   align-items: center;
   width: 16px;
   height: 16px;
-  border: 1px solid #76777c;
-  border-radius: 3px;
-  margin-right: 8px;
-  background-color: #e2e2e2;
-  color: #0e1b36;
+  border: var(--border-thin) solid var(--gray-500);
+  border-radius: var(--radius-sm);
+  margin-right: var(--spacing-sm);
+  background-color: var(--surface-light);
+  color: var(--text-dark);
 }
 
 .subtask-checkbox.checked {
-  background-color: #86d6ff;
-  border-color: #86d6ff;
+  background-color: var(--primary);
+  border-color: var(--primary);
 }
 
 .empty-subtasks,
 .empty-description {
-  color: #76777c;
+  color: var(--gray-500);
   font-style: italic;
   margin: 0;
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 /* ====== ANIMATIONS ====== */
@@ -466,82 +475,7 @@
   }
 }
 
-/* ====== DARK MODE STYLES ====== */
-@media (prefers-color-scheme: dark) {
-  /* Task base styles */
-  .task {
-    background-color: #0e1b36;
-    border-left-color: #86d6ff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-  
-  .task-content {
-    color: #d1fdff;
-  }
-  
-  .task:hover {
-    background-color: rgba(134, 214, 255, 0.1);
-  }
-  
-  .task::before {
-    background: linear-gradient(to left, #0e1b36 0%, transparent 100%);
-  }
-  
-  .task:hover::before {
-    background: linear-gradient(to left, rgba(134, 214, 255, 0.1) 0%, transparent 100%);
-  }
-
-  /* Labels and UI elements */
-  .task-label-pill {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .task-label-count {
-    background-color: #1a2944;
-    color: #e2e2e2;
-  }
-
-  /* Delete button and modal */
-  .delete-modal {
-    background-color: #0e1b36;
-  }
-  
-  .delete-modal p {
-    color: #d1fdff;
-  }
-  
-  .cancel-delete-btn {
-    background-color: #76777c;
-    color: #e2e2e2;
-  }
-  
-  .cancel-delete-btn:hover {
-    background-color: #86d6ff;
-    color: #0e1b36;
-  }
-  
-  /* Description popover elements */
-  .description-dropdown-btn {
-    background-color: #0e1b36;
-    color: #d1fdff;
-    border-color: #76777c;
-  }
-  
-  .description-dropdown-btn:hover {
-    background-color: rgba(134, 214, 255, 0.1);
-  }
-  
-  .description-popover {
-    background-color: #1a2944;
-    border-color: #76777c;
-    color: #d1fdff;
-  }
-  
-  .description-popover-arrow {
-    border-bottom-color: #1a2944;
-  }
-}
-
+/* ====== TASK RELATIONSHIPS ====== */
 .showing-task-relationships .task {
   position: relative !important;
   z-index: 100 !important; 
@@ -549,8 +483,8 @@
 
 .task.dragging {
   opacity: 0.8 !important; 
-  background-color: rgba(134, 214, 255, 0.2) !important;
-  outline: 2px solid #86d6ff !important;
+  background-color: var(--primary-transparent) !important;
+  outline: var(--border-medium) solid var(--primary) !important;
   box-shadow: 0 0 15px rgba(134, 214, 255, 0.3) !important;
 }
 
@@ -574,39 +508,77 @@
   }
 }
 
-.task.deadline-expired {
-  border-left: 3px solid #e53935; 
-}
-
-.task.deadline-upcoming {
-  border-left: 3px solid #f57c00; 
-}
-
-.deadline-indicator {
-  display: flex;
-  align-items: center;
-  margin-top: 8px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  width: fit-content;
-}
-
-.deadline-indicator.expired {
-  background-color: rgba(229, 57, 53, 0.1);
-  color: #e53935;
-}
-
-.deadline-indicator.upcoming {
-  background-color: rgba(245, 124, 0, 0.1);
-  color: #f57c00;
-}
-
-.deadline-icon {
-  margin-right: 4px;
-}
-
+/* ====== DARK MODE STYLES ====== */
 @media (prefers-color-scheme: dark) {
+  .task {
+    background-color: var(--surface-dark);
+    border-left-color: var(--primary);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .task-content {
+    color: var(--text-light);
+  }
+  
+  .task:hover {
+    background-color: var(--primary-transparent);
+  }
+  
+  .task::before {
+    background: linear-gradient(to left, var(--surface-dark) 0%, transparent 100%);
+  }
+  
+  .task:hover::before {
+    background: linear-gradient(to left, var(--primary-transparent) 0%, transparent 100%);
+  }
+
+  .task-label-pill {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .task-label-count {
+    background-color: var(--surface-dark-hover);
+    color: var(--text-light);
+  }
+
+  .delete-modal {
+    background-color: var(--surface-dark);
+  }
+  
+  .delete-modal p {
+    color: var(--text-light);
+  }
+  
+  .cancel-delete-btn {
+    background-color: var(--gray-500);
+    color: var(--text-light);
+  }
+  
+  .cancel-delete-btn:hover {
+    background-color: var(--primary);
+    color: var(--text-dark);
+  }
+  
+  .description-dropdown-btn {
+    background-color: var(--surface-dark);
+    color: var(--text-light);
+    border-color: var(--gray-500);
+  }
+  
+  .description-dropdown-btn:hover {
+    background-color: var(--primary-transparent);
+  }
+  
+  .description-popover {
+    background-color: var(--surface-dark-hover);
+    border-color: var(--gray-500);
+    color: var(--text-light);
+  }
+  
+  .description-popover-arrow {
+    border-bottom-color: var(--surface-dark-hover);
+  }
+
   .task.deadline-expired {
     border-left-color: #ff5252;
   }
