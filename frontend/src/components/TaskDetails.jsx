@@ -743,15 +743,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>
             </button>
-            <button 
-              className="assign-user-icon" 
-              onClick={() => setShowAssignForm(!showAssignForm)}
-              title={t('taskActions.assignUser')}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </button>
             <button
                   className={`history-timeline-btn ${currentView === 'history' ? 'active' : ''}`}
                   onClick={() => setCurrentView(currentView === 'main' ? 'history' : 'main')}
@@ -839,42 +830,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                 </div>
               )}
             </div>
-
-            {/* User assignment dropdown */}
-            {showAssignForm && (
-              <div className="assign-user-dropdown">
-                <div className="dropdown-header">
-                  <h4>{t('taskActions.assign')}</h4>
-                  <button 
-                    className="close-dropdown" 
-                    onClick={() => setShowAssignForm(false)}
-                  >
-                    ×
-                  </button>
-                </div>
-                <select 
-                  value={selectedUserId}
-                  onChange={(e) => setSelectedUserId(e.target.value)}
-                >
-                  <option value="">{t('forms.wipLimit.selectUser')}</option>
-                  {users
-                    .filter(user => !assignedUsers.some(assignedUser => assignedUser.id === user.id))
-                    .map(user => (
-                      <option key={user.id} value={user.id}>
-                        {user.name}
-                      </option>
-                    ))
-                  }
-                </select>
-                <button 
-                  onClick={handleAssignUser} 
-                  disabled={!selectedUserId}
-                  className="assign-btn"
-                >
-                  {t('taskActions.assign')}
-                </button>
-              </div>
-            )}
 
             {/* Subtasks Section */}
             <div className="subtasks-section">
@@ -1010,7 +965,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                 <h4>{t('taskActions.assignUser')}</h4>
               </div>
 
-              {/* Current assigned users */}
               {assignedUsers.length > 0 && (
                 <div className="current-assignments">
                   <h5>Currently Assigned:</h5>
@@ -1032,7 +986,6 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                 </div>
               )}
 
-              {/* Add new user assignment */}
               <div className="add-assignment">
                 <h5>Assign New User:</h5>
                 <div className="assignment-controls">
