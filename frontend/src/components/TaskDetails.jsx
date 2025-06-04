@@ -752,14 +752,23 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </button>
-            <button 
-              className={`history-timeline-btn ${currentView === 'history' ? 'active' : ''}`}
-              onClick={() => setCurrentView(currentView === 'main' ? 'history' : 'main')}
-              title="History & Timeline"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+            <button
+                  className={`history-timeline-btn ${currentView === 'history' ? 'active' : ''}`}
+                  onClick={() => setCurrentView(currentView === 'main' ? 'history' : 'main')}
+                  title="History & Timeline"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+                <button
+                  className={`parent-child-btn ${currentView === 'relationships' ? 'active' : ''}`}
+                  onClick={() => setCurrentView(currentView === 'relationships' ? 'main' : 'relationships')}
+                  title="Parent & Child Tasks"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
             </button>
             <button
               className="close-panel-btn"
@@ -986,42 +995,125 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               )}
             </div>
 
-            {/* Parent Task section */}
-            <div className="task-parent-section">
-              <h4>Parent Task</h4>
-        
+          </>
+        ) : currentView === 'relationships' ? (
+          /* Parent & Child Tasks Management View */
+          <div className="relationships-view">
+            {/* User Assignment Section */}
+            <div className="user-assignment-section">
+              <div className="section-header">
+                <span className="assignment-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </span>
+                <h4>{t('taskActions.assignUser')}</h4>
+              </div>
+
+              {/* Current assigned users */}
+              {assignedUsers.length > 0 && (
+                <div className="current-assignments">
+                  <h5>Currently Assigned:</h5>
+                  <div className="assigned-users-grid">
+                    {assignedUsers.map(user => (
+                      <div key={user.id} className="assigned-user-card">
+                        {renderUserAvatar(user)}
+                        <span className="user-name">{user.name}</span>
+                        <button 
+                          className="remove-user-btn-card"
+                          onClick={() => confirmRemoveUser(user.id)}
+                          title={t('forms.deleteUser')}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Add new user assignment */}
+              <div className="add-assignment">
+                <h5>Assign New User:</h5>
+                <div className="assignment-controls">
+                  <select 
+                    value={selectedUserId}
+                    onChange={(e) => setSelectedUserId(e.target.value)}
+                    className="user-select"
+                  >
+                    <option value="">{t('forms.wipLimit.selectUser')}</option>
+                    {users
+                      .filter(user => !assignedUsers.some(assignedUser => assignedUser.id === user.id))
+                      .map(user => (
+                        <option key={user.id} value={user.id}>
+                          {user.name}
+                        </option>
+                      ))
+                    }
+                  </select>
+                  <button 
+                    onClick={handleAssignUser} 
+                    disabled={!selectedUserId}
+                    className="assign-btn-relationships"
+                  >
+                    {t('taskActions.assign')}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Parent Task Section */}
+            <div className="parent-task-section">
+              <div className="section-header">
+                <span className="parent-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                  </svg>
+                </span>
+                <h4>Parent Task</h4>
+              </div>
+              
               {parentTask ? (
-                <div className="current-parent-task">
-                  <p>Current: <strong>{parentTask.title}</strong></p>
+                <div className="current-parent-card">
+                  <div className="parent-info">
+                    <strong>{parentTask.title}</strong>
+                    <span className="parent-id">ID: {parentTask.id}</span>
+                  </div>
                   <button 
                     onClick={handleRemoveParent}
                     className="remove-parent-btn"
-                    title={t('taskActions.delete')}
+                    title="Remove parent link"
                   >
-                    Remove link
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </div>
-             ) : (
-                <p className="no-parent">No parent task</p>
+              ) : (
+                <div className="no-parent-card">
+                  <span>No parent task assigned</span>
+                </div>
               )}
-        
+
               <button
-                className="assign-parent-btn"
+                className="manage-parent-btn"
                 onClick={handleShowParentSelector}
               >
-                {parentTask ? 'Change parent task' : 'Assign parent task'}
+                {parentTask ? 'Change Parent Task' : 'Assign Parent Task'}
               </button>
-        
+
               {showParentSelector && (
-                <div className="parent-selector">
+                <div className="parent-selector-card">
+                  <h5>Select Parent Task:</h5>
                   <select 
                     value={selectedParentId}
                     onChange={(e) => setSelectedParentId(e.target.value)}
+                    className="parent-select"
                   >
-                    <option value="">{t('forms.wipLimit.selectUser')}</option>
+                    <option value="">Choose a task...</option>
                     {availableTasks.map(availableTask => (
                       <option key={availableTask.id} value={availableTask.id}>
-                      {availableTask.title}
+                        {availableTask.title}
                       </option>
                     ))}
                   </select>
@@ -1031,32 +1123,53 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                       disabled={!selectedParentId}
                       className="confirm-parent-btn"
                     >
-                      {t('taskActions.yes')}
+                      Assign
                     </button>
                     <button 
                       onClick={() => setShowParentSelector(false)}
                       className="cancel-parent-btn"
                     >
-                      {t('taskActions.no')}
+                      Cancel
                     </button>
                   </div>
                 </div>
               )}
-        
-              {childTasks.length > 0 && (
-                <div className="child-tasks-section">
-                  <h5>Child Tasks:</h5>
-                  <ul className="child-tasks-list">
-                    {childTasks.map(childTask => (
-                      <li key={childTask.id} className="child-task-item">
-                        {childTask.title}
-                      </li>
-                   ))}
-                  </ul>
+            </div>
+
+            {/* Child Tasks Section */}
+            <div className="child-tasks-section">
+              <div className="section-header">
+                <span className="child-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                  </svg>
+                </span>
+                <h4>Child Tasks</h4>
+              </div>
+
+              {childTasks.length > 0 ? (
+                <div className="child-tasks-grid">
+                  {childTasks.map(childTask => (
+                    <div key={childTask.id} className="child-task-card">
+                      <div className="child-task-info">
+                        <strong>{childTask.title}</strong>
+                        <span className="child-id">ID: {childTask.id}</span>
+                        {childTask.status && (
+                          <span className={`status-badge ${childTask.status.toLowerCase()}`}>
+                            {childTask.status}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-children-card">
+                  <span>No child tasks</span>
                 </div>
               )}
             </div>
-          </>
+          </div>
         ) : (
           /* History & Timeline View */
           <div className="history-timeline-view">
