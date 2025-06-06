@@ -744,22 +744,22 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
               </svg>
             </button>
             <button
-                  className={`history-timeline-btn ${currentView === 'history' ? 'active' : ''}`}
-                  onClick={() => setCurrentView(currentView === 'main' ? 'history' : 'main')}
-                  title="History & Timeline"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </button>
-                <button
-                  className={`parent-child-btn ${currentView === 'relationships' ? 'active' : ''}`}
-                  onClick={() => setCurrentView(currentView === 'relationships' ? 'main' : 'relationships')}
-                  title="Parent & Child Tasks"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
+              className={`history-timeline-btn ${currentView === 'history' ? 'active' : ''}`}
+              onClick={() => setCurrentView('history')}
+              title="History & Timeline"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+            <button
+              className={`parent-child-btn ${currentView === 'relationships' ? 'active' : ''}`}
+              onClick={() => setCurrentView('relationships')}
+              title="Parent & Child Tasks"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
             </button>
             <button
               className="close-panel-btn"
