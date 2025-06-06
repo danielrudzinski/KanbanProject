@@ -1273,14 +1273,82 @@ function TaskDetails({ task, onClose, onSubtaskUpdate }) {
                       </button>
                       
                       <div className="page-indicators">
-                        {Array.from({ length: Math.ceil(columnHistory.length / HISTORY_PAGE_SIZE) }, (_, i) => (
-                          <button
-                            key={i}
-                            className={`page-dot ${i === columnHistoryPage ? 'active' : ''}`}
-                            onClick={() => setColumnHistoryPage(i)}
-                            title={`Page ${i + 1}`}
-                          />
-                        ))}
+                        {(() => {
+                          const totalPages = Math.ceil(columnHistory.length / HISTORY_PAGE_SIZE);
+                          const maxVisiblePages = 5;
+                          
+                          if (totalPages <= maxVisiblePages) {
+                            return Array.from({ length: totalPages }, (_, i) => (
+                              <button
+                                key={i}
+                                className={`page-dot ${i === columnHistoryPage ? 'active' : ''}`}
+                                onClick={() => setColumnHistoryPage(i)}
+                                title={`Page ${i + 1}`}
+                              />
+                            ));
+                          }
+                          
+                          let startPage = Math.max(0, columnHistoryPage - 2);
+                          let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+                          
+                          if (endPage - startPage < maxVisiblePages - 1) {
+                            startPage = Math.max(0, endPage - maxVisiblePages + 1);
+                          }
+                          
+                          const pages = [];
+                          
+                          if (startPage > 0) {
+                            pages.push(
+                              <button
+                                key={0}
+                                className={`page-dot ${0 === columnHistoryPage ? 'active' : ''}`}
+                                onClick={() => setColumnHistoryPage(0)}
+                                title="Page 1"
+                              />
+                            );
+                            if (startPage > 1) {
+                              pages.push(
+                                <span key="start-ellipsis" className="page-ellipsis">
+                                  ...
+                                </span>
+                              );
+                            }
+                          }
+                          
+                          for (let i = startPage; i <= endPage; i++) {
+                            if (i === 0 && startPage > 0) continue; 
+                            if (i === totalPages - 1 && endPage < totalPages - 1) continue;
+                            
+                            pages.push(
+                              <button
+                                key={i}
+                                className={`page-dot ${i === columnHistoryPage ? 'active' : ''}`}
+                                onClick={() => setColumnHistoryPage(i)}
+                                title={`Page ${i + 1}`}
+                              />
+                            );
+                          }
+                          
+                          if (endPage < totalPages - 1) {
+                            if (endPage < totalPages - 2) {
+                              pages.push(
+                                <span key="end-ellipsis" className="page-ellipsis">
+                                  ...
+                                </span>
+                              );
+                            }
+                            pages.push(
+                              <button
+                                key={totalPages - 1}
+                                className={`page-dot ${totalPages - 1 === columnHistoryPage ? 'active' : ''}`}
+                                onClick={() => setColumnHistoryPage(totalPages - 1)}
+                                title={`Page ${totalPages}`}
+                              />
+                            );
+                          }
+                          
+                          return pages;
+                        })()}
                       </div>
 
                       <button 
