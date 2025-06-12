@@ -62,6 +62,9 @@ public class SecurityConfiguration {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "https://kanbanproject.pl",
+                "https://www.kanbanproject.pl",
+                "http://kanbanproject.pl",
+                "http://www.kanbanproject.pl",
                 "http://localhost:5173",
                 "http://localhost:3000",
                 "http://localhost:5174",
