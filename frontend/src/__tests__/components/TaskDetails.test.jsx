@@ -357,8 +357,11 @@ describe('TaskDetails Component', () => {
     await waitFor(() => {
       expect(screen.queryByText('board.loading')).not.toBeInTheDocument();
     });
+
+    const relationshipsButton = screen.getByTitle('Parent & Child Tasks');
+    fireEvent.click(relationshipsButton);
     
-    const assignButton = await screen.findByTitle('taskActions.assignUser');
+    const assignButton = screen.getByRole('button', { name: 'taskActions.assign' });
     fireEvent.click(assignButton);
     
     await waitFor(() => {
@@ -382,8 +385,11 @@ describe('TaskDetails Component', () => {
     await waitFor(() => {
       expect(screen.queryByText('board.loading')).not.toBeInTheDocument();
     });
+
+    const relationshipsButton = screen.getByTitle('Parent & Child Tasks');
+    fireEvent.click(relationshipsButton);
     
-    const assignButton = await screen.findByTitle('taskActions.assignUser');
+    const assignButton = screen.getByRole('button', { name: 'taskActions.assign' });
     fireEvent.click(assignButton);
     
     const submitButton = screen.getByRole('button', { name: 'taskActions.assign' });
@@ -582,21 +588,21 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('board.loading')).not.toBeInTheDocument();
     });
     
-    const assignButton = screen.getByTitle('taskActions.assignUser');
-    fireEvent.click(assignButton);
-
+    const relationshipsButton = screen.getByTitle('Parent & Child Tasks');
+    fireEvent.click(relationshipsButton);
+    
     await waitFor(() => {
       expect(screen.getByText('forms.wipLimit.selectUser')).toBeInTheDocument();
     });
     
     const select = screen.getByRole('combobox');
     fireEvent.change(select, { target: { value: '2' } });
-
+  
     const assignSubmitButton = screen.getByRole('button', { name: 'taskActions.assign' });
     await act(async () => {
       fireEvent.click(assignSubmitButton);
     });
-
+  
     await waitFor(() => {
       expect(api.assignUserToTask).toHaveBeenCalledWith(mockTask.id, 2);
       expect(console.error).toHaveBeenCalledWith(
@@ -620,8 +626,12 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('board.loading')).not.toBeInTheDocument();
     });
     
-    const assignButton = screen.getByRole('button', { name: 'taskActions.assignUser' });
-    fireEvent.click(assignButton);
+    const relationshipsButton = screen.getByTitle('Parent & Child Tasks');
+    fireEvent.click(relationshipsButton);
+    
+    await waitFor(() => {
+      expect(screen.getByText('forms.wipLimit.selectUser')).toBeInTheDocument();
+    });
     
     const userSelect = screen.getByRole('combobox');
     fireEvent.change(userSelect, { target: { value: '2' } });
@@ -705,18 +715,26 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('board.loading')).not.toBeInTheDocument();
     });
     
-    const assignButton = screen.getByTitle('taskActions.assignUser');
-    fireEvent.click(assignButton);
+    const relationshipsButton = screen.getByTitle('Parent & Child Tasks');
+    fireEvent.click(relationshipsButton);
     
     await waitFor(() => {
-      expect(screen.getByText('forms.wipLimit.selectUser')).toBeInTheDocument();
+      expect(screen.getByText('taskActions.assignUser')).toBeInTheDocument();
+    });
+    
+    const userSelect = screen.getByRole('combobox');
+    fireEvent.change(userSelect, { target: { value: '2' } });
+    
+    await waitFor(() => {
       expect(screen.getByRole('combobox')).toBeInTheDocument();
+      const assignButton = screen.getByRole('button', { name: 'taskActions.assign' });
+      expect(assignButton).not.toBeDisabled();
     });
     
     fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
     
     await waitFor(() => {
-      expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+      expect(onCloseMock).toHaveBeenCalled();
     });
   });
   
@@ -802,17 +820,21 @@ describe('TaskDetails Component', () => {
       expect(screen.queryByText('board.loading')).not.toBeInTheDocument();
     });
     
-    const assignButton = screen.getByTitle('taskActions.assignUser');
+    const relationshipsButton = screen.getByTitle('Parent & Child Tasks');
+    fireEvent.click(relationshipsButton);
+  
+    await waitFor(() => { 
+      expect(screen.getByText('taskActions.assignUser')).toBeInTheDocument();
+    });
+    
+    const assignButton = screen.getByRole('button', { name: 'taskActions.assign' });
     fireEvent.click(assignButton);
-
+  
     await waitFor(() => { 
       expect(screen.getByText('forms.wipLimit.selectUser')).toBeInTheDocument();
     });
     
-    const dropdownHeader = screen.getByRole('heading', { name: 'taskActions.assign' }).closest('.dropdown-header');
-    const closeButton = within(dropdownHeader).getByText('×');
-    fireEvent.click(closeButton);
-
+    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
     expect(api.assignUserToTask).not.toHaveBeenCalled();
   });
 
