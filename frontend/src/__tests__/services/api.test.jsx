@@ -580,7 +580,9 @@ describe('API Services', () => {
     test('updateTaskLabels should handle error responses', async () => {
       fetch.mockResolvedValueOnce({
         ok: false,
-        status: 400
+        status: 400,
+        text: async () => 'Bad request',
+        json: async () => ({ message: 'Bad request' })
       });
         
       await expect(api.updateTaskLabels('1', ['bug', 'feature'])).rejects.toThrow('Error updating task labels: 400');
