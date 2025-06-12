@@ -49,13 +49,28 @@ spec:
                 secretKeyRef:
                   name: secrets
                   key: POSTGRES_PASSWORD
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: JWT_SECRET_KEY
+            - name: SPRING_MAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: SPRING_MAIL_USERNAME
+            - name: SPRING_MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: SPRING_MAIL_PASSWORD
           resources:
             requests:
-              memory: "512Mi"
-              cpu: "250m"
-            limits:
-              memory: "2Gi"
+              memory: "1Gi"
               cpu: "500m"
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
           readinessProbe:
             httpGet:
               path: /actuator/health

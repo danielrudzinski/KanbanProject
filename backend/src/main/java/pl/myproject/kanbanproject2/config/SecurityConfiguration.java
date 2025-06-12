@@ -34,6 +34,8 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/actuator/health/**").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/ws/**").permitAll() 
                         .requestMatchers("/chat").permitAll()
