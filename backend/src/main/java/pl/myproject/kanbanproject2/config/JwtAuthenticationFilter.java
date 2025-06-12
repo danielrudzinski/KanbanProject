@@ -36,51 +36,66 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
-        final String authHeader = request.getHeader("Authorization");
-
-        String requestPath = request.getRequestURI();
-        if (requestPath.startsWith("/auth/") || 
-            requestPath.startsWith("/actuator/") ||
-            requestPath.equals("/ws") ||
-            requestPath.startsWith("/ws/")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        try {
-            final String jwt = authHeader.substring(7);
-            final String userEmail = jwtService.extractUsername(jwt);
-
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (userEmail != null && authentication == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-
-                if (jwtService.isTokenValid(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
-            }
-
-            filterChain.doFilter(request, response);
-        } catch (Exception exception) {
-            handlerExceptionResolver.resolveException(request, response, null, exception);
-        }
+protected void doFilterInternal(
+        @NonNull HttpServletRequest request,
+        @NonNull HttpServletResponse response,
+        @NonNull FilterChain filterChain
+) throws ServletException, IOException {
+    
+    String requestPath = request.getRequestURI();
+    String method = request.getMethod();
+    String origin = request.getHeader("Origin");
+    
+    System.out.println("JWT Filter - Processing: " + method + " " + requestPath + " from: " + origin);
+    
+    if (shouldSkipFilter(requestPath, method)) {
+        System.out.println("JWT Filter - Skipping for: " + requestPath);
+        filterChain.doFilter(request, response);
+        return;
     }
+    
+    final String authHeader = request.getHeader("Authorization");
+
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        filterChain.doFilter(request, response);
+        return;
+    }
+
+    try {
+        final String jwt = authHeader.substring(7);
+        final String userEmail = jwtService.extractUsername(jwt);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (userEmail != null && authentication == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
+            if (jwtService.isTokenValid(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    } catch (Exception exception) {
+        System.err.println("JWT Filter error: " + exception.getMessage());
+        handlerExceptionResolver.resolveException(request, response, null, exception);
+    }
+}
+
+private boolean shouldSkipFilter(String requestPath, String method) {
+    return requestPath.startsWith("/auth/") || 
+           requestPath.startsWith("/actuator/") ||
+           requestPath.startsWith("/ws/") ||
+           requestPath.equals("/chat") ||
+           "OPTIONS".equals(method) ||
+           requestPath.matches(".*\\.(html|js|css|ico|json|png|svg|jpg|jpeg|gif|webp|woff|woff2|ttf)$");
+}
+
 }

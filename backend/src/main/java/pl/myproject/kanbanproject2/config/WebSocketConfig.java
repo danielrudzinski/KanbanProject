@@ -19,12 +19,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setAllowedOrigins("https://kanbanproject.pl",
-                        "http://localhost:5173",
-                        "http://localhost:3000",
-                        "http://localhost:8080",
-                        "http://localhost:80",
-                        "http://127.0.0.1:8080",
-                        "http://app:8080")
+                "https://www.kanbanproject.pl",
+                "http://kanbanproject.pl",
+                "http://www.kanbanproject.pl",
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "http://localhost:5174",
+                "http://localhost:8080",
+                "http://localhost:80",
+                "http://127.0.0.1:8080",
+                "http://app:8080")
                 .withSockJS();
     }
 
