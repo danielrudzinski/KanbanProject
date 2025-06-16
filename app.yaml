@@ -7,9 +7,47 @@ spec:
     app: kanban-app
   ports:
     - protocol: TCP
-      port: 80
+      port: 8080
       targetPort: 8080
-  type: LoadBalancer
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kanban-app-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - kanbanproject.pl
+    - www.kanbanproject.pl
+    secretName: kanban-tls
+  rules:
+  - host: kanbanproject.pl
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kanban-app
+            port:
+              number: 8080
+  - host: www.kanbanproject.pl
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kanban-app
+            port:
+              number: 8080
 
 ---
 apiVersion: apps/v1
@@ -79,7 +117,6 @@ spec:
             periodSeconds: 15
             timeoutSeconds: 5
             failureThreshold: 6
-
           livenessProbe:
             httpGet:
               path: /actuator/health
