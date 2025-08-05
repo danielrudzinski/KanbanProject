@@ -1,4 +1,5 @@
 package pl.myproject.kanbanproject2.service;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;

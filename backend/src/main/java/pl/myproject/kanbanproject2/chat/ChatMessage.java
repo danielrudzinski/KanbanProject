@@ -1,6 +1,7 @@
 package pl.myproject.kanbanproject2.chat;
 
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Getter
