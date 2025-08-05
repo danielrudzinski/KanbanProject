@@ -40,7 +40,7 @@ public class ColumnService {
     }
 
     public ColumnDTO patchColumn(ColumnDTO columnDTO, Integer id) {
-        Column existingColumn = columnRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nie ma takiej kolumny"));
+        var  existingColumn = columnRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nie ma takiej kolumny"));
 
         if (columnDTO.name() != null) {
             existingColumn.setName(columnDTO.name());
@@ -69,10 +69,10 @@ public class ColumnService {
     }
 
     public ColumnDTO updateColumnPosition(Integer id, Integer position) {
-        Column column = columnRepository.findById(id)
+        var  column = columnRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma kolumny o takim id"));
         column.setPosition(position);
-        Column updatedColumn = columnRepository.save(column);
+        var  updatedColumn = columnRepository.save(column);
         return columnMapper.apply(updatedColumn);
     }
 

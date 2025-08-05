@@ -46,7 +46,7 @@ public class RowService {
     }
 
     public RowDTO patchRow(RowDTO rowDTO, Integer id) {
-        Row existingRow = rowRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nie ma takiego wiersza"));
+        var  existingRow = rowRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nie ma takiego wiersza"));
 
         if (rowDTO.name() != null) {
             existingRow.setName(rowDTO.name());

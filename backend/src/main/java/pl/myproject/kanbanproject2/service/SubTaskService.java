@@ -97,7 +97,7 @@ public class SubTaskService {
                 existingSubTask.setDescription(subTask.getDescription());
             }
 
-            SubTask savedSubTask = subTaskRepository.save(existingSubTask);
+            var  savedSubTask = subTaskRepository.save(existingSubTask);
             return subTaskMapper.toDto(savedSubTask);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
@@ -106,17 +106,17 @@ public class SubTaskService {
 
     public SubTaskDTO assignTaskToSubTask(Integer subTaskId, Integer taskId) {
         try {
-            SubTask subTask = subTaskRepository.findById(subTaskId)
+            var  subTask = subTaskRepository.findById(subTaskId)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma podzadania o takim id"));
 
-            Task task = taskRepository.findById(taskId)
+            var  task = taskRepository.findById(taskId)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
             subTask.setTask(task);
             task.getSubTasks().add(subTask);
 
             taskRepository.save(task);
-            SubTask updatedSubTask = subTaskRepository.save(subTask);
+            var  updatedSubTask = subTaskRepository.save(subTask);
 
             return subTaskMapper.toDto(updatedSubTask);
         } catch (EntityNotFoundException e) {
@@ -126,7 +126,7 @@ public class SubTaskService {
 
     public List<SubTaskDTO> getSubTasksByTaskId(Integer taskId) {
         try {
-            Task task = taskRepository.findById(taskId)
+            var  task = taskRepository.findById(taskId)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
             return task.getSubTasks().stream()
@@ -139,12 +139,12 @@ public class SubTaskService {
 
     public SubTaskDTO toggleSubTaskCompletion(Integer id) {
         try {
-            SubTask subTask = subTaskRepository.findById(id)
+            var  subTask = subTaskRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma podzadania o takim id"));
 
             subTask.setCompleted(!subTask.isCompleted());
 
-            SubTask updatedSubTask = subTaskRepository.save(subTask);
+            var  updatedSubTask = subTaskRepository.save(subTask);
             return subTaskMapper.toDto(updatedSubTask);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
@@ -153,10 +153,10 @@ public class SubTaskService {
 
     public SubTaskDTO updateSubTaskPosition(Integer id, Integer position) {
         try {
-            SubTask subTask = subTaskRepository.findById(id)
+            var subTask = subTaskRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma podzadania o takim id"));
             subTask.setPosition(position);
-            SubTask updatedSubTask = subTaskRepository.save(subTask);
+            var updatedSubTask = subTaskRepository.save(subTask);
             return subTaskMapper.toDto(updatedSubTask);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
