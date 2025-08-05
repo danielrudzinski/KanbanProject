@@ -75,7 +75,7 @@ public class TaskService {
     }
 
     public void deleteTask(Integer id) {
-        Task task = taskRepository.findById(id)
+        var task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Nie ma zadania o takim id"));
 
         taskColumnHistoryRepository.deleteAll(taskColumnHistoryRepository.findByTaskOrderByChangedAtDesc(task));
@@ -166,11 +166,11 @@ public class TaskService {
         Integer nextHistoryOrder = 0;
 
         if (!taskHistory.isEmpty()) {
-            TaskColumnHistory lastHistory = taskHistory.get(0);
+            var lastHistory = taskHistory.get(0);
             nextHistoryOrder = (lastHistory.getHistoryOrder() != null ? lastHistory.getHistoryOrder() : 0) + 1;
         }
 
-        TaskColumnHistory history = new TaskColumnHistory(task, column);
+        var history = new TaskColumnHistory(task, column);
         history.setHistoryOrder(nextHistoryOrder);
         taskColumnHistoryRepository.save(history);
     }
