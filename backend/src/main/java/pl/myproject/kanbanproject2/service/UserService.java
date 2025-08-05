@@ -66,7 +66,7 @@ public class UserService {
 
     public User updateUser(Integer id, User user) {
         try {
-            User existingUser = userRepository.findById(id)
+            var existingUser = userRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
             if (user.getEmail() != null) {
@@ -86,7 +86,7 @@ public class UserService {
 
     public UserDTO patchUser(UserDTO userDTO, Integer id) {
         try {
-            User existingUser = userRepository.findById(id)
+            var existingUser = userRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
             if (userDTO.email() != null) {
@@ -98,7 +98,7 @@ public class UserService {
             if (userDTO.wipLimit() != null) {
                 existingUser.setWipLimit(userDTO.wipLimit());
             }
-            User updatedUser = userRepository.save(existingUser);
+            var updatedUser = userRepository.save(existingUser);
             return userMapper.apply(updatedUser);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
@@ -107,10 +107,10 @@ public class UserService {
 
     public void uploadAvatar(Integer id, MultipartFile file) {
         try {
-            User user = userRepository.findById(id)
+            var user = userRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
-            File avatar = new File();
+            var avatar = new File();
             avatar.setName(file.getOriginalFilename());
             avatar.setType(file.getContentType());
             avatar.setData(file.getBytes());
@@ -127,7 +127,7 @@ public class UserService {
 
     public byte[] getAvatar(Integer userId) {
         try {
-            User user = userRepository.findById(userId)
+            var user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
             if (user.getAvatar() == null) {
@@ -142,7 +142,7 @@ public class UserService {
 
     public String getAvatarContentType(Integer userId) {
         try {
-            User user = userRepository.findById(userId)
+            var user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
             if (user.getAvatar() == null) {
@@ -157,14 +157,14 @@ public class UserService {
 
     public void deleteAvatar(Integer id) {
         try {
-            User user = userRepository.findById(id)
+            var user = userRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
             if (user.getAvatar() == null) {
                 throw new EntityNotFoundException("Użytkownik nie posiada avatara");
             }
 
-            File avatar = user.getAvatar();
+            var avatar = user.getAvatar();
             user.setAvatar(null);
             userRepository.save(user);
             fileRepository.delete(avatar);
@@ -175,11 +175,11 @@ public class UserService {
 
     public UserDTO updateWipLimit(Integer userId, Integer wipLimit) {
         try {
-            User user = userRepository.findById(userId)
+            var user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("Nie ma użytkownika o takim id"));
 
             user.setWipLimit(wipLimit);
-            User updatedUser = userRepository.save(user);
+            var updatedUser = userRepository.save(user);
 
             return userMapper.apply(updatedUser);
         } catch (EntityNotFoundException e) {
@@ -189,7 +189,7 @@ public class UserService {
 
     public boolean checkWipStatus(Integer userId) {
         try {
-            User user = userRepository.findById(userId)
+            var user = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
             Integer wipLimit = user.getWipLimit();
