@@ -20,7 +20,7 @@ jobs:
     - name: Log in to ACR
       uses: azure/docker-login@v1
       with:
-        login-server: kanbanproject.azurecr.io
+        login-server: kanbanprojectcr.azurecr.io
         username: ${{ secrets.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
       
@@ -30,7 +30,7 @@ jobs:
         context: .
         push: true
         tags: |
-          kanbanproject.azurecr.io/kanbanproject-app:latest
-          kanbanproject.azurecr.io/kanbanproject-app:${{ github.sha }}
-        cache-from: type=registry,ref=kanbanproject.azurecr.io/kanbanproject-app:latest
+          kanbanprojectcr.azurecr.io/kanbanproject-app:latest
+          kanbanprojectcr.azurecr.io/kanbanproject-app:${{ github.sha }}
+        cache-from: type=registry,ref=kanbanprojectcr.azurecr.io/kanbanproject-app:latest
         cache-to: type=inline
