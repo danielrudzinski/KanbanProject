@@ -8,31 +8,43 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 @Service
 public class CaptchaService {
 
-    @Value("${captcha.enabled:true}")
-    private boolean captchaEnabled;
+    private static final Logger log = LoggerFactory.getLogger(CaptchaService.class);
 
-    @Value("${captcha.secret:}")
-    private String secret;
+    private final boolean captchaEnabled;
+    private final String secret;
+    private final String verifyUrl;
+    private final RestTemplate restTemplate;
 
-    @Value("${captcha.verify-url:https://www.google.com/recaptcha/api/siteverify}")
-    private String verifyUrl;
-
-    private final RestTemplate restTemplate = new RestTemplate();
+    public CaptchaService(
+            @Value("${captcha.enabled:true}") boolean captchaEnabled,
+            @Value("${captcha.secret:}") String secret,
+            @Value("${captcha.verify-url:https://www.google.com/recaptcha/api/siteverify}") String verifyUrl,
+            RestTemplateBuilder restTemplateBuilder) {
+        this.captchaEnabled = captchaEnabled;
+        this.secret = secret;
+        this.verifyUrl = verifyUrl;
+        this.restTemplate = restTemplateBuilder.build();
+    }
 
     public boolean validateCaptcha(String token) {
         if (!captchaEnabled) {
             return true;
         }
         if (token == null || token.isBlank()) {
-            System.out.println("Captcha validation: received null/blank token, captcha enabled: " + captchaEnabled);
+            log.debug("Captcha validation: received null/blank token, captcha enabled: {}", captchaEnabled);
             return false;
         }
         try {
@@ -47,13 +59,16 @@ public class CaptchaService {
 
             @SuppressWarnings("unchecked")
             Map<String, Object> resp = restTemplate.postForObject(verifyUrl, request, Map.class);
-            if (resp == null) return false;
+            if (resp == null) {
+                log.warn("Captcha verify endpoint returned null response");
+                return false;
+            }
             Object successObj = resp.get("success");
             boolean result = Boolean.TRUE.equals(successObj);
-            System.out.println("Captcha validation result: " + result);
+            log.debug("Captcha validation result: {}", result);
             return result;
-        } catch (Exception e) {
-            System.out.println("Captcha validation exception: " + e.getMessage());
+        } catch (RestClientException e) {
+            log.warn("Captcha validation exception (http client): {}", e.getMessage(), e);
             return false;
         }
     }
@@ -66,9 +81,9 @@ public class CaptchaService {
 
     public void verifyOrThrowWithSkip(String token, boolean skipCaptcha) {
         if (skipCaptcha) {
-            System.out.println("Captcha validation skipped (recently verified user)");
+            log.debug("Captcha validation skipped (recently verified user)");
             return;
         }
         verifyOrThrow(token);
-    }
+        }
 }

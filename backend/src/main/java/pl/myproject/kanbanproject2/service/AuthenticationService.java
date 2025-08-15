@@ -83,8 +83,8 @@ public class AuthenticationService {
                 user.setVerificationCode(null);
                 user.setVerificationCodeExpiresAt(null);
                 userRepository.save(user);
-                String jwtToken = jwtService.generateToken(user);
-                long expiresIn = jwtService.getExpirationTime();
+                var jwtToken = jwtService.generateToken(user);
+                var expiresIn = jwtService.getExpirationTime();
                 
                 return new LoginResponse(jwtToken, expiresIn);
             } else {
@@ -106,8 +106,8 @@ public class AuthenticationService {
             throw new RuntimeException("Account not verified. Please verify your account.");
         }
 
-        String jwtToken = jwtService.generateToken(user);
-        long expiresIn = jwtService.getExpirationTime();
+        var jwtToken = jwtService.generateToken(user);
+        var expiresIn = jwtService.getExpirationTime();
 
         return new LoginResponse(jwtToken, expiresIn);
     }

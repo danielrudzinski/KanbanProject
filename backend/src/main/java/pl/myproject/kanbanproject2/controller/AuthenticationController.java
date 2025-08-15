@@ -40,7 +40,7 @@ public class AuthenticationController {
     @PostMapping("/verify")
     public ResponseEntity<?> verifyUser(@RequestBody VerifyUserDto verifyUserDto) {
         try {
-            LoginResponse loginResponse = authenticationService.verifyUser(verifyUserDto);
+            var loginResponse = authenticationService.verifyUser(verifyUserDto);
             return ResponseEntity.ok(loginResponse);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
