@@ -71,7 +71,7 @@ public class AuthenticationService {
     }
 
 
-    public void verifyUser(VerifyUserDto input) {
+    public LoginResponse verifyUser(VerifyUserDto input) {
         Optional<User> optionalUser = userRepository.findByEmail(input.getEmail());
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -83,6 +83,10 @@ public class AuthenticationService {
                 user.setVerificationCode(null);
                 user.setVerificationCodeExpiresAt(null);
                 userRepository.save(user);
+                String jwtToken = jwtService.generateToken(user);
+                long expiresIn = jwtService.getExpirationTime();
+                
+                return new LoginResponse(jwtToken, expiresIn);
             } else {
                 throw new RuntimeException("Invalid verification code");
             }
