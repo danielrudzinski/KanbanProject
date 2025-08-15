@@ -189,8 +189,10 @@
     "registerSuccess": "Account created! Please verify your email.",
     "registerFailed": "Registration failed:",
     "verifySuccess": "Account verified successfully! Please log in.",
+    "verifyAndLoginSuccess": "Account verified and signed in successfully!",
     "verifyFailed": "Verification failed:",
-    "codeSent": "Verification code sent to your email."
+    "codeSent": "Verification code sent to your email.",
+    "recentlyVerified": "Account verified! CAPTCHA skipped for this login."
   },
   "taskLabels": {
     "addLabel": "+ Label",

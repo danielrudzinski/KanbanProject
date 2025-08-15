@@ -49,7 +49,12 @@ export const authService = {
       throw new Error(errorData || 'Verification failed');
     }
     
-    return await response.text();
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      return await response.json();
+    } else {
+      return await response.text();
+    }
   },
   
   resendVerificationCode: async (email) => {

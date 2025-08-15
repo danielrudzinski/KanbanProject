@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { authService } from '../services/authService';
@@ -18,7 +19,15 @@ const HomePage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [longLoading, setLongLoading] = useState(false);
-  
+  const [captchaToken, setCaptchaToken] = useState('');
+  const isCaptchaRequired = !!import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+  const [captchaReady, setCaptchaReady] = useState(false);
+  const [captchaLoadError, setCaptchaLoadError] = useState(false);
+  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+  const recaptchaRef = useRef(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const [captchaWarn, setCaptchaWarn] = useState(false);
+
   const { t } = useTranslation();
   const { login, logout } = useAuth();
   const navigate = useNavigate();
@@ -48,7 +57,7 @@ const HomePage = () => {
     if (loading) {
       timeoutId = setTimeout(() => {
         setLongLoading(true);
-      }, 5000);
+      }, 10000);
     } else {
       setLongLoading(false);
     }
@@ -59,16 +68,18 @@ const HomePage = () => {
   }, [loading]);
   
   const handleLogin = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     setError('');
     setLoading(true);
     
     try {
-      const response = await authService.login({ email, password });
+      const captchaTokenToSend = (isCaptchaRequired) ? captchaToken : undefined;
+      const response = await authService.login({ email, password, captchaToken: captchaTokenToSend });
       login(response.token, response.expiresIn);
       toast.success(t('auth.loginSuccess', 'Successfully signed in!'));
       navigate('/board');
     } catch (error) {
+      console.error('[Auth] Login failed:', error.message);
       setError(error.message);
       toast.error(t('auth.loginFailed', 'Login failed:') + ' ' + error.message);
     } finally {
@@ -77,12 +88,12 @@ const HomePage = () => {
   };
   
   const handleRegister = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     setError('');
     setLoading(true);
     
     try {
-      await authService.register({ username, email, password });
+      await authService.register({ username, email, password, captchaToken: isCaptchaRequired ? captchaToken : undefined });
       toast.success(t('auth.registerSuccess', 'Account created! Please verify your email.'));
       setShowVerification(true);
       setVerificationEmail(email);
@@ -95,15 +106,22 @@ const HomePage = () => {
   };
   
   const handleVerify = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     setError('');
     setLoading(true);
     
     try {
-      await authService.verifyAccount({ email: verificationEmail, verificationCode });
-      setActiveTab('login');
-      setShowVerification(false);
-      toast.success(t('auth.verifySuccess', 'Account verified successfully! Please log in.'));
+      const response = await authService.verifyAccount({ email: verificationEmail, verificationCode });
+      
+      if (response && response.token) {
+        login(response.token, response.expiresIn);
+        toast.success(t('auth.verifyAndLoginSuccess', 'Account verified and signed in successfully!'));
+        navigate('/board');
+      } else {
+        toast.success(t('auth.verifySuccess', 'Account verified successfully! Please sign in.'));
+        setActiveTab('login');
+        setEmail(verificationEmail);
+      }
     } catch (error) {
       setError(error.message);
       toast.error(t('auth.verifyFailed', 'Verification failed:') + ' ' + error.message);
@@ -137,7 +155,7 @@ const HomePage = () => {
             <form onSubmit={handleVerify}>
               <div className="form-group">
                 <input
-                  type="text"
+                  type="Verification Code"
                   placeholder={t('auth.verificationCode', 'Verification Code')}
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
@@ -150,7 +168,7 @@ const HomePage = () => {
               <button type="submit" disabled={loading} className="auth-button">
               {loading ? (
                   <>
-                  <span className="loading-spinner"></span>
+                  <span className="loading-spinner" style={{ width: '20px', height: '20px', borderWidth: '2px' }}></span>
                   <span className="loading-text">{t('auth.verifying', 'Verifying...')}</span>
                   </>
                 ) : t('auth.verifyAccount', 'Verify Account')}
@@ -183,7 +201,6 @@ const HomePage = () => {
                 {t('auth.register', 'Register')}
               </button>
             </div>
-            
             <div className="tab-content">
               {activeTab === 'login' ? (
                 <form onSubmit={handleLogin}>
@@ -205,28 +222,13 @@ const HomePage = () => {
                       required
                     />
                   </div>
-                  
                   {error && <div className="error-message">{error}</div>}
-                  
-                  <button type="submit" disabled={loading} className="auth-button">
-                    {loading ? (
-                      <>
-                        <span className="loading-spinner"></span>
-                        <span className="loading-text">{t('auth.signingIn', 'Signing In...')}</span>
-                      </>
-                    ) : t('auth.signIn', 'Sign In')}
-                  </button>
-                  {loading && longLoading && (
-                    <div className="long-loading-message">
-                      {t('auth.pleaseWait', 'Please wait! We are working on handling this.')}
-                    </div>
-                  )}
                 </form>
               ) : (
                 <form onSubmit={handleRegister}>
                   <div className="form-group">
                     <input
-                      type="text"
+                      type="username"
                       placeholder={t('auth.username', 'Username')}
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
@@ -251,23 +253,108 @@ const HomePage = () => {
                       required
                     />
                   </div>
-                  
                   {error && <div className="error-message">{error}</div>}
-                  
-                  <button type="submit" disabled={loading} className="auth-button">
-                    {loading ? (
-                      <>
-                        <span className="loading-spinner"></span>
-                        <span className="loading-text">{t('auth.registering', 'Registering...')}</span>
-                      </>
-                    ) : t('auth.register', 'Register')}
-                  </button>
-                  {loading && longLoading && (
-                    <div className="long-loading-message">
-                      {t('auth.pleaseWait', 'Please wait! We are working on handling this.')}
+                </form>
+              )}
+            </div>
+
+            {isCaptchaRequired && (
+              <div className="form-group recaptcha-wrapper" style={{ minHeight: '78px' }}>
+                <div className="recaptcha-inner" style={{ 
+                  minHeight: '78px', 
+                  maxHeight: '78px',
+                  position: 'relative', 
+                  width: '302px', 
+                  margin: '0 auto',
+                  overflow: 'hidden'
+                }}>
+                  {!captchaReady && (
+                    <div style={{ 
+                      position: 'absolute', 
+                      top: '39px', 
+                      left: '151px', 
+                      transform: 'translate(-50%, -50%)',
+                      zIndex: 1,
+                      width: '20px',
+                      height: '20px'
+                    }}>
+                      <span className="loading-spinner" style={{ 
+                        width: '20px', 
+                        height: '20px', 
+                        borderWidth: '2px',
+                        display: 'block'
+                      }}></span>
                     </div>
                   )}
-                </form>
+                  <ReCAPTCHA
+                    key={captchaKey}
+                    ref={recaptchaRef}
+                    sitekey={siteKey}
+                    onChange={(val) => setCaptchaToken(val || '')}
+                    asyncScriptOnLoad={() => setCaptchaReady(true)}
+                    onErrored={() => {
+                      setCaptchaWarn(true);
+                      console.warn('[Captcha] onErrored event fired');
+                    }}
+                    style={{ opacity: captchaReady ? 1 : 0, transition: 'opacity 0.3s ease' }}
+                  />
+                  {/* Manual fallback container (will be used only if library fails to inject iframe) */}
+                  {!captchaReady && (
+                    <div id="manual-recaptcha" style={{ minWidth: 302, minHeight: 76 }} />
+                  )}
+                </div>
+                {captchaWarn && captchaReady && (
+                  <div className="captcha-warning" style={{ marginTop: '8px', fontSize: '0.8rem', color: '#c0392b' }}>
+                    reCAPTCHA nie załadował się (script blocked?). Sprawdź: brak blokady wtyczek (uBlock / AdBlock).
+                  </div>
+                )}
+                {captchaLoadError && (
+                  <div style={{ marginTop: '6px', fontSize: '0.75rem', color: '#b03a2e' }}>
+                    Script load error. <button type="button" style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', color: '#007bff', padding: 0 }} onClick={() => {
+                      setCaptchaLoadError(false);
+                      setCaptchaWarn(false);
+                      setCaptchaReady(false);
+                      setCaptchaKey(k => k + 1);
+                      // Try reinjecting if still absent
+                      const existing = document.querySelector('script[src*="recaptcha/api.js"]');
+                      if (!existing) {
+                        const script = document.createElement('script');
+                        script.src = 'https://www.google.com/recaptcha/api.js?render=explicit';
+                        script.async = true;
+                        script.defer = true;
+                        script.onerror = () => {
+                          setCaptchaLoadError(true);
+                          setCaptchaWarn(true);
+                        };
+                        document.head.appendChild(script);
+                      }
+                    }}>Reload</button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="shared-submit">
+              <button
+                type="button"
+                disabled={loading || (isCaptchaRequired && !captchaToken)}
+                className="auth-button"
+                onClick={() => {
+                  if (activeTab === 'login') handleLogin();
+                  else handleRegister();
+                }}
+              >
+                {loading ? (
+                  <>
+                    <span className="loading-spinner" style={{ width: '20px', height: '20px', borderWidth: '2px' }}></span>
+                    <span className="loading-text">{activeTab === 'login' ? t('auth.signingIn', 'Signing In...') : t('auth.registering', 'Registering...')}</span>
+                  </>
+                ) : (activeTab === 'login' ? t('auth.signIn', 'Sign In') : t('auth.register', 'Register'))}
+              </button>
+              {loading && longLoading && (
+                <div className="long-loading-message">
+                  {t('auth.pleaseWait', 'Please wait! We are working on handling this.')}
+                </div>
               )}
             </div>
           </>

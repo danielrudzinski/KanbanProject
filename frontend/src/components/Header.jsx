@@ -11,7 +11,6 @@ function Header() {
   const [activeForm, setActiveForm] = useState(null); // 'task', 'boardItem', or 'wip'
   const [isSticky, setIsSticky] = useState(false);
   const { logout } = useAuth();
-  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const handleFormToggle = (formType) => {
@@ -20,7 +19,7 @@ function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    window.location.href = '/';
   };
 
   useEffect(() => {
