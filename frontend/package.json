@@ -27,6 +27,7 @@
     "react-router-dom": "^7.3.0",
     "react-toastify": "^11.0.5",
     "react-xarrows": "^2.0.2",
+    "react-google-recaptcha": "^2.1.0",
     "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
