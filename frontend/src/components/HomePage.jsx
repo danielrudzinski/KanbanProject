@@ -73,8 +73,9 @@ const HomePage = () => {
     setLoading(true);
     
     try {
-      const captchaTokenToSend = (isCaptchaRequired) ? captchaToken : undefined;
-      const response = await authService.login({ email, password, captchaToken: captchaTokenToSend });
+  const payload = { email, password };
+  if (isCaptchaRequired && captchaToken) payload.captcha = { token: captchaToken };
+  const response = await authService.login(payload);
       login(response.token, response.expiresIn);
       toast.success(t('auth.loginSuccess', 'Successfully signed in!'));
       navigate('/board');
@@ -93,7 +94,9 @@ const HomePage = () => {
     setLoading(true);
     
     try {
-      await authService.register({ username, email, password, captchaToken: isCaptchaRequired ? captchaToken : undefined });
+  const payload = { username, email, password };
+  if (isCaptchaRequired && captchaToken) payload.captcha = { token: captchaToken };
+  await authService.register(payload);
       toast.success(t('auth.registerSuccess', 'Account created! Please verify your email.'));
       setShowVerification(true);
       setVerificationEmail(email);

@@ -9,6 +9,7 @@ import pl.myproject.kanbanproject2.service.JwtService;
 import pl.myproject.kanbanproject2.service.CaptchaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 @RequestMapping("/auth")
 @RestController
@@ -25,15 +26,15 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto) {
-        captchaService.verifyOrThrow(registerUserDto.getCaptchaToken());
+    public ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto registerUserDto) {
+        captchaService.verifyOrThrow(registerUserDto.getCaptcha().getToken());
         User registeredUser = authenticationService.signup(registerUserDto);
         return ResponseEntity.ok(registeredUser);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginUserDto loginDto) {
-        captchaService.verifyOrThrow(loginDto.getCaptchaToken());
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginUserDto loginDto) {
+        captchaService.verifyOrThrow(loginDto.getCaptcha().getToken());
         return ResponseEntity.ok(authenticationService.login(loginDto));
     }
 
