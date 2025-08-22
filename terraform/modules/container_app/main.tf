@@ -34,8 +34,6 @@ variable "github_repository_owner" {
   type = string
 }
 
-// GHCR auth not required for public images
-
 variable "jwt_secret_key" {
   type      = string
   sensitive = true
@@ -93,7 +91,6 @@ resource "azurerm_container_app" "main" {
   key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "SPRING-MAIL-PASSWORD")
     identity             = azurerm_user_assigned_identity.main.id
   }
-  # no GHCR password secret needed for public images
 
   template {
     container {
@@ -181,7 +178,6 @@ resource "azurerm_role_assignment" "key_vault_secrets_user" {
   principal_id         = azurerm_user_assigned_identity.main.principal_id
 }
 
-# Store application secrets in Key Vault so the Container App can reference them
 resource "azurerm_key_vault_secret" "jwt_secret" {
   name         = "JWT-SECRET-KEY"
   value        = var.jwt_secret_key

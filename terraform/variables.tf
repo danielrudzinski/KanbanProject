@@ -18,8 +18,6 @@ variable "github_repository_owner" {
   description = "The owner of the GitHub repository."
 }
 
-// GHCR auth not required for public images
-
 variable "key_vault_allowed_ips" {
   description = "Optional list of IPv4 addresses allowed to access Key Vault (dev convenience)."
   type        = list(string)

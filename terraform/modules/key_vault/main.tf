@@ -77,7 +77,6 @@ resource "azurerm_key_vault" "main" {
   }
 }
 
-# Private DNS zone for Key Vault Private Endpoint
 resource "azurerm_private_dns_zone" "kv" {
   name                = "privatelink.vaultcore.azure.net"
   resource_group_name = var.resource_group_name
@@ -90,7 +89,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "kv" {
   virtual_network_id    = var.vnet_id
 }
 
-# Private Endpoint for Key Vault in the backend subnet
 resource "azurerm_private_endpoint" "kv" {
   name                = "pe-kv-${var.env}"
   location            = var.location

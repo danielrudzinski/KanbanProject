@@ -55,7 +55,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   administrator_password = random_password.password.result
   zone                   = "1"
   storage_mb             = 32768
-  sku_name               = "B_Standard_B1ms" # Burstable, cheap for dev/test
+  sku_name               = "B_Standard_B1ms"
 
   maintenance_window {
     day_of_week  = 0
@@ -95,7 +95,6 @@ resource "azurerm_key_vault_secret" "postgres_password" {
   key_vault_id = var.key_vault_id
 }
 
-# Expose a ready-to-use JDBC connection string for Spring
 resource "azurerm_key_vault_secret" "postgres_connection_string" {
   name         = "POSTGRES-CONNECTION-STRING"
   value        = format("jdbc:postgresql://%s:5432/%s?sslmode=require", azurerm_postgresql_flexible_server.main.fqdn, azurerm_postgresql_flexible_server_database.main.name)
