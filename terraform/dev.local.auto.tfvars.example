@@ -1,0 +1,5 @@
+# Copy this file to dev.local.auto.tfvars (excluded by .gitignore) and set your current public IP.
+# It will be picked up automatically by Terraform and override variables from dev.tfvars without committing secrets.
+
+key_vault_allowed_ips = ["203.0.113.42"]  # replace with your IP
+# key_vault_allow_azure_services_bypass = true  # optional override

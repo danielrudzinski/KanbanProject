@@ -37,3 +37,5 @@ hs_err_pid14848.log
 /frontend/.vite
 /frontend/coverage
 secrets.yaml
+/terraform/.terraform
+terraform/dev.local.auto.tfvars
