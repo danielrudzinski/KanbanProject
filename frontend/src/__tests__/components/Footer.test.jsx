@@ -3,6 +3,12 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Footer from '../../components/Footer';
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => key
+  })
+}));
+
 describe('Footer Component', () => {
   test('renders footer with copyright information', () => {
     render(<Footer />);
@@ -16,9 +22,9 @@ describe('Footer Component', () => {
   test('renders footer links', () => {
     render(<Footer />);
     
-    expect(screen.getByText('Pomoc')).toBeInTheDocument();
-    expect(screen.getByText('O nas')).toBeInTheDocument();
-    expect(screen.getByText('Kontakt')).toBeInTheDocument();
+  expect(screen.getByText('footer.help')).toBeInTheDocument();
+  expect(screen.getByText('footer.about')).toBeInTheDocument();
+  expect(screen.getByText('footer.contact')).toBeInTheDocument();
   });
   
   test('renders links as anchor elements', () => {
