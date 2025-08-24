@@ -151,7 +151,7 @@ export function KanbanProvider({ children }) {
     }
   };
 
-  const handleAddTask = async (title, columnId, deadline = null) => {
+  const handleAddTask = async (title, columnId, deadline = null, rowId = null) => {
     try {
       if (!columns || columns.length === 0) {
         const errorMessage = t('notifications.noColumnError');
@@ -163,16 +163,22 @@ export function KanbanProvider({ children }) {
       
       const targetColumnId = columnId || columns[0].id;
       const newTask = await addTask(title, targetColumnId, deadline);
-      
-      if (rows.length > 0) {
+
+      // Prefer explicit row if provided; otherwise fallback to first row when available
+      let finalTask = newTask;
+      const hasRows = rows && rows.length > 0;
+      const validProvidedRow = rowId && (rows?.some(r => String(r.id) === String(rowId)));
+
+      if (validProvidedRow) {
+        await updateTaskRow(newTask.id, rowId);
+        finalTask = { ...newTask, rowId };
+      } else if (hasRows) {
         const targetRowId = rows[0].id;
         await updateTaskRow(newTask.id, targetRowId);
-        
-        const updatedTask = { ...newTask, rowId: targetRowId };
-        setTasks(prevTasks => [...prevTasks, updatedTask]);
-      } else {
-        setTasks(prevTasks => [...prevTasks, newTask]);
+        finalTask = { ...newTask, rowId: targetRowId };
       }
+
+      setTasks(prevTasks => [...prevTasks, finalTask]);
       
       await refreshTasks();
       toast.success(t('notifications.taskAdded', { title }));

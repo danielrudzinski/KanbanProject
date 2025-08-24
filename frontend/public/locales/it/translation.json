@@ -34,7 +34,8 @@
       "editDeadline": "Modifica scadenza",
       "noDeadline": "Nessuna scadenza",
       "columnHistory": "Cronologia colonna",
-      "upcoming": "In arrivo"
+      "upcoming": "In arrivo",
+      "addTaskHere": "+ Aggiungi attività qui"
     },
     "board": {
       "loading": "Caricamento bacheca kanban...",
@@ -75,14 +76,16 @@
       "wipExceeded": "superato!",
       "noLimit": "Nessun limite",
       "taskCount": "Attività",
-      "delete": "Elimina colonna"
+      "delete": "Elimina colonna",
+      "add": "Aggiungi colonna"
     },
     "row": {
       "deleteConfirm": "Sei sicuro di voler eliminare questa riga?",
       "delete": "Elimina riga",
       "wipLimit": "Limite",
       "wipExceeded": "superato!",
-      "lastRowWarning": "Impossibile eliminare l'ultima riga."
+      "lastRowWarning": "Impossibile eliminare l'ultima riga.",
+      "add": "Aggiungi riga"
     },
     "header": {
       "addTask": "Aggiungi attività",
@@ -153,7 +156,10 @@
         "selectColumn": "Seleziona una colonna",
         "columnHelp": "Opzionale. Le attività senza colonna appariranno nel backlog.",
         "deadlineLabel": "Scadenza:",
-        "deadlineHelp": "Opzionale. Le attività saranno contrassegnate come scadute quando la scadenza passa."
+        "deadlineHelp": "Opzionale. Le attività saranno contrassegnate come scadute quando la scadenza passa.",
+        "rowLabel": "Riga:",
+        "selectRow": "Seleziona una riga",
+        "rowHelp": "Opzionale. Predefinita la prima riga se non selezionata."
       },
       "deleteUser": "Elimina utente"
     },
@@ -258,5 +264,10 @@
       "noMessages": "Ancora nessun messaggio",
       "userJoined": "{{user}} si è unito alla chat",
       "userLeft": "{{user}} ha lasciato la chat"
+    },
+    "footer": {
+      "help": "Guida",
+      "about": "Chi siamo",
+      "contact": "Contatto"
     }
   }

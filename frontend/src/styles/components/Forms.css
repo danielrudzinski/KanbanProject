@@ -22,8 +22,7 @@ html.dark .form-container {
 }
 
 .form-container:hover {
-  box-shadow: 0 15px 35px rgba(134, 214, 255, 0.25);
-  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(14, 27, 54, 0.18);
 }
 
 html.dark .form-container:hover {
@@ -142,9 +141,8 @@ html.dark .form-group select {
 .form-group select:focus {
   border-color: #3a86ff;
   outline: none;
-  box-shadow: 0 0 0 4px rgba(58, 134, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.15);
   background-color: #ffffff;
-  transform: translateY(-2px);
 }
 
 html.dark .form-group input:focus,
@@ -457,6 +455,17 @@ html.dark .modal-overlay {
   }
 }
 
+/* Centered modal container */
+.form-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 420px;
+  width: 92vw;
+  z-index: 1001;
+}
+
 @keyframes errorShake {
   10%, 90% {
     transform: translate3d(-1px, 0, 0);
@@ -548,6 +557,7 @@ html.dark .modal-overlay {
   .modal-overlay {
     padding: 10px;
   }
+  .form-modal { width: 96vw; max-width: 520px; }
 }
 
 /* System Dark Mode Support */

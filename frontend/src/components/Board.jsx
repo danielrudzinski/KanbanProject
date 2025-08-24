@@ -1,12 +1,15 @@
 import { useKanban } from '../context/KanbanContext';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Task from './Task';
 import EditableText from './EditableText';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import '../styles/components/Board.css';
+import AddTaskForm from './AddTaskForm';
+import AddRowColumnForm from './AddRowColumnForm';
 
 function Board() {
+  const [addContext, setAddContext] = useState({ type: null, columnId: null, rowId: null });
   const { 
     columns, 
     rows, 
@@ -229,7 +232,7 @@ function Board() {
             type="row"
           />
         </div>
-        <div className="row-actions">
+  <div className="row-actions">
           <span className="task-count">{row.taskCount || 0}</span>
           {row.wipLimit > 0 && (
             <span className={`wip-limit ${row.isOverLimit ? 'exceeded' : ''}`}>
@@ -285,7 +288,7 @@ function Board() {
             type="column"
           />
         </div>
-        <div className="column-actions">
+  <div className="column-actions">
           <span className="task-count">{columnTaskCount}</span>
           {column.wipLimit > 0 && (
             <span className={`wip-limit ${isOverLimit ? 'exceeded' : ''}`}>
@@ -339,6 +342,14 @@ function Board() {
             rowId={row.id}
           />
         ))}
+        <button
+          className="add-task-placeholder"
+          onClick={() => setAddContext({ type: 'task', columnId: column.id, rowId: row.id })}
+          title={t('taskActions.addTaskHere', 'Add task')}
+          aria-label={t('taskActions.addTaskHere', 'Add task')}
+        >
+          {t('taskActions.addTaskHere', 'Add task')}
+        </button>
       </td>
     );
   };
@@ -353,6 +364,16 @@ function Board() {
             
             {/* Column headers */}
             {enhancedColumns.map(column => renderColumnHeader(column))}
+            {/* Add column placeholder header */}
+      <th className="grid-column-header add-placeholder-header">
+              <button
+                className="add-column-btn"
+        title={t('column.add', 'Add column')}
+                onClick={() => setAddContext({ type: 'column', columnId: null, rowId: null })}
+              >
+        + {t('column.add', 'Add column')}
+              </button>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -364,10 +385,48 @@ function Board() {
               
               {/* Row cells */}
               {enhancedColumns.map(column => renderCell(column, row))}
+              {/* Trailing empty cell to align with add-column header */}
+              <td className="grid-cell" />
             </tr>
           ))}
+          {/* Add row placeholder row */}
+          <tr>
+      <td className="grid-row-header add-placeholder-row">
+              <button
+                className="add-row-btn"
+        title={t('row.add', 'Add row')}
+                onClick={() => setAddContext({ type: 'row', columnId: null, rowId: null })}
+              >
+        + {t('row.add', 'Add row')}
+              </button>
+            </td>
+            {enhancedColumns.map((column) => (
+              <td key={`add-row-empty-${column.id}`} className="grid-cell"/>
+            ))}
+            {/* Trailing empty cell for add-column header alignment */}
+            <td className="grid-cell" />
+          </tr>
         </tbody>
       </table>
+      {addContext.type === 'task' && (
+        <AddTaskForm
+          onClose={() => setAddContext({ type: null, columnId: null, rowId: null })}
+          defaultColumnId={addContext.columnId || ''}
+          defaultRowId={addContext.rowId || ''}
+        />
+      )}
+      {addContext.type === 'column' && (
+        <AddRowColumnForm
+          onClose={() => setAddContext({ type: null, columnId: null, rowId: null })}
+          defaultTab="column"
+        />
+      )}
+      {addContext.type === 'row' && (
+        <AddRowColumnForm
+          onClose={() => setAddContext({ type: null, columnId: null, rowId: null })}
+          defaultTab="row"
+        />
+      )}
     </div>
   );
 }

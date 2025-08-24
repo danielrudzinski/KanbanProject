@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { useTranslation } from 'react-i18next';
 import '../styles/components/Forms.css';
+import FormModal from './FormModal';
 
 function WipLimitControl({ onClose }) {
   const { columns, rows, updateWipLimit, updateRowWipLimit } = useKanban();
@@ -84,6 +85,7 @@ function WipLimitControl({ onClose }) {
   }
   
   return (
+    <FormModal onClose={onClose} ariaLabel={t('forms.wipLimit.title')}>
     <div className="form-container">
       <form onSubmit={handleSubmit} role="form">
         <div className="form-header">
@@ -189,6 +191,7 @@ function WipLimitControl({ onClose }) {
         </div>
       </form>
     </div>
+  </FormModal>
   );
 }
 
