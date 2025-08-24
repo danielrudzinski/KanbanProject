@@ -1,34 +1,3 @@
-variable "resource_group_name" {
-  type = string
-}
-
-variable "location" {
-  type = string
-}
-
-variable "env" {
-  type = string
-}
-
-variable "subnet_id" {
-  type = string
-}
-
-variable "key_vault_id" {
-  type = string
-}
-
-variable "admin_password" {
-  description = "The administrator password for the PostgreSQL server."
-  type        = string
-  sensitive   = true
-}
-
-variable "vnet_id" {
-  description = "The ID of the virtual network to link the private DNS zone to."
-  type        = string
-}
-
 resource "random_password" "password" {
   length           = 32
   special          = true
@@ -99,12 +68,4 @@ resource "azurerm_key_vault_secret" "postgres_connection_string" {
   name         = "POSTGRES-CONNECTION-STRING"
   value        = format("jdbc:postgresql://%s:5432/%s?sslmode=require", azurerm_postgresql_flexible_server.main.fqdn, azurerm_postgresql_flexible_server_database.main.name)
   key_vault_id = var.key_vault_id
-}
-
-output "postgres_server_name" {
-  value = azurerm_postgresql_flexible_server.main.name
-}
-
-output "postgres_db_name" {
-  value = azurerm_postgresql_flexible_server_database.main.name
 }

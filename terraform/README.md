@@ -6,52 +6,63 @@ This directory contains the Terraform configuration for deploying the Kanban pro
 
 - [Terraform CLI](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-- Logged in to Azure CLI (`az login`)
-- An Azure Storage Account to store Terraform state.
+- Logged in to Azure CLI and correct subscription selected
+- An Azure Storage Account to store Terraform state
 
 ## Setup
 
-1.  **Create Storage for Terraform State:**
-    You need to create a resource group and a storage account to store the Terraform state remotely.
+1) Azure login and subscription
 
-    ```bash
-    az group create --name tfstate-rg --location "West Europe"
-    az storage account create --name tfstatekanban --resource-group tfstate-rg --location "West Europe" --sku Standard_LRS
-    az storage container create --name tfstate --account-name tfstatekanban
-    ```
+```powershell
+az login
+# Optional: select subscription explicitly
+az account set --subscription "<subscription-id-or-name>"
+```
 
-2.  **Populate Key Vault:**
-    The application requires secrets to be stored in Azure Key Vault. The Terraform configuration creates the Key Vault and stores values provided via variables. Ensure these are provided for apply (tfvars or environment variables):
-    - `jwt_secret_key`
-    - `spring_mail_username`
-    - `spring_mail_password`
+2) Create storage for Terraform state (once per organization)
+
+```powershell
+az group create --name tfstate-rg --location "West Europe"
+az storage account create --name tfstatekanban --resource-group tfstate-rg --location "West Europe" --sku Standard_LRS
+az storage container create --name tfstate --account-name tfstatekanban
+```
+
+3) Provide required secrets/variables
+
+The app stores secrets in Azure Key Vault; values are provided to Terraform via variables:
+- `jwt_secret_key`
+- `spring_mail_username`
+- `spring_mail_password`
+
+Recommended: copy `dev.local.auto.tfvars.example` to `dev.local.auto.tfvars` and fill in values for local development (auto-loaded and usually gitignored). Alternatively, use the provided `*.tfvars` files and pass with `-var-file`.
 
 ## Deployment
 
-1.  **Initialize Terraform:**
-    Navigate to the `terraform` directory and run:
-    ```bash
-    terraform init
-    ```
+1) Initialize Terraform for a target environment by setting a distinct backend key
 
-2.  **Select Workspace:**
-    For different environments, use Terraform workspaces.
-    ```bash
-    terraform workspace select dev # for development
-    terraform workspace select prod # for production
-    ```
-    If the workspace doesn't exist, create it:
-    ```bash
-    terraform workspace new dev
-    ```
+Use a unique state key per environment instead of Terraform workspaces:
 
-3.  **Plan and Apply:**
-    Run `terraform plan` to see the changes and `terraform apply` to deploy.
-    ```bash
-    terraform plan -var-file="dev.tfvars"
-    terraform apply -var-file="dev.tfvars"
-    ```
-    For production, use `prod.tfvars`.
+```powershell
+# Development
+terraform init -reconfigure -backend-config="key=env/dev/terraform.tfstate"
+
+# Production
+terraform init -reconfigure -backend-config="key=env/prod/terraform.tfstate"
+```
+
+Note: Re-run init with `-reconfigure` and a different `key` when switching environments.
+
+2) Plan and apply
+
+```powershell
+# Development
+terraform plan  -var-file "dev.tfvars"
+terraform apply -var-file "dev.tfvars"
+
+# Production
+terraform plan  -var-file "prod.tfvars"
+terraform apply -var-file "prod.tfvars"
+```
 
 ## CI/CD
-The existing GitHub Actions workflow in `.github/workflows/kanban-cd.yml` builds and pushes the Docker image to GitHub Container Registry (public). The Container App pulls the public image without authentication. The Container App's managed identity is granted `Key Vault Secrets User` role to be able to read application secrets from Key Vault.
+The existing GitHub Actions workflow in `.github/workflows/kanban-cd.yml` builds and pushes the Docker image to GitHub Container Registry (public). The Container App pulls the public image without authentication. The Container App's managed identity is granted `Key Vault Secrets User` role to read application secrets from Key Vault.

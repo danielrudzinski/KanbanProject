@@ -1,54 +1,3 @@
-variable "resource_group_name" {
-  type = string
-}
-
-variable "location" {
-  type = string
-}
-
-variable "env" {
-  type = string
-}
-
-variable "container_app_env_id" {
-  type = string
-}
-
-variable "postgres_server_name" {
-  type = string
-}
-
-variable "postgres_db_name" {
-  type = string
-}
-
-variable "key_vault_uri" {
-  type = string
-}
-
-variable "key_vault_id" {
-  type = string
-}
-
-variable "github_repository_owner" {
-  type = string
-}
-
-variable "jwt_secret_key" {
-  type      = string
-  sensitive = true
-}
-
-variable "spring_mail_username" {
-  type      = string
-  sensitive = true
-}
-
-variable "spring_mail_password" {
-  type      = string
-  sensitive = true
-}
-
 resource "azurerm_container_app" "main" {
   name                         = "kanban-app-${var.env}"
   resource_group_name          = var.resource_group_name
@@ -194,9 +143,4 @@ resource "azurerm_key_vault_secret" "spring_mail_password" {
   name         = "SPRING-MAIL-PASSWORD"
   value        = var.spring_mail_password
   key_vault_id = var.key_vault_id
-}
-
-
-output "container_app_url" {
-  value = "https://${azurerm_container_app.main.latest_revision_fqdn}"
 }

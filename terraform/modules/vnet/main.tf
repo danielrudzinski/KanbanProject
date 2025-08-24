@@ -1,18 +1,3 @@
-variable "resource_group_name" {
-  type        = string
-  description = "The name of the resource group."
-}
-
-variable "location" {
-  type        = string
-  description = "The Azure region."
-}
-
-variable "env" {
-  type        = string
-  description = "The environment name."
-}
-
 resource "azurerm_virtual_network" "main" {
   name                = "vnet-${var.env}"
   address_space       = ["10.0.0.0/16"]
@@ -50,21 +35,4 @@ resource "azurerm_container_app_environment" "main" {
   location                   = var.location
   resource_group_name        = var.resource_group_name
   infrastructure_subnet_id   = azurerm_subnet.backend.id
-}
-
-output "backend_subnet_id" {
-  value = azurerm_subnet.backend.id
-}
-
-output "db_subnet_id" {
-  value = azurerm_subnet.db.id
-}
-
-output "container_app_env_id" {
-  value = azurerm_container_app_environment.main.id
-}
-
-output "id" {
-  description = "The ID of the virtual network."
-  value       = azurerm_virtual_network.main.id
 }
