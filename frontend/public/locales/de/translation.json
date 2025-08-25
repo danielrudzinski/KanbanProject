@@ -34,7 +34,8 @@
     "editDeadline": "Frist bearbeiten",
     "noDeadline": "Keine Frist",
     "columnHistory": "Spaltenverlauf",
-    "upcoming": "Bevorstehend"
+    "upcoming": "Bevorstehend",
+    "addTaskHere": "+ Aufgabe hier hinzufügen"
   },
   "board": {
     "loading": "Kanban-Board wird geladen...",
@@ -75,14 +76,16 @@
     "wipExceeded": "überschritten!",
     "noLimit": "Kein Limit",
     "taskCount": "Aufgaben",
-    "delete": "Spalte löschen"
+    "delete": "Spalte löschen",
+    "add": "Spalte hinzufügen"
   },
   "row": {
     "deleteConfirm": "Sind Sie sicher, dass Sie diese Zeile löschen möchten?",
     "delete": "Zeile löschen",
     "wipLimit": "Limit",
     "wipExceeded": "überschritten!",
-    "lastRowWarning": "Die letzte Zeile kann nicht gelöscht werden."
+    "lastRowWarning": "Die letzte Zeile kann nicht gelöscht werden.",
+    "add": "Zeile hinzufügen"
   },
   "header": {
     "addTask": "Aufgabe hinzufügen",
@@ -153,7 +156,10 @@
       "selectColumn": "Spalte auswählen",
       "columnHelp": "Optional. Aufgaben ohne Spalte erscheinen im Backlog.",
       "deadlineLabel": "Frist:",
-      "deadlineHelp": "Optional. Aufgaben werden als abgelaufen markiert, wenn die Frist überschritten ist."
+      "deadlineHelp": "Optional. Aufgaben werden als abgelaufen markiert, wenn die Frist überschritten ist.",
+      "rowLabel": "Zeile:",
+      "selectRow": "Zeile auswählen",
+      "rowHelp": "Optional. Standard ist die erste Zeile, wenn keine ausgewählt ist."
     },
     "deleteUser": "Benutzer löschen"
   },
@@ -258,5 +264,10 @@
     "noMessages": "Noch keine Nachrichten",
     "userJoined": "{{user}} ist dem Chat beigetreten",
     "userLeft": "{{user}} hat den Chat verlassen"
+  },
+  "footer": {
+    "help": "Hilfe",
+    "about": "Über uns",
+    "contact": "Kontakt"
   }
 }

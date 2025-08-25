@@ -113,6 +113,26 @@
   vertical-align: top;
 }
 
+.add-task-placeholder {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  background: transparent;
+  border: 1px dashed rgba(118, 119, 124, 0.4);
+  color: #76777c;
+  border-radius: 6px;
+  font-size: 12px;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.add-task-placeholder:hover {
+  background: rgba(134, 214, 255, 0.1);
+  border-color: rgba(134, 214, 255, 0.6);
+  color: #0e1b36;
+}
 /* WIP limit indicator */
 .wip-limit {
   font-size: 0.8rem;
@@ -122,6 +142,26 @@
 .wip-limit.exceeded {
   color: #0e1b36;
   font-weight: bold;
+.add-column-btn,
+.add-row-btn {
+  background: none;
+  border: 1px dashed rgba(118, 119, 124, 0.5);
+  color: #76777c;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0.15rem 0.4rem;
+  min-width: auto;
+  border-radius: 6px;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.add-column-btn:hover,
+.add-row-btn:hover {
+  background: rgba(134, 214, 255, 0.1);
+  border-color: rgba(134, 214, 255, 0.6);
+  color: #0e1b36;
+}
 }
 
 .task-count {
@@ -194,6 +234,29 @@
     background-color: #121825;
   }
   
+  .add-task-placeholder {
+    border-color: rgba(156, 163, 175, 0.4);
+    color: #9ca3af;
+  }
+
+  .add-task-placeholder:hover {
+    background: rgba(76, 201, 240, 0.08);
+    border-color: rgba(76, 201, 240, 0.5);
+    color: #e2e2e2;
+  }
+
+  .add-column-btn,
+  .add-row-btn {
+    border-color: rgba(156, 163, 175, 0.5);
+    color: #9ca3af;
+  }
+
+  .add-column-btn:hover,
+  .add-row-btn:hover {
+    background: rgba(76, 201, 240, 0.08);
+    border-color: rgba(76, 201, 240, 0.5);
+    color: #f0f4f8;
+  }
   .task-count {
     background-color: #3a3b3f;
     color: #e2e2e2;

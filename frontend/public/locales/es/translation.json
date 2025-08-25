@@ -34,7 +34,8 @@
       "editDeadline": "Editar fecha límite",
       "noDeadline": "Sin fecha límite",
       "columnHistory": "Historial de columnas",
-      "upcoming": "Próximo"
+      "upcoming": "Próximo",
+      "addTaskHere": "+ Añadir tarea aquí"
     },
     "board": {
       "loading": "Cargando tablero kanban...",
@@ -75,14 +76,16 @@
       "wipExceeded": "¡excedido!",
       "noLimit": "Sin límite",
       "taskCount": "Tareas",
-      "delete": "Eliminar columna"
+      "delete": "Eliminar columna",
+      "add": "Añadir columna"
     },
     "row": {
       "deleteConfirm": "¿Está seguro de que desea eliminar esta fila?",
       "delete": "Eliminar fila",
       "wipLimit": "Límite",
       "wipExceeded": "¡excedido!",
-      "lastRowWarning": "No se puede eliminar la última fila."
+      "lastRowWarning": "No se puede eliminar la última fila.",
+      "add": "Añadir fila"
     },
     "header": {
       "addTask": "Añadir tarea",
@@ -153,7 +156,10 @@
         "selectColumn": "Seleccione una columna",
         "columnHelp": "Opcional. Las tareas sin columna aparecerán en el backlog.",
         "deadlineLabel": "Fecha límite:",
-        "deadlineHelp": "Opcional. Las tareas se marcarán como expiradas cuando pase la fecha límite."
+        "deadlineHelp": "Opcional. Las tareas se marcarán como expiradas cuando pase la fecha límite.",
+        "rowLabel": "Fila:",
+        "selectRow": "Selecciona una fila",
+        "rowHelp": "Opcional. Por defecto la primera fila si no seleccionas."
       },
       "deleteUser": "Eliminar usuario"
     },
@@ -258,5 +264,10 @@
       "noMessages": "Aún no hay mensajes",
       "userJoined": "{{user}} se unió al chat",
       "userLeft": "{{user}} abandonó el chat"
+    },
+    "footer": {
+      "help": "Ayuda",
+      "about": "Sobre nosotros",
+      "contact": "Contacto"
     }
   }

@@ -34,7 +34,8 @@
       "editDeadline": "Modifier la date limite",
       "noDeadline": "Pas de date limite",
       "columnHistory": "Historique des colonnes",
-      "upcoming": "À venir"
+      "upcoming": "À venir",
+      "addTaskHere": "+ Ajouter une tâche ici"
     },
     "board": {
       "loading": "Chargement du tableau kanban...",
@@ -75,14 +76,16 @@
       "wipExceeded": "dépassée !",
       "noLimit": "Pas de limite",
       "taskCount": "Tâches",
-      "delete": "Supprimer la colonne"
+      "delete": "Supprimer la colonne",
+      "add": "Ajouter une colonne"
     },
     "row": {
       "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette ligne ?",
       "delete": "Supprimer la ligne",
       "wipLimit": "Limite",
       "wipExceeded": "dépassée !",
-      "lastRowWarning": "Impossible de supprimer la dernière ligne."
+      "lastRowWarning": "Impossible de supprimer la dernière ligne.",
+      "add": "Ajouter une ligne"
     },
     "header": {
       "addTask": "Ajouter une tâche",
@@ -153,7 +156,10 @@
         "selectColumn": "Sélectionnez une colonne",
         "columnHelp": "Optionnel. Les tâches sans colonne apparaîtront dans le backlog.",
         "deadlineLabel": "Date limite :",
-        "deadlineHelp": "Optionnel. Les tâches seront marquées comme expirées lorsque la date limite sera dépassée."
+        "deadlineHelp": "Optionnel. Les tâches seront marquées comme expirées lorsque la date limite sera dépassée.",
+        "rowLabel": "Ligne :",
+        "selectRow": "Sélectionner une ligne",
+        "rowHelp": "Optionnel. Par défaut la première ligne si aucune n’est sélectionnée."
       },
       "deleteUser": "Supprimer l'utilisateur"
     },
@@ -258,5 +264,10 @@
       "noMessages": "Pas encore de messages",
       "userJoined": "{{user}} a rejoint le chat",
       "userLeft": "{{user}} a quitté le chat"
+    },
+    "footer": {
+      "help": "Aide",
+      "about": "À propos",
+      "contact": "Contact"
     }
   }

@@ -34,7 +34,8 @@
     "editDeadline": "Edytuj termin",
     "noDeadline": "Brak terminu",
     "columnHistory": "Historia kolumny",
-    "upcoming": "Nadchodzące"
+    "upcoming": "Nadchodzące",
+    "addTaskHere": "+ Dodaj zadanie"
   },
   "board": {
     "loading": "Ładowanie tablicy kanban...",
@@ -75,14 +76,16 @@
     "wipExceeded": "przekroczony!",
     "noLimit": "Bez limitu",
     "taskCount": "Zadania",
-    "delete": "Usuń kolumnę"
+    "delete": "Usuń kolumnę",
+    "add": "Dodaj kolumnę"
   },
   "row": {
     "deleteConfirm": "Czy na pewno chcesz usunąć ten wiersz?",
     "delete": "Usuń wiersz",
     "wipLimit": "Limit",
     "wipExceeded": "przekroczony!",
-    "lastRowWarning": "Nie można usunąć ostatniego wiersza."
+    "lastRowWarning": "Nie można usunąć ostatniego wiersza.",
+    "add": "Dodaj wiersz"
   },
   "header": {
     "addTask": "Dodaj zadanie",
@@ -153,7 +156,10 @@
       "selectColumn": "Wybierz kolumnę",
       "columnHelp": "Opcjonalne. Zadania bez kolumny pojawią się w backlogu.",
       "deadlineLabel": "Termin:",
-      "deadlineHelp": "Opcjonalne. Zadania zostaną oznaczone jako przeterminowane po upływie terminu."
+      "deadlineHelp": "Opcjonalne. Zadania zostaną oznaczone jako przeterminowane po upływie terminu.",
+      "rowLabel": "Wiersz:",
+      "selectRow": "Wybierz wiersz",
+      "rowHelp": "Opcjonalnie. Domyślnie pierwszy wiersz, jeśli nie wybrano."
     },
     "deleteUser": "Usuń użytkownika"
   },
@@ -258,5 +264,10 @@
     "noMessages": "Brak wiadomości",
     "userJoined": "{{user}} dołączył do czatu",
     "userLeft": "{{user}} opuścił czat"
+  },
+  "footer": {
+    "help": "Pomoc",
+    "about": "O nas",
+    "contact": "Kontakt"
   }
 }

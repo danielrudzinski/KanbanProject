@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { useKanban } from '../context/KanbanContext';
 import { useTranslation } from 'react-i18next';
 import '../styles/components/Forms.css';
+import FormModal from './FormModal';
 
-function AddRowColumnForm({ onClose }) {
+function AddRowColumnForm({ onClose, defaultTab = 'column' }) {
   const { addColumn, addRow } = useKanban();
   const [name, setName] = useState('');
   const [wipLimit, setWipLimit] = useState('0');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('column'); // Default to column
+  const [activeTab, setActiveTab] = useState(defaultTab); // Default to column
   const { t } = useTranslation();
 
   const handleSubmit = async (e) => {
@@ -49,6 +50,7 @@ function AddRowColumnForm({ onClose }) {
   };
 
   return (
+    <FormModal onClose={onClose} ariaLabel={t('forms.addRowColumn.title')}>
     <div className="form-container">
       <form onSubmit={handleSubmit}>
         <div className="form-header">
@@ -129,6 +131,7 @@ function AddRowColumnForm({ onClose }) {
         </div>
       </form>
     </div>
+  </FormModal>
   );
 }
 

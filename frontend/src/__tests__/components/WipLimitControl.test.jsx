@@ -136,11 +136,13 @@ describe('WipLimitControl Component', () => {
             </KanbanContext.Provider>
         );
         
-        const form = container.querySelector('form');
-        
-        await act(async () => {
-            fireEvent.submit(form);
-        });
+        // form is rendered inside a portal (document.body) by FormModal, so query the document as a fallback
+        const form = container.querySelector('form') || document.querySelector('form');
+    
+            expect(form).not.toBeNull();
+            await act(async () => {
+                fireEvent.submit(form);
+            });
         
         expect(screen.getByText('forms.wipLimit.selectColumn')).toBeInTheDocument();
         expect(mockUpdateWipLimit).not.toHaveBeenCalled();

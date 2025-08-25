@@ -34,7 +34,8 @@
     "editDeadline": "Edit deadline",
     "noDeadline": "No deadline",
     "columnHistory": "Column history",
-    "upcoming": "Upcoming"
+    "upcoming": "Upcoming",
+    "addTaskHere": "+ Add task"
   },
   "board": {
     "loading": "Loading kanban board...",
@@ -75,14 +76,16 @@
     "wipExceeded": "exceeded!",
     "noLimit": "No limit",
     "taskCount": "Tasks",
-    "delete": "Delete column"
+    "delete": "Delete column",
+    "add": "Add column"
   },
   "row": {
     "deleteConfirm": "Are you sure you want to delete this row?",
     "delete": "Delete row",
     "wipLimit": "Limit",
     "wipExceeded": "exceeded!",
-    "lastRowWarning": "Cannot delete the last row."
+    "lastRowWarning": "Cannot delete the last row.",
+    "add": "Add row"
   },
   "header": {
     "addTask": "Add task",
@@ -153,7 +156,10 @@
       "selectColumn": "Select a column",
       "columnHelp": "Optional. Tasks without a column will appear in the backlog.",
       "deadlineLabel": "Deadline:",
-      "deadlineHelp": "Optional. Tasks will be marked as expired when the deadline passes."
+      "deadlineHelp": "Optional. Tasks will be marked as expired when the deadline passes.",
+      "rowLabel": "Row:",
+      "selectRow": "Select a row",
+      "rowHelp": "Optional. Defaults to the first row if none is selected."
     },
     "deleteUser": "Delete user"
   },
@@ -260,5 +266,10 @@
     "noMessages": "No messages yet",
     "userJoined": "{{user}} joined the chat",
     "userLeft": "{{user}} left the chat"
+  },
+  "footer": {
+    "help": "Help",
+    "about": "About",
+    "contact": "Contact"
   }
 }

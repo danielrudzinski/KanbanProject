@@ -34,7 +34,8 @@
       "editDeadline": "期限を編集",
       "noDeadline": "期限なし",
       "columnHistory": "カラム履歴",
-      "upcoming": "今後の予定"
+      "upcoming": "今後の予定",
+      "addTaskHere": "+ ここにタスクを追加"
     },
     "board": {
       "loading": "かんばんボードを読み込み中...",
@@ -75,14 +76,16 @@
       "wipExceeded": "超過！",
       "noLimit": "制限なし",
       "taskCount": "タスク",
-      "delete": "カラムを削除"
+      "delete": "カラムを削除",
+      "add": "列を追加"
     },
     "row": {
       "deleteConfirm": "この行を削除してもよろしいですか？",
       "delete": "行を削除",
       "wipLimit": "制限",
       "wipExceeded": "超過！",
-      "lastRowWarning": "最後の行は削除できません。"
+      "lastRowWarning": "最後の行は削除できません。",
+      "add": "行を追加"
     },
     "header": {
       "addTask": "タスクを追加",
@@ -153,7 +156,10 @@
         "selectColumn": "カラムを選択",
         "columnHelp": "任意。カラムのないタスクはバックログに表示されます。",
         "deadlineLabel": "期限:",
-        "deadlineHelp": "任意。期限を過ぎるとタスクは期限切れとしてマークされます。"
+        "deadlineHelp": "任意。期限を過ぎるとタスクは期限切れとしてマークされます。",
+        "rowLabel": "行:",
+        "selectRow": "行を選択",
+        "rowHelp": "任意。未選択の場合は最初の行になります。"
       },
       "deleteUser": "ユーザーを削除"
     },
@@ -258,5 +264,10 @@
       "noMessages": "まだメッセージはありません",
       "userJoined": "{{user}}がチャットに参加しました",
       "userLeft": "{{user}}がチャットを退出しました"
+    },
+    "footer": {
+      "help": "ヘルプ",
+      "about": "私たちについて",
+      "contact": "お問い合わせ"
     }
   }
