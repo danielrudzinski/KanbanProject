@@ -1011,7 +1011,7 @@ export const canTaskBeCompleted = async (taskId) => {
 
 export const getTaskColumnHistory = async (taskId) => {
   try {
-    const response = await fetch(`api/${API_ENDPOINTS.TASKS}/${taskId}/column-history`);
+    const response = await fetch(`${API_ENDPOINTS.TASKS}/${taskId}/column-history`);
     if (!response.ok) {
       throw new Error(`Error fetching task column history: ${response.status}`);
     }
