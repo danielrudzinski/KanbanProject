@@ -2,12 +2,19 @@ const API_BASE_URL = '';
 
 export const authService = {
   register: async (userData) => {
+    // map legacy captchaToken -> nested { captcha: { token } }
+    const payload = { ...userData };
+    if (payload.captchaToken) {
+      payload.captcha = { token: payload.captchaToken };
+      delete payload.captchaToken;
+    }
+
     const response = await fetch(`${API_BASE_URL}/auth/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(userData),
+      body: JSON.stringify(payload),
     });
     
     if (!response.ok) {
@@ -19,12 +26,18 @@ export const authService = {
   },
   
   login: async (credentials) => {
+    const payload = { ...credentials };
+    if (payload.captchaToken) {
+      payload.captcha = { token: payload.captchaToken };
+      delete payload.captchaToken;
+    }
+
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(credentials),
+      body: JSON.stringify(payload),
     });
     
     if (!response.ok) {
@@ -49,7 +62,12 @@ export const authService = {
       throw new Error(errorData || 'Verification failed');
     }
     
-    return await response.text();
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      return await response.json();
+    } else {
+      return await response.text();
+    }
   },
   
   resendVerificationCode: async (email) => {

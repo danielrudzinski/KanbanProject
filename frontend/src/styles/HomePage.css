@@ -45,14 +45,86 @@
   .form-group {
     margin-bottom: 1.5rem;
   }
-  
-  .form-group input {
+
+  .auth-container .form-group input {
     width: 100%;
-    padding: 10px;
+    padding: 12px 14px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 16px;
+    background: #fff;
+    color: #333;
+    box-sizing: border-box;
+    display: block;
+    line-height: 1.2;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
   }
+
+  .auth-container .form-group input:-webkit-autofill,
+  .auth-container .form-group input:-webkit-autofill:hover,
+  .auth-container .form-group input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #fff inset;
+    box-shadow: 0 0 0 1000px #fff inset;
+    -webkit-text-fill-color: #333;
+    caret-color: #333;
+  }
+
+  .auth-container .form-group input:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+
+  .recaptcha-wrapper {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 12px;
+    align-items: center;
+   min-height: 78px;
+  }
+
+  .recaptcha-wrapper > div {
+    box-sizing: border-box;
+   transform: none !important;
+    max-width: 420px;
+   transition: none !important;
+   opacity: 1 !important;
+  }
+
+  .recaptcha-wrapper.loading {
+    position: relative;
+  }
+
+  .recaptcha-inner { position: relative; }
+
+  .captcha-spinner-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    z-index: 2;
+  }
+
+  .recaptcha-wrapper.hidden {
+    height: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 12px;
+  }
+
+  .recaptcha-wrapper.hidden > div { opacity: 0 !important; pointer-events: none; }
+
+  @media (max-width: 420px) {
+    .recaptcha-wrapper { padding: 0 8px; }
+  }
+  
   
   button[type="submit"] {
     width: 100%;
@@ -74,6 +146,33 @@
     background-color: #cccccc;
     cursor: not-allowed;
   }
+
+  .auth-button {
+    width: 100%;
+    padding: 12px 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .auth-container .auth-button {
+    min-height: 48px;
+    line-height: 1.2;
+  }
+
+  .shared-submit { margin-top: 4px; }
+
+  .auth-button:hover { background-color: #0056b3; }
+  .auth-button:disabled { background-color: #cccccc; cursor: not-allowed; }
   
   .error-message {
     color: #dc3545;

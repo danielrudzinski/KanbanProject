@@ -6,8 +6,10 @@ import pl.myproject.kanbanproject2.model.User;
 import pl.myproject.kanbanproject2.response.LoginResponse;
 import pl.myproject.kanbanproject2.service.AuthenticationService;
 import pl.myproject.kanbanproject2.service.JwtService;
+import pl.myproject.kanbanproject2.service.CaptchaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 @RequestMapping("/auth")
 @RestController
@@ -15,28 +17,32 @@ public class AuthenticationController {
     private final JwtService jwtService;
 
     private final AuthenticationService authenticationService;
+    private final CaptchaService captchaService;
 
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService) {
+    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, CaptchaService captchaService) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
+        this.captchaService = captchaService;
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto) {
+    public ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto registerUserDto) {
+        captchaService.verifyOrThrow(registerUserDto.getCaptcha().getToken());
         User registeredUser = authenticationService.signup(registerUserDto);
         return ResponseEntity.ok(registeredUser);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginUserDto loginDto) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginUserDto loginDto) {
+        captchaService.verifyOrThrow(loginDto.getCaptcha().getToken());
         return ResponseEntity.ok(authenticationService.login(loginDto));
     }
 
     @PostMapping("/verify")
     public ResponseEntity<?> verifyUser(@RequestBody VerifyUserDto verifyUserDto) {
         try {
-            authenticationService.verifyUser(verifyUserDto);
-            return ResponseEntity.ok("Account verified successfully");
+            var loginResponse = authenticationService.verifyUser(verifyUserDto);
+            return ResponseEntity.ok(loginResponse);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
