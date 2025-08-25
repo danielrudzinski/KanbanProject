@@ -48,3 +48,16 @@ variable "spring_mail_password" {
   type      = string
   sensitive = true
 }
+
+variable "captcha_enabled" {
+  type = bool
+}
+
+variable "captcha_secret" {
+  type      = string
+  sensitive = true
+}
+
+variable "vite_recaptcha_site_key" {
+  type = string
+}
