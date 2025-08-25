@@ -53,3 +53,22 @@ variable "spring_mail_password" {
   type        = string
   sensitive   = true
 }
+
+variable "captcha_enabled" {
+  description = "Enable captcha verification in backend."
+  type        = bool
+  default     = true
+}
+
+variable "captcha_secret" {
+  description = "Captcha secret used by the backend (server-side verification)."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "vite_recaptcha_site_key" {
+  description = "Frontend reCAPTCHA site key (Vite env)."
+  type        = string
+  default     = ""
+}

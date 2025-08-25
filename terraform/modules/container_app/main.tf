@@ -8,36 +8,42 @@ resource "azurerm_container_app" "main" {
     azurerm_key_vault_secret.jwt_secret,
     azurerm_key_vault_secret.spring_mail_username,
     azurerm_key_vault_secret.spring_mail_password,
+    azurerm_key_vault_secret.captcha_secret,
   ]
 
   secret {
     name                 = "postgres-connection-string"
-  key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-CONNECTION-STRING")
+    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-CONNECTION-STRING")
     identity             = azurerm_user_assigned_identity.main.id
   }
   secret {
     name                 = "postgres-user"
-  key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-USER")
+    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-USER")
     identity             = azurerm_user_assigned_identity.main.id
   }
   secret {
     name                 = "postgres-password"
-  key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-PASSWORD")
+   key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-PASSWORD")
     identity             = azurerm_user_assigned_identity.main.id
   }
   secret {
     name                 = "jwt-secret-key"
-  key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "JWT-SECRET-KEY")
+    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "JWT-SECRET-KEY")
     identity             = azurerm_user_assigned_identity.main.id
   }
   secret {
     name                 = "spring-mail-username"
-  key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "SPRING-MAIL-USERNAME")
+    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "SPRING-MAIL-USERNAME")
     identity             = azurerm_user_assigned_identity.main.id
   }
   secret {
     name                 = "spring-mail-password"
-  key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "SPRING-MAIL-PASSWORD")
+    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "SPRING-MAIL-PASSWORD")
+    identity             = azurerm_user_assigned_identity.main.id
+  }
+  secret {
+    name                 = "captcha-secret"
+    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "CAPTCHA-SECRET")
     identity             = azurerm_user_assigned_identity.main.id
   }
 
@@ -71,6 +77,19 @@ resource "azurerm_container_app" "main" {
       env {
         name        = "SPRING_MAIL_PASSWORD"
         secret_name = "spring-mail-password"
+      }
+      env {
+        name  = "CAPTCHA_ENABLED"
+        value = tostring(var.captcha_enabled)
+      }
+      env {
+        name        = "CAPTCHA_SECRET"
+        secret_name = "captcha-secret"
+      }
+
+      env {
+        name  = "VITE_RECAPTCHA_SITE_KEY"
+        value = var.vite_recaptcha_site_key
       }
     }
 
@@ -142,5 +161,11 @@ resource "azurerm_key_vault_secret" "spring_mail_username" {
 resource "azurerm_key_vault_secret" "spring_mail_password" {
   name         = "SPRING-MAIL-PASSWORD"
   value        = var.spring_mail_password
+  key_vault_id = var.key_vault_id
+}
+
+resource "azurerm_key_vault_secret" "captcha_secret" {
+  name         = "CAPTCHA-SECRET"
+  value        = var.captcha_secret
   key_vault_id = var.key_vault_id
 }

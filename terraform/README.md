@@ -33,6 +33,9 @@ The app stores secrets in Azure Key Vault; values are provided to Terraform via 
 - `jwt_secret_key`
 - `spring_mail_username`
 - `spring_mail_password`
+ - `captcha_enabled`
+ - `captcha_secret`
+ - `vite_recaptcha_site_key`
 
 Recommended: copy `dev.local.auto.tfvars.example` to `dev.local.auto.tfvars` and fill in values for local development (auto-loaded and usually gitignored). Alternatively, use the provided `*.tfvars` files and pass with `-var-file`.
 

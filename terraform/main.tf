@@ -60,5 +60,9 @@ module "container_app" {
   jwt_secret_key          = var.jwt_secret_key
   spring_mail_username    = var.spring_mail_username
   spring_mail_password    = var.spring_mail_password
+  captcha_enabled         = var.captcha_enabled
+  captcha_secret          = var.captcha_secret
+  vite_recaptcha_site_key = var.vite_recaptcha_site_key
+
   depends_on              = [module.key_vault, module.postgres]
 }
