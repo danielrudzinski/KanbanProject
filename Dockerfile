@@ -1,15 +1,15 @@
 # Stage 1: Build frontend
-FROM node:20-slim AS frontend-build
+FROM node:24.6.0-alpine3.22 AS frontend-build
 WORKDIR /frontend
 COPY frontend/package*.json ./
 RUN npm ci --legacy-peer-deps
 COPY frontend/ ./
 ARG VITE_RECAPTCHA_SITE_KEY
-ENV VITE_RECAPTCHA_SITE_KEY=$VITE_RECAPTCHA_SITE_KEY
+RUN VITE_RECAPTCHA_SITE_KEY="$VITE_RECAPTCHA_SITE_KEY"
 RUN npm run build
 
 # Stage 2: Build and run the application
-FROM openjdk:23-jdk-slim
+FROM eclipse-temurin:23-jdk
 WORKDIR /app
 
 # Copy the frontend build output
