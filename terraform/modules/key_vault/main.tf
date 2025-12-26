@@ -1,20 +1,20 @@
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "main" {
-  name                        = "kv-${var.env}-kanban"
-  location                    = var.location
-  resource_group_name         = var.resource_group_name
-  tenant_id                   = data.azurerm_client_config.current.tenant_id
-  sku_name                    = "standard"
-  enabled_for_deployment      = true
-  enabled_for_disk_encryption = true
+  name                            = "kv-${var.env}-kanban"
+  location                        = var.location
+  resource_group_name             = var.resource_group_name
+  tenant_id                       = data.azurerm_client_config.current.tenant_id
+  sku_name                        = "standard"
+  enabled_for_deployment          = true
+  enabled_for_disk_encryption     = true
   enabled_for_template_deployment = true
 
   network_acls {
-  default_action             = var.network_default_action
-  bypass                     = var.allow_azure_services_bypass ? "AzureServices" : "None"
-  virtual_network_subnet_ids = [var.subnet_id]
-  ip_rules                   = var.ip_rules
+    default_action             = var.network_default_action
+    bypass                     = var.allow_azure_services_bypass ? "AzureServices" : "None"
+    virtual_network_subnet_ids = [var.subnet_id]
+    ip_rules                   = var.ip_rules
   }
 
   access_policy {

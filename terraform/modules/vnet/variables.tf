@@ -12,3 +12,9 @@ variable "env" {
   type        = string
   description = "The environment name."
 }
+
+variable "log_analytics_workspace_id" {
+  type        = string
+  description = "Log Analytics Workspace ID for Container Apps environment diagnostics."
+  default     = null
+}

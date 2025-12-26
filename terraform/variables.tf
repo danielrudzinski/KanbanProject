@@ -18,6 +18,12 @@ variable "github_repository_owner" {
   description = "The owner of the GitHub repository."
 }
 
+variable "app_image_tag" {
+  type        = string
+  description = "Tag for the application container image. Use an immutable value like a git SHA for reproducible deploys."
+  default     = "latest"
+}
+
 variable "key_vault_allowed_ips" {
   description = "Optional list of IPv4 addresses allowed to access Key Vault (dev convenience)."
   type        = list(string)
@@ -69,6 +75,12 @@ variable "captcha_secret" {
 
 variable "vite_recaptcha_site_key" {
   description = "Frontend reCAPTCHA site key (Vite env)."
+  type        = string
+  default     = ""
+}
+
+variable "alert_email" {
+  description = "Optional email address to receive Azure Monitor alerts. If empty, alerts are not created."
   type        = string
   default     = ""
 }

@@ -12,45 +12,45 @@ resource "azurerm_container_app" "main" {
   ]
 
   secret {
-    name                 = "postgres-connection-string"
-    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-CONNECTION-STRING")
-    identity             = azurerm_user_assigned_identity.main.id
+    name                = "postgres-connection-string"
+    key_vault_secret_id = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-CONNECTION-STRING")
+    identity            = azurerm_user_assigned_identity.main.id
   }
   secret {
-    name                 = "postgres-user"
-    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-USER")
-    identity             = azurerm_user_assigned_identity.main.id
+    name                = "postgres-user"
+    key_vault_secret_id = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-USER")
+    identity            = azurerm_user_assigned_identity.main.id
   }
   secret {
-    name                 = "postgres-password"
-   key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-PASSWORD")
-    identity             = azurerm_user_assigned_identity.main.id
+    name                = "postgres-password"
+    key_vault_secret_id = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "POSTGRES-PASSWORD")
+    identity            = azurerm_user_assigned_identity.main.id
   }
   secret {
-    name                 = "jwt-secret-key"
-    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "JWT-SECRET-KEY")
-    identity             = azurerm_user_assigned_identity.main.id
+    name                = "jwt-secret-key"
+    key_vault_secret_id = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "JWT-SECRET-KEY")
+    identity            = azurerm_user_assigned_identity.main.id
   }
   secret {
-    name                 = "spring-mail-username"
-    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "SPRING-MAIL-USERNAME")
-    identity             = azurerm_user_assigned_identity.main.id
+    name                = "spring-mail-username"
+    key_vault_secret_id = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "SPRING-MAIL-USERNAME")
+    identity            = azurerm_user_assigned_identity.main.id
   }
   secret {
-    name                 = "spring-mail-password"
-    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "SPRING-MAIL-PASSWORD")
-    identity             = azurerm_user_assigned_identity.main.id
+    name                = "spring-mail-password"
+    key_vault_secret_id = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "SPRING-MAIL-PASSWORD")
+    identity            = azurerm_user_assigned_identity.main.id
   }
   secret {
-    name                 = "captcha-secret"
-    key_vault_secret_id  = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "CAPTCHA-SECRET")
-    identity             = azurerm_user_assigned_identity.main.id
+    name                = "captcha-secret"
+    key_vault_secret_id = format("%s/secrets/%s", trimsuffix(var.key_vault_uri, "/"), "CAPTCHA-SECRET")
+    identity            = azurerm_user_assigned_identity.main.id
   }
 
   template {
     container {
       name   = "kanban-app"
-      image  = "ghcr.io/${var.github_repository_owner}/kanbanproject-app:latest"
+      image  = "ghcr.io/${var.github_repository_owner}/kanbanproject-app:${var.app_image_tag}"
       cpu    = 0.25
       memory = "0.5Gi"
 
@@ -97,7 +97,7 @@ resource "azurerm_container_app" "main" {
     max_replicas = 5
 
     http_scale_rule {
-      name               = "http-scale"
+      name                = "http-scale"
       concurrent_requests = "50"
     }
 

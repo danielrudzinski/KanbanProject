@@ -1,6 +1,9 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        VITE_RECAPTCHA_SITE_KEY: ${VITE_RECAPTCHA_SITE_KEY}
     ports:
       - "8080:8080"
     depends_on:
@@ -17,7 +20,7 @@ services:
       CAPTCHA_ENABLED: ${CAPTCHA_ENABLED}
       
   postgres:
-    image: postgres:latest
+    image: postgres:17
     environment:
       POSTGRES_DB: ${SPRING_DATASOURCE_DB}
       POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
