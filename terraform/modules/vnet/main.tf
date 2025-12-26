@@ -35,4 +35,5 @@ resource "azurerm_container_app_environment" "main" {
   location                   = var.location
   resource_group_name        = var.resource_group_name
   infrastructure_subnet_id   = azurerm_subnet.backend.id
+  log_analytics_workspace_id = var.log_analytics_workspace_id
 }

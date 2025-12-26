@@ -37,6 +37,12 @@ The app stores secrets in Azure Key Vault; values are provided to Terraform via 
  - `captcha_secret`
  - `vite_recaptcha_site_key`
 
+Optional (recommended):
+- `app_image_tag` - container image tag deployed to Azure Container Apps. For reproducible deployments, set this to an immutable value like the git SHA pushed by the CI pipeline.
+
+Optional (monitoring):
+- `alert_email` - if set, Terraform creates an Azure Monitor action group and basic Container Apps metric alerts (CPU + memory).
+
 Recommended: copy `dev.local.auto.tfvars.example` to `dev.local.auto.tfvars` and fill in values for local development (auto-loaded and usually gitignored). Alternatively, use the provided `*.tfvars` files and pass with `-var-file`.
 
 ## Deployment
@@ -69,3 +75,8 @@ terraform apply -var-file "prod.tfvars"
 
 ## CI/CD
 The existing GitHub Actions workflow in `.github/workflows/kanban-cd.yml` builds and pushes the Docker image to GitHub Container Registry (public). The Container App pulls the public image without authentication. The Container App's managed identity is granted `Key Vault Secrets User` role to read application secrets from Key Vault.
+
+## Notes
+
+- **Postgres password generation**: the Postgres Terraform module generates the administrator password internally and stores it in Key Vault. (A previously-declared but unused `admin_password` input was removed to avoid confusion.)
+- **Logging/analytics**: a Log Analytics Workspace is created and connected to the Container Apps Environment, so Container Apps logs/metrics are available in Azure Monitor Logs.
