@@ -34,6 +34,11 @@ variable "github_repository_owner" {
   type = string
 }
 
+variable "app_image_tag" {
+  description = "Container image tag for the app."
+  type        = string
+}
+
 variable "jwt_secret_key" {
   type      = string
   sensitive = true

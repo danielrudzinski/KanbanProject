@@ -18,13 +18,13 @@ resource "azurerm_postgresql_flexible_server" "main" {
   location               = var.location
   version                = "17"
   public_network_access_enabled = false
-  delegated_subnet_id    = var.subnet_id
-  private_dns_zone_id    = azurerm_private_dns_zone.main.id
-  administrator_login    = "psqladmin"
-  administrator_password = random_password.password.result
-  zone                   = "1"
-  storage_mb             = 32768
-  sku_name               = "B_Standard_B1ms"
+  delegated_subnet_id           = var.subnet_id
+  private_dns_zone_id           = azurerm_private_dns_zone.main.id
+  administrator_login           = "psqladmin"
+  administrator_password        = random_password.password.result
+  zone                          = "1"
+  storage_mb                    = 32768
+  sku_name                      = "B_Standard_B1ms"
 
   maintenance_window {
     day_of_week  = 0
