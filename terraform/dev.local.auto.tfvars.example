@@ -9,3 +9,5 @@ jwt_secret_key =""
 captcha_enabled = true
 captcha_secret  = ""
 vite_recaptcha_site_key = ""
+app_image_tag = ""
+alert_email = "email@email.com"
