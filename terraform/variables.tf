@@ -3,6 +3,13 @@ variable "resource_group_name" {
   description = "The name of the resource group."
 }
 
+variable "subscription_id" {
+  type        = string
+  nullable    = true
+  description = "Optional Azure subscription ID used by the azurerm provider. Leave unset to use the active Azure CLI subscription (az account show)."
+  default     = null
+}
+
 variable "location" {
   type        = string
   description = "The Azure region where resources will be deployed."

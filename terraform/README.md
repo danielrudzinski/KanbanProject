@@ -27,6 +27,22 @@ az storage account create --name tfstatekanban --resource-group tfstate-rg --loc
 az storage container create --name tfstate --account-name tfstatekanban
 ```
 
+2b) Grant yourself access to the Terraform state container
+
+This project uses the `azurerm` backend with `use_azuread_auth = true`, so you need **Storage Blob data-plane** permissions on the state storage account.
+
+Assign at least `Storage Blob Data Contributor` (recommended) on the storage account scope:
+
+```powershell
+$subId = az account show --query id -o tsv
+$userObjectId = az ad signed-in-user show --query id -o tsv
+$scope = "/subscriptions/$subId/resourceGroups/tfstate-rg/providers/Microsoft.Storage/storageAccounts/tfstatekanban"
+
+az role assignment create --assignee-object-id $userObjectId --assignee-principal-type User --role "Storage Blob Data Contributor" --scope $scope
+```
+
+If you get an authorization error creating the role assignment, ask a subscription Owner/User Access Administrator to run it.
+
 3) Provide required secrets/variables
 
 The app stores secrets in Azure Key Vault; values are provided to Terraform via variables:
@@ -44,6 +60,8 @@ Optional (monitoring):
 - `alert_email` - if set, Terraform creates an Azure Monitor action group and basic Container Apps metric alerts (CPU + memory).
 
 Recommended: copy `dev.local.auto.tfvars.example` to `dev.local.auto.tfvars` and fill in values for local development (auto-loaded and usually gitignored). Alternatively, use the provided `*.tfvars` files and pass with `-var-file`.
+
+Note: the `azurerm` provider uses the active Azure CLI context by default (`use_cli = true`). If Terraform cannot determine your subscription for any reason, set `subscription_id` in `dev.local.auto.tfvars` or export `ARM_SUBSCRIPTION_ID`.
 
 ## Deployment
 
@@ -72,6 +90,8 @@ terraform apply -var-file "dev.tfvars"
 terraform plan  -var-file "prod.tfvars"
 terraform apply -var-file "prod.tfvars"
 ```
+
+Note: if you see `subscription ID could not be determined`, set `subscription_id` in `dev.local.auto.tfvars` (preferred) or export `ARM_SUBSCRIPTION_ID` in your shell.
 
 ## CI/CD
 The existing GitHub Actions workflow in `.github/workflows/kanban-cd.yml` builds and pushes the Docker image to GitHub Container Registry (public). The Container App pulls the public image without authentication. The Container App's managed identity is granted `Key Vault Secrets User` role to read application secrets from Key Vault.
