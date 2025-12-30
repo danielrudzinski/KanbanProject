@@ -39,3 +39,4 @@ hs_err_pid14848.log
 secrets.yaml
 /terraform/.terraform
 terraform/dev.local.auto.tfvars
+terraform/errored.tfstate

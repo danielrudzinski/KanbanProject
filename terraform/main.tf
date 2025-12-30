@@ -71,64 +71,13 @@ module "container_app" {
   depends_on = [module.key_vault, module.postgres]
 }
 
-resource "azurerm_monitor_action_group" "main" {
-  count               = var.alert_email != "" ? 1 : 0
-  name                = "ag-kanban-${var.env}"
-  resource_group_name = azurerm_resource_group.main.name
-  short_name          = "kanban${var.env}"
+module "diagnostics" {
+  source = "./modules/diagnostics"
 
-  email_receiver {
-    name          = "primary"
-    email_address = var.alert_email
-  }
-}
-
-resource "azurerm_monitor_metric_alert" "container_app_high_cpu" {
-  count               = var.alert_email != "" ? 1 : 0
-  name                = "kanban-${var.env}-high-cpu"
-  resource_group_name = azurerm_resource_group.main.name
-  scopes              = [module.container_app.container_app_id]
-  description         = "Average CPU usage is close to the configured limit."
-  severity            = 2
-  enabled             = true
-
-  frequency   = "PT1M"
-  window_size = "PT5M"
-
-  criteria {
-    metric_namespace = "Microsoft.App/containerApps"
-    metric_name      = "UsageNanoCores"
-    aggregation      = "Average"
-    operator         = "GreaterThan"
-    threshold        = 200000000
-  }
-
-  action {
-    action_group_id = azurerm_monitor_action_group.main[0].id
-  }
-}
-
-resource "azurerm_monitor_metric_alert" "container_app_high_memory" {
-  count               = var.alert_email != "" ? 1 : 0
-  name                = "kanban-${var.env}-high-memory"
-  resource_group_name = azurerm_resource_group.main.name
-  scopes              = [module.container_app.container_app_id]
-  description         = "Average memory working set is close to the configured limit."
-  severity            = 2
-  enabled             = true
-
-  frequency   = "PT1M"
-  window_size = "PT5M"
-
-  criteria {
-    metric_namespace = "Microsoft.App/containerApps"
-    metric_name      = "WorkingSetBytes"
-    aggregation      = "Average"
-    operator         = "GreaterThan"
-    threshold        = 450000000
-  }
-
-  action {
-    action_group_id = azurerm_monitor_action_group.main[0].id
-  }
+  env                        = var.env
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+  container_app_id           = module.container_app.container_app_id
+  container_app_env_id       = module.vnet.container_app_env_id
+  resource_group_name        = azurerm_resource_group.main.name
+  alert_email                = var.alert_email
 }
