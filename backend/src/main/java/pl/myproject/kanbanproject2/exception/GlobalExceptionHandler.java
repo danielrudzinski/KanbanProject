@@ -43,8 +43,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({BadCredentialsException.class, AuthenticationException.class})
-    @SuppressWarnings("unused")
-    public ResponseEntity<ErrorResponse> handleAuthentication(@SuppressWarnings("unused") Exception ex) {
+    public ResponseEntity<ErrorResponse> handleAuthentication(Exception ex) {
         log.debug("Authentication exception handled: {}", ex.getClass().getSimpleName());
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
@@ -54,8 +53,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    @SuppressWarnings("unused")
-    public ResponseEntity<ErrorResponse> handleAccessDenied(@SuppressWarnings("unused") AccessDeniedException ex) {
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
         log.debug("Access denied: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
