@@ -43,7 +43,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({BadCredentialsException.class, AuthenticationException.class})
-    public ResponseEntity<ErrorResponse> handleAuthentication(Exception ex) {
+    @SuppressWarnings("unused")
+    public ResponseEntity<ErrorResponse> handleAuthentication(@SuppressWarnings("unused") Exception ex) {
+        log.debug("Authentication exception handled: {}", ex.getClass().getSimpleName());
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(ErrorResponse.of(
@@ -52,7 +54,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+    @SuppressWarnings("unused")
+    public ResponseEntity<ErrorResponse> handleAccessDenied(@SuppressWarnings("unused") AccessDeniedException ex) {
+        log.debug("Access denied: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of("ACCESS_DENIED", "You do not have permission to perform this operation"));
